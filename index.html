@@ -211,6 +211,17 @@
         </div>
     </div>
 
+    <div id="leaveGroupModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="margin-top:0; color:var(--danger);">Gruppe verlassen?</h2>
+            <p>Bist du sicher, dass du diese Gruppe verlassen möchtest? Du musst neu eingeladen werden, um wieder beizutreten.</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button class="danger" onclick="executeLeaveGroup()">Verlassen</button>
+                <button onclick="document.getElementById('leaveGroupModal').classList.add('hidden')" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
@@ -365,9 +376,14 @@
             });
         }
 
+        // --- ÜBERARBEITETE LOGIK FÜR GRUPPE VERLASSEN ---
         function confirmLeaveGroup() {
-            if(!confirm("Möchtest du die Gruppe wirklich verlassen?")) return;
+            document.getElementById('leaveGroupModal').classList.remove('hidden');
+        }
+
+        function executeLeaveGroup() {
             const gid = activeChatID;
+            document.getElementById('leaveGroupModal').classList.add('hidden');
             
             // 1. Systemnachricht senden
             db.ref('groups/' + gid + '/messages').push({
@@ -392,6 +408,7 @@
                 triggerEmbed("Gruppe verlassen", "success");
             });
         }
+        // --- ENDE ÜBERARBEITETE LOGIK ---
 
         function sendMessage() {
             const t = document.getElementById('chatInput').value; if(!t) return;
