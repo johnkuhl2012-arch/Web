@@ -25,7 +25,6 @@
             overflow: hidden; 
         }
         
-        /* Standard Ansicht (für Home, Login, Register) */
         .view { 
             animation: fadeIn 0.4s; 
             width: 90%; 
@@ -40,13 +39,10 @@
             display: flex; 
             flex-direction: column; 
             box-sizing: border-box;
-            max-height: 90vh; /* Verhindert Überlaufen auf kleinen Screens */
+            max-height: 90vh; 
         }
 
-        /* Große Ansicht (Nur für eingeloggte User: MainView, Chat, Settings) */
-        .view-large { 
-            height: 85vh; 
-        }
+        .view-large { height: 85vh; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -105,6 +101,7 @@
         .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; position: relative; }
         .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
         .msg .del-btn { float: right; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
+        .system-msg { color: var(--danger); font-weight: bold; text-align: center; border: none; background: transparent; }
         
         .del-confirm { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--danger); border-radius: 5px; margin-top: 5px; padding: 5px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; }
         .del-confirm button { padding: 4px 8px; font-size: 0.7rem; }
@@ -215,7 +212,6 @@
     </div>
 
     <script>
-        // FIREBASE CONFIG & LOGIK (Unverändert)
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
             authDomain: "johnchat-97cbf.firebaseapp.com",
@@ -282,7 +278,7 @@
                 const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
                 if(data.groups) Object.keys(data.groups).forEach(gid => {
                     db.ref('groups/'+gid+'/name').once('value', s => {
-                        gList.innerHTML += `<div class="friend-item"><span>👥 ${s.val()}</span><button onclick="openChat('${gid}', true, '${s.val()}')">Chat</button></div>`;
+                        if(s.exists()) gList.innerHTML += `<div class="friend-item"><span>👥 ${s.val()}</span><button onclick="openChat('${gid}', true, '${s.val()}')">Chat</button></div>`;
                     });
                 });
             });
@@ -349,12 +345,13 @@
                 const box = document.getElementById('messageBox'); box.innerHTML = "";
                 snap.forEach(m => {
                     const d = m.val(), key = m.key;
+                    let isSystem = d.from === "SYSTEM";
                     let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
-                    let delBtn = (d.from === currentUser || currentUser.toLowerCase() === "knödel") ? `<span class="del-btn" onclick="showInlineConfirm('${key}')">🗑️</span>` : "";
+                    let delBtn = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === "knödel")) ? `<span class="del-btn" onclick="showInlineConfirm('${key}')">🗑️</span>` : "";
                     
                     box.innerHTML += `
-                        <div class="msg" id="msg-${key}">
-                            <b>${formatName(d.from)}:</b><br>${content}${delBtn}
+                        <div class="msg ${isSystem ? 'system-msg' : ''}" id="msg-${key}">
+                            ${isSystem ? '' : `<b>${formatName(d.from)}:</b><br>`}${content}${delBtn}
                             <div id="confirm-${key}" class="del-confirm hidden">
                                 <span>Löschen?</span>
                                 <div>
@@ -365,6 +362,34 @@
                         </div>`;
                 });
                 box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function confirmLeaveGroup() {
+            if(!confirm("Möchtest du die Gruppe wirklich verlassen?")) return;
+            const gid = activeChatID;
+            
+            // 1. Systemnachricht senden
+            db.ref('groups/' + gid + '/messages').push({
+                from: "SYSTEM",
+                txt: `${currentUser} hat die Gruppe verlassen`,
+                type: 'text'
+            });
+
+            // 2. Aus User-Liste entfernen
+            db.ref('users/' + currentUser + '/groups/' + gid).remove();
+
+            // 3. Aus Gruppen-Mitgliederliste entfernen
+            db.ref('groups/' + gid + '/members').once('value', snap => {
+                let members = snap.val() || [];
+                let updated = members.filter(m => m !== currentUser);
+                if(updated.length === 0) {
+                    db.ref('groups/' + gid).remove(); // Letzter verlässt -> Gruppe löschen
+                } else {
+                    db.ref('groups/' + gid + '/members').set(updated);
+                }
+                showView('mainView');
+                triggerEmbed("Gruppe verlassen", "success");
             });
         }
 
