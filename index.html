@@ -8,160 +8,152 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
-        :root { 
-            --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; 
-            --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; 
-        }
+        :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; }
         .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
         
-        * { box-sizing: border-box; }
-
+        /* Verhindert Scrollen des Bodys und fixiert das Layout */
         html, body { 
             height: 100%; width: 100%; margin: 0; padding: 0; 
-            overflow: hidden; position: fixed; font-family: 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg); color: var(--txt);
-            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; position: fixed;
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); color: var(--txt); 
+            display: flex; justify-content: center; align-items: center; 
         }
-        
-        /* Responsive View Container */
+
+        /* Die Haupt-Box: Skaliert jetzt dynamisch */
         .view { 
-            animation: fadeIn 0.3s ease; 
-            width: 92vw; 
-            max-width: 400px; /* Begrenzt Breite im Querformat */
-            height: 85vh; 
-            max-height: 700px; /* Verhindert zu massive UI auf großen Screens */
+            animation: fadeIn 0.4s; 
+            width: 95vw;           /* 95% der Bildschirmbreite */
+            max-width: 420px;      /* Aber maximal 420px (perfekt für Querformat/Desktop) */
+            height: 92vh;          /* 92% der Bildschirmlänge */
+            max-height: 800px;     /* Deckelung für sehr lange Screens */
             background: var(--cont); 
             border: 1px solid var(--brd); 
-            border-radius: 15px; 
-            padding: 15px; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
-            display: flex; flex-direction: column; 
-            position: relative;
+            border-radius: 20px; 
+            padding: 15px;         /* Etwas kleineres Padding für mehr Platz */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            text-align: center; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box;
         }
 
-        /* Anpassung für Querformat auf Handys */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .view { height: 95vh; padding: 10px; }
-            h1, h2 { font-size: 1.2rem; margin: 5px 0; }
+        /* Responsive Anpassung für sehr kleine Handys oder Querformat */
+        @media (max-height: 500px) {
+            .view { height: 98vh; padding: 10px; }
+            h1 { font-size: 1.2rem; margin: 5px; }
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        h1, h2, h3 { margin: 10px 0; font-size: 1.4rem; }
-        
-        button { 
-            padding: 10px; border: none; border-radius: 8px; 
-            background: var(--main); color: white; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; flex-shrink: 0; font-size: 0.9rem;
-        }
-        button:active { transform: scale(0.95); }
+        button { padding: 10px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        button:hover { opacity: 0.9; }
         button.secondary { background: #747f8d; }
         
-        input { 
-            width: 100%; padding: 10px; margin: 5px 0; 
-            border: 1px solid var(--brd); border-radius: 8px; 
-            background: var(--cont); color: var(--txt); flex-shrink: 0;
-            font-size: 0.9rem;
-        }
-        
+        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; flex-shrink: 0; }
         .hidden { display: none !important; }
 
-        /* Scroll-Bereiche */
-        #messageBox, #scrollAreaMain, .member-grid, .agb-content {
-            flex: 1; overflow-y: auto; overflow-x: hidden;
-            border-radius: 8px; margin: 8px 0; padding: 5px;
-            -webkit-overflow-scrolling: touch; /* Sanftes Scrollen iOS */
-        }
-
-        #messageBox { background: rgba(0,0,0,0.02); border: 1px solid var(--brd); display: flex; flex-direction: column; gap: 6px; }
-        .msg { padding: 6px 10px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; font-size: 0.85rem; }
-
-        /* Modal Overlay */
+        /* Modal für Gruppen */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
             display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-card {
-            background: var(--cont); width: 85%; max-width: 350px;
-            max-height: 80vh; padding: 15px; border-radius: 15px;
+            background: var(--cont); width: 90%; max-width: 380px;
+            max-height: 85vh; padding: 20px; border-radius: 20px;
             display: flex; flex-direction: column;
         }
 
-        .member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.03); }
-        .member-card { font-size: 0.8rem; padding: 8px; border: 1px solid var(--brd); border-radius: 6px; display: flex; align-items: center; gap: 5px; background: var(--bg); }
-
-        .chat-input-area { display: flex; gap: 5px; padding-top: 5px; }
-        
-        #customAlert { 
-            position: fixed; top: 10px; left: 50%; transform: translateX(-50%); 
-            padding: 10px 20px; border-radius: 20px; color: white; 
-            font-size: 0.8rem; z-index: 9999; display: none; white-space: nowrap;
+        /* Scrollbereiche optimiert */
+        #messageBox, #scrollAreaMain, .member-grid { 
+            flex: 1; 
+            overflow-y: auto; 
+            margin: 10px 0; 
+            padding: 5px;
+            border-radius: 8px;
         }
+        
+        #messageBox { border: 1px solid var(--brd); background: rgba(0,0,0,0.02); text-align: left; display: flex; flex-direction: column; gap: 8px; }
+
+        .agb-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.85rem; margin: 10px 0; }
+        
+        #agbEmbed { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--cont); border-radius: 20px; padding: 20px; 
+            box-sizing: border-box; z-index: 100; display: flex; flex-direction: column; 
+        }
+
+        /* UI Elemente */
+        .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; font-size: 0.9rem; }
+        .member-card { background: var(--cont); border: 1px solid var(--brd); border-radius: 10px; padding: 8px; display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.8rem; }
+        .friend-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--brd); align-items: center; font-size: 0.9rem; }
+        .chat-input-area { display: flex; gap: 5px; align-items: center; flex-shrink: 0; padding-top: 5px; }
     </style>
 </head>
 <body>
 
+    <div id="systemEmbed"></div>
     <div id="customAlert"></div>
 
     <div id="homeView" class="view">
         <h1>John Chat</h1>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top: auto; margin-bottom: auto;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
             <button onclick="showView('loginView')">Anmelden</button>
             <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
     </div>
 
     <div id="registerView" class="view hidden">
-        <h2>Konto erstellen</h2>
+        <h1>Konto erstellen</h1>
         <input type="text" id="regUser" placeholder="Benutzername">
         <input type="password" id="regPass" placeholder="Passwort">
-        <div style="font-size: 0.75rem; margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 5px;">
-            <input type="checkbox" id="agbCheck" style="width: auto;">
-            <span>Akzeptiere <span style="color:var(--main); cursor:pointer;" onclick="toggleAgb(true)">AGB</span></span>
+        <div class="agb-row">
+            <input type="checkbox" id="agbCheck">
+            <span>Ich akzeptiere die <span style="color:var(--main); cursor:pointer; text-decoration:underline;" onclick="toggleAgb(true)">AGB</span></span>
         </div>
-        <button onclick="register()">Registrieren</button>
-        <button onclick="showView('homeView')" class="secondary" style="margin-top:5px;">Zurück</button>
+        <button onclick="register()">Konto erstellen</button>
+        <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
         
-        <div id="agbEmbed" class="view hidden" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10;">
-            <h3>AGB</h3>
-            <div class="agb-content">
-                <p>1. Privates Projekt.</p>
-                <p>2. Keine Beleidigungen.</p>
-                <p>3. Daten werden bei Firebase gespeichert.</p>
+        <div id="agbEmbed" class="hidden">
+            <h2>Regeln</h2>
+            <div style="overflow-y:auto; flex:1; text-align:left; font-size:0.8rem;">
+                <p>1. Projekt-Status: Privat.</p>
+                <p>2. Moderation: Vorhanden.</p>
+                <p>3. Daten: Firebase.</p>
             </div>
-            <button onclick="toggleAgb(false)">OK</button>
+            <button onclick="toggleAgb(false)">Schließen</button>
         </div>
     </div>
 
     <div id="loginView" class="view hidden">
-        <h2>Login</h2>
+        <h1>Login</h1>
         <input type="text" id="loginUser" placeholder="Benutzername">
         <input type="password" id="loginPass" placeholder="Passwort">
         <button onclick="login()">Einloggen</button>
-        <button onclick="showView('homeView')" class="secondary" style="margin-top:5px;">Zurück</button>
+        <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
     </div>
 
     <div id="mainView" class="view hidden">
-        <h3 id="userGreeting" style="margin-bottom:5px;">Hi</h3>
-        <div style="display:flex; gap:5px;">
-            <input type="text" id="targetFriend" placeholder="User adden...">
-            <button onclick="sendRequest()">+</button>
-        </div>
-        <button onclick="openGroupCreator()" class="secondary" style="margin: 5px 0;">+ Gruppe erstellen</button>
+        <h2 id="userGreeting">Hi</h2>
+        <input type="text" id="targetFriend" placeholder="Username adden...">
+        <button onclick="sendRequest()">Adden</button>
+        <button onclick="openGroupCreator()" class="secondary" style="margin-top:10px;">+ Gruppe erstellen</button>
         
         <div id="scrollAreaMain">
             <div id="pendingRequests"></div>
             <div id="friendsList"></div>
             <div id="groupsList"></div>
         </div>
-        <button onclick="logout()" class="secondary">Logout</button>
+        
+        <button onclick="logout()" class="secondary">Abmelden</button>
     </div>
 
     <div id="groupCreator" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>Neue Gruppe</h3>
-            <input type="text" id="newGroupName" placeholder="Name">
+            <h2>Neue Gruppe</h2>
+            <input type="text" id="newGroupName" placeholder="Gruppenname">
             <div id="groupMembersList" class="member-grid"></div>
             <button onclick="createGroup()">Erstellen</button>
             <button onclick="closeGroupCreator()" class="secondary" style="margin-top:5px;">Abbrechen</button>
@@ -169,18 +161,17 @@
     </div>
 
     <div id="chatWindow" class="view hidden">
-        <h3 id="chatWithTitle" style="font-size:1.1rem; margin-bottom:5px;">Chat</h3>
+        <h3 id="chatWithTitle">Chat</h3>
         <div id="messageBox"></div>
         <div class="chat-input-area">
-            <label style="cursor:pointer; padding: 5px;">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
-            <input type="text" id="chatInput" placeholder="Text...">
-            <button onclick="sendMessage()" style="min-width:45px;">></button>
+            <label style="cursor:pointer; font-size:1.2rem;">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
+            <input type="text" id="chatInput" placeholder="Nachricht...">
+            <button onclick="sendMessage()" style="width:50px;">></button>
         </div>
-        <button onclick="showView('mainView')" class="secondary" style="margin-top:5px;">Zurück</button>
+        <button onclick="showView('mainView')" class="secondary" style="margin-top:10px;">Zurück</button>
     </div>
 
     <script>
-        // FIREBASE BLEIBT GLEICH
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
             authDomain: "johnchat-97cbf.firebaseapp.com",
@@ -194,24 +185,12 @@
         const db = firebase.database();
         let currentUser = null, activeChatID = null, isGroup = false;
 
-        function showView(id) { 
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
-            document.getElementById(id).classList.remove('hidden'); 
-        }
-
+        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
         function toggleAgb(s) { document.getElementById('agbEmbed').classList.toggle('hidden', !s); }
-
-        function showAlert(msg, type) { 
-            const el = document.getElementById('customAlert'); 
-            el.innerText = msg; el.style.display = 'block'; 
-            el.style.background = type === "danger" ? "var(--danger)" : "var(--success)"; 
-            setTimeout(() => el.style.display = 'none', 2500); 
-        }
-
-        // LOGIN / LOGIK (Kompakt gehalten)
+        function showAlert(msg, type) { const el = document.getElementById('customAlert'); el.innerText = msg; el.style.display = 'block'; el.style.background = type === "danger" ? "var(--danger)" : "var(--success)"; setTimeout(() => el.style.display = 'none', 3000); }
+        
         function login() {
             const user = document.getElementById('loginUser').value.trim().toLowerCase(), pass = document.getElementById('loginPass').value;
-            if(!user || !pass) return;
             db.ref('users/' + user).get().then(snap => {
                 const data = snap.val();
                 if(data && data.pass === pass) {
@@ -225,12 +204,12 @@
         function startSync() {
             db.ref('users/' + currentUser).on('value', snap => {
                 const data = snap.val(); if(!data) return;
-                const fList = document.getElementById('friendsList'); fList.innerHTML = "<b>Freunde</b>";
-                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:5px; border-bottom:1px solid #eee; font-size:0.85rem;">${f} <button onclick="openChat('${f}', false)" style="padding:4px 8px;">Chat</button></div>`);
-                const gList = document.getElementById('groupsList'); gList.innerHTML = "<b style='display:block; margin-top:10px;'>Gruppen</b>";
+                const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
+                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div class="friend-item"><span>${f}</span><button onclick="openChat('${f}', false)">Chat</button></div>`);
+                const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
                 if(data.groups) Object.keys(data.groups).forEach(gid => {
                     db.ref('groups/'+gid+'/name').once('value', s => {
-                        gList.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:5px; border-bottom:1px solid #eee; font-size:0.85rem;">👥 ${s.val()} <button onclick="openChat('${gid}', true, '${s.val()}')" style="padding:4px 8px;">Chat</button></div>`;
+                        gList.innerHTML += `<div class="friend-item"><span>👥 ${s.val()}</span><button onclick="openChat('${gid}', true, '${s.val()}')">Chat</button></div>`;
                     });
                 });
             });
@@ -241,12 +220,11 @@
             document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : id;
             showView('chatWindow');
             const path = isG ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-            db.ref(path).off();
             db.ref(path).on('value', snap => {
                 const box = document.getElementById('messageBox'); box.innerHTML = "";
                 snap.forEach(m => {
                     const d = m.val();
-                    box.innerHTML += `<div class="msg"><b>${d.from}:</b> ${d.txt}</div>`;
+                    box.innerHTML += `<div class="msg"><b>${d.from}:</b><br>${d.txt}</div>`;
                 });
                 box.scrollTop = box.scrollHeight;
             });
