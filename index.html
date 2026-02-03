@@ -1,1 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>John Chat Global</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
+    <style>
+        :root { 
+            --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; 
+            --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; 
+        }
+        .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
+        
+        * { box-sizing: border-box; }
+
+        html, body { 
+            height: 100%; width: 100%; margin: 0; padding: 0; 
+            overflow: hidden; position: fixed; font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg); color: var(--txt);
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        /* Responsive View Container */
+        .view { 
+            animation: fadeIn 0.3s ease; 
+            width: 92vw; 
+            max-width: 400px; /* Begrenzt Breite im Querformat */
+            height: 85vh; 
+            max-height: 700px; /* Verhindert zu massive UI auf großen Screens */
+            background: var(--cont); 
+            border: 1px solid var(--brd); 
+            border-radius: 15px; 
+            padding: 15px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
+            display: flex; flex-direction: column; 
+            position: relative;
+        }
+
+        /* Anpassung für Querformat auf Handys */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .view { height: 95vh; padding: 10px; }
+            h1, h2 { font-size: 1.2rem; margin: 5px 0; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        
+        h1, h2, h3 { margin: 10px 0; font-size: 1.4rem; }
+        
+        button { 
+            padding: 10px; border: none; border-radius: 8px; 
+            background: var(--main); color: white; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; flex-shrink: 0; font-size: 0.9rem;
+        }
+        button:active { transform: scale(0.95); }
+        button.secondary { background: #747f8d; }
+        
+        input { 
+            width: 100%; padding: 10px; margin: 5px 0; 
+            border: 1px solid var(--brd); border-radius: 8px; 
+            background: var(--cont); color: var(--txt); flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+        
+        .hidden { display: none !important; }
+
+        /* Scroll-Bereiche */
+        #messageBox, #scrollAreaMain, .member-grid, .agb-content {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            border-radius: 8px; margin: 8px 0; padding: 5px;
+            -webkit-overflow-scrolling: touch; /* Sanftes Scrollen iOS */
+        }
+
+        #messageBox { background: rgba(0,0,0,0.02); border: 1px solid var(--brd); display: flex; flex-direction: column; gap: 6px; }
+        .msg { padding: 6px 10px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; font-size: 0.85rem; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-card {
+            background: var(--cont); width: 85%; max-width: 350px;
+            max-height: 80vh; padding: 15px; border-radius: 15px;
+            display: flex; flex-direction: column;
+        }
+
+        .member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.03); }
+        .member-card { font-size: 0.8rem; padding: 8px; border: 1px solid var(--brd); border-radius: 6px; display: flex; align-items: center; gap: 5px; background: var(--bg); }
+
+        .chat-input-area { display: flex; gap: 5px; padding-top: 5px; }
+        
+        #customAlert { 
+            position: fixed; top: 10px; left: 50%; transform: translateX(-50%); 
+            padding: 10px 20px; border-radius: 20px; color: white; 
+            font-size: 0.8rem; z-index: 9999; display: none; white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="customAlert"></div>
+
+    <div id="homeView" class="view">
+        <h1>John Chat</h1>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top: auto; margin-bottom: auto;">
+            <button onclick="showView('loginView')">Anmelden</button>
+            <button onclick="showView('registerView')" class="secondary">Registrieren</button>
+        </div>
+    </div>
+
+    <div id="registerView" class="view hidden">
+        <h2>Konto erstellen</h2>
+        <input type="text" id="regUser" placeholder="Benutzername">
+        <input type="password" id="regPass" placeholder="Passwort">
+        <div style="font-size: 0.75rem; margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 5px;">
+            <input type="checkbox" id="agbCheck" style="width: auto;">
+            <span>Akzeptiere <span style="color:var(--main); cursor:pointer;" onclick="toggleAgb(true)">AGB</span></span>
+        </div>
+        <button onclick="register()">Registrieren</button>
+        <button onclick="showView('homeView')" class="secondary" style="margin-top:5px;">Zurück</button>
+        
+        <div id="agbEmbed" class="view hidden" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10;">
+            <h3>AGB</h3>
+            <div class="agb-content">
+                <p>1. Privates Projekt.</p>
+                <p>2. Keine Beleidigungen.</p>
+                <p>3. Daten werden bei Firebase gespeichert.</p>
+            </div>
+            <button onclick="toggleAgb(false)">OK</button>
+        </div>
+    </div>
+
+    <div id="loginView" class="view hidden">
+        <h2>Login</h2>
+        <input type="text" id="loginUser" placeholder="Benutzername">
+        <input type="password" id="loginPass" placeholder="Passwort">
+        <button onclick="login()">Einloggen</button>
+        <button onclick="showView('homeView')" class="secondary" style="margin-top:5px;">Zurück</button>
+    </div>
+
+    <div id="mainView" class="view hidden">
+        <h3 id="userGreeting" style="margin-bottom:5px;">Hi</h3>
+        <div style="display:flex; gap:5px;">
+            <input type="text" id="targetFriend" placeholder="User adden...">
+            <button onclick="sendRequest()">+</button>
+        </div>
+        <button onclick="openGroupCreator()" class="secondary" style="margin: 5px 0;">+ Gruppe erstellen</button>
+        
+        <div id="scrollAreaMain">
+            <div id="pendingRequests"></div>
+            <div id="friendsList"></div>
+            <div id="groupsList"></div>
+        </div>
+        <button onclick="logout()" class="secondary">Logout</button>
+    </div>
+
+    <div id="groupCreator" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Neue Gruppe</h3>
+            <input type="text" id="newGroupName" placeholder="Name">
+            <div id="groupMembersList" class="member-grid"></div>
+            <button onclick="createGroup()">Erstellen</button>
+            <button onclick="closeGroupCreator()" class="secondary" style="margin-top:5px;">Abbrechen</button>
+        </div>
+    </div>
+
+    <div id="chatWindow" class="view hidden">
+        <h3 id="chatWithTitle" style="font-size:1.1rem; margin-bottom:5px;">Chat</h3>
+        <div id="messageBox"></div>
+        <div class="chat-input-area">
+            <label style="cursor:pointer; padding: 5px;">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
+            <input type="text" id="chatInput" placeholder="Text...">
+            <button onclick="sendMessage()" style="min-width:45px;">></button>
+        </div>
+        <button onclick="showView('mainView')" class="secondary" style="margin-top:5px;">Zurück</button>
+    </div>
+
+    <script>
+        // FIREBASE BLEIBT GLEICH
+        const firebaseConfig = {
+            apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
+            authDomain: "johnchat-97cbf.firebaseapp.com",
+            databaseURL: "https://johnchat-97cbf-default-rtdb.firebaseio.com",
+            projectId: "johnchat-97cbf",
+            storageBucket: "johnchat-97cbf.firebasestorage.app",
+            messagingSenderId: "652304721979",
+            appId: "1:652304721979:web:602baf7cc4893324a6141e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let currentUser = null, activeChatID = null, isGroup = false;
+
+        function showView(id) { 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById(id).classList.remove('hidden'); 
+        }
+
+        function toggleAgb(s) { document.getElementById('agbEmbed').classList.toggle('hidden', !s); }
+
+        function showAlert(msg, type) { 
+            const el = document.getElementById('customAlert'); 
+            el.innerText = msg; el.style.display = 'block'; 
+            el.style.background = type === "danger" ? "var(--danger)" : "var(--success)"; 
+            setTimeout(() => el.style.display = 'none', 2500); 
+        }
+
+        // LOGIN / LOGIK (Kompakt gehalten)
+        function login() {
+            const user = document.getElementById('loginUser').value.trim().toLowerCase(), pass = document.getElementById('loginPass').value;
+            if(!user || !pass) return;
+            db.ref('users/' + user).get().then(snap => {
+                const data = snap.val();
+                if(data && data.pass === pass) {
+                    currentUser = user;
+                    document.getElementById('userGreeting').innerText = "Hi " + user;
+                    startSync(); showView('mainView');
+                } else showAlert("Login falsch!", "danger");
+            });
+        }
+
+        function startSync() {
+            db.ref('users/' + currentUser).on('value', snap => {
+                const data = snap.val(); if(!data) return;
+                const fList = document.getElementById('friendsList'); fList.innerHTML = "<b>Freunde</b>";
+                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:5px; border-bottom:1px solid #eee; font-size:0.85rem;">${f} <button onclick="openChat('${f}', false)" style="padding:4px 8px;">Chat</button></div>`);
+                const gList = document.getElementById('groupsList'); gList.innerHTML = "<b style='display:block; margin-top:10px;'>Gruppen</b>";
+                if(data.groups) Object.keys(data.groups).forEach(gid => {
+                    db.ref('groups/'+gid+'/name').once('value', s => {
+                        gList.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:5px; border-bottom:1px solid #eee; font-size:0.85rem;">👥 ${s.val()} <button onclick="openChat('${gid}', true, '${s.val()}')" style="padding:4px 8px;">Chat</button></div>`;
+                    });
+                });
+            });
+        }
+
+        function openChat(id, isG, gTitle) {
+            isGroup = isG; activeChatID = isG ? id : [currentUser, id].sort().join("_");
+            document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : id;
+            showView('chatWindow');
+            const path = isG ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+            db.ref(path).off();
+            db.ref(path).on('value', snap => {
+                const box = document.getElementById('messageBox'); box.innerHTML = "";
+                snap.forEach(m => {
+                    const d = m.val();
+                    box.innerHTML += `<div class="msg"><b>${d.from}:</b> ${d.txt}</div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function sendMessage() {
+            const t = document.getElementById('chatInput').value; if(!t) return;
+            const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+            db.ref(path).push({ from: currentUser, txt: t });
+            document.getElementById('chatInput').value = "";
+        }
+
+        function openGroupCreator() {
+            const list = document.getElementById('groupMembersList'); list.innerHTML = "";
+            db.ref('users/'+currentUser+'/friends').once('value', snap => {
+                snap.forEach(f => {
+                    list.innerHTML += `<label class="member-card"><input type="checkbox" class="g-member" value="${f.key}">${f.key}</label>`;
+                });
+            });
+            document.getElementById('groupCreator').classList.remove('hidden');
+        }
+
+        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden'); }
+        function logout() { location.reload(); }
+    </script>
+</body>
+</html>
