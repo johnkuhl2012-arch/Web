@@ -2,8 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>John Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>John Chat Global</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
@@ -11,12 +11,42 @@
         :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; }
         .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; transition: 0.3s; overflow: hidden; }
+        /* Vollständige Zentrierung und Fixierung des Hintergrunds */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--txt); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            height: -webkit-fill-available; /* Fix für Mobile Browser */
+            transition: 0.3s; 
+            overflow: hidden; 
+        }
         
-        .view { animation: fadeIn 0.4s; width: 90%; max-width: 420px; background: var(--cont); border: 1px solid var(--brd); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
+        /* Vereinheitlichung aller Container-Größen */
+        .view { 
+            animation: fadeIn 0.4s; 
+            width: 90%; 
+            max-width: 420px; 
+            height: 85vh; /* Einheitliche Höhe für alle */
+            background: var(--cont); 
+            border: 1px solid var(--brd); 
+            border-radius: 20px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            text-align: center; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box;
+        }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        button { padding: 12px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button { padding: 12px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
         button:hover { opacity: 0.9; transform: scale(1.02); }
         button.secondary { background: #747f8d; }
         button.danger { background: var(--danger); padding: 8px 12px; }
@@ -66,19 +96,23 @@
 
         #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 12px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
+        
+        /* Chatbereich füllt den Platz im View-Container aus */
         #messageBox { flex: 1; overflow-y: auto; border: 1px solid var(--brd); border-radius: 8px; padding: 10px; text-align: left; margin-bottom: 10px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; }
         .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; position: relative; }
         .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
         .msg .del-btn { float: right; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
         
-        /* Inline Delete Confirmation UI */
         .del-confirm { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--danger); border-radius: 5px; margin-top: 5px; padding: 5px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; }
         .del-confirm button { padding: 4px 8px; font-size: 0.7rem; }
 
         .friend-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); align-items: center; }
         .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; }
-        .chat-input-area { display: flex; gap: 5px; align-items: center; }
+        .chat-input-area { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
         .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
+        
+        /* Scroller für Listen im MainView */
+        .scroll-area { flex: 1; overflow-y: auto; border-top: 1px solid var(--brd); margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -88,7 +122,7 @@
 
     <div id="homeView" class="view">
         <h1>John Chat</h1>
-        <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; flex-direction:column; gap:10px; justify-content: center; flex: 1;">
             <button onclick="showView('loginView')">Anmelden</button>
             <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
@@ -96,14 +130,16 @@
 
     <div id="registerView" class="view hidden">
         <h1>Konto erstellen</h1>
-        <input type="text" id="regUser" placeholder="Benutzername" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
-        <input type="password" id="regPass" placeholder="Passwort">
-        <div class="agb-row">
-            <input type="checkbox" id="agbCheck">
-            <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <input type="text" id="regUser" placeholder="Benutzername" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
+            <input type="password" id="regPass" placeholder="Passwort">
+            <div class="agb-row">
+                <input type="checkbox" id="agbCheck">
+                <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
+            </div>
+            <button onclick="register()">Konto erstellen</button>
+            <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
         </div>
-        <button onclick="register()">Konto erstellen</button>
-        <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
         <div id="agbEmbed" class="hidden">
             <h2 style="color:var(--main); margin-top:0;">Regeln & Nutzung</h2>
             <div class="agb-content">
@@ -118,10 +154,12 @@
 
     <div id="loginView" class="view hidden">
         <h1>Login</h1>
-        <input type="text" id="loginUser" placeholder="Benutzername">
-        <input type="password" id="loginPass" placeholder="Passwort">
-        <button onclick="login()" style="width:100%">Einloggen</button>
-        <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <input type="text" id="loginUser" placeholder="Benutzername">
+            <input type="password" id="loginPass" placeholder="Passwort">
+            <button onclick="login()" style="width:100%">Einloggen</button>
+            <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+        </div>
     </div>
 
     <div id="mainView" class="view hidden">
@@ -133,7 +171,7 @@
         </div>
         <button onclick="openGroupCreator()" class="secondary" style="font-size:0.8rem; margin-bottom:10px;">+ Neue Gruppe erstellen</button>
         <div id="pendingRequests"></div>
-        <div style="flex:1; overflow-y:auto; border-top:1px solid var(--brd)">
+        <div class="scroll-area">
             <div id="friendsList"></div>
             <div id="groupsList"></div>
         </div>
@@ -154,8 +192,8 @@
     </div>
 
     <div id="chatWindow" class="view hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="chatWithTitle" style="margin:0; font-size:1rem;">Chat</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 id="chatWithTitle" style="margin:0; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">Chat</h3>
             <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.7rem;">Verlassen</button>
         </div>
         <div id="messageBox"></div>
@@ -169,13 +207,16 @@
 
     <div id="settingsView" class="view hidden">
         <h1>Einstellungen</h1>
-        <button onclick="toggleTheme()" style="width:100%; margin-bottom:15px;">Dunkel / Hell Modus</button>
-        <input type="password" id="setNewPass" placeholder="Neues Passwort">
-        <button onclick="changePassword()" style="width:100%">Speichern</button>
-        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <button onclick="toggleTheme()" style="width:100%; margin-bottom:15px;">Dunkel / Hell Modus</button>
+            <input type="password" id="setNewPass" placeholder="Neues Passwort">
+            <button onclick="changePassword()" style="width:100%">Speichern</button>
+            <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
+        </div>
     </div>
 
     <script>
+        // Hier folgt dein originaler Firebase-Script Teil (unverändert)
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
             authDomain: "johnchat-97cbf.firebaseapp.com",
@@ -359,14 +400,8 @@
             });
         }
 
-        // --- NEW IN-APP DELETE LOGIC ---
-        function showInlineConfirm(key) {
-            document.getElementById('confirm-' + key).classList.remove('hidden');
-        }
-
-        function hideInlineConfirm(key) {
-            document.getElementById('confirm-' + key).classList.add('hidden');
-        }
+        function showInlineConfirm(key) { document.getElementById('confirm-' + key).classList.remove('hidden'); }
+        function hideInlineConfirm(key) { document.getElementById('confirm-' + key).classList.add('hidden'); }
 
         function deleteMessage(key) {
             const path = isGroup ? 'groups/'+activeChatID+'/messages/'+key : 'chats/'+activeChatID+'/'+key;
