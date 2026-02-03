@@ -8,9 +8,22 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
-        :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; }
+        :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; --gold: #ffd700; }
         .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
         
+        /* Premium Backgrounds */
+        .bg-yellow { --bg: #fff9c4 !important; --cont: #fffde7 !important; }
+        .bg-red { --bg: #ffcdd2 !important; --cont: #ffebee !important; }
+        .bg-blue { --bg: #bbdefb !important; --cont: #e3f2fd !important; }
+        .dark-mode.bg-yellow { --bg: #4a4100 !important; --cont: #332d00 !important; }
+        .dark-mode.bg-red { --bg: #4a0000 !important; --cont: #330000 !important; }
+        .dark-mode.bg-blue { --bg: #001b4a !important; --cont: #001233 !important; }
+
+        /* Nametag Colors */
+        .name-blue { color: #2196F3 !important; }
+        .name-yellow { color: #FBC02D !important; }
+        .name-green { color: #4CAF50 !important; }
+
         html, body {
             height: 100%;
             margin: 0;
@@ -45,7 +58,7 @@
             flex-direction: column; 
             box-sizing: border-box;
             max-height: 85vh; 
-            margin: auto; /* Sorgt für Zentrierung auf Mobile */
+            margin: auto; 
         }
 
         .view-large { height: 85vh; }
@@ -56,6 +69,7 @@
         button:hover { opacity: 0.9; transform: scale(1.02); }
         button.secondary { background: #747f8d; }
         button.danger { background: var(--danger); padding: 8px 12px; }
+        button.gold-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; }
         
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; }
         .hidden { display: none !important; }
@@ -118,6 +132,48 @@
         .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
         
         .scroll-area { flex: 1; overflow-y: auto; border-top: 1px solid var(--brd); margin-top: 10px; }
+
+        /* --- CHAT PLUS STYLES --- */
+        .chat-plus-container {
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            position: relative;
+            background: linear-gradient(to bottom, rgba(255, 215, 0, 0.05), transparent);
+        }
+        .chat-plus-header {
+            color: #d4af37; /* Darker Gold */
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .plus-list { list-style: none; padding: 0; margin: 0 0 15px 0; font-size: 0.9rem; }
+        .plus-list li { margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        
+        .plus-options { display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-start; flex-wrap: wrap; }
+        .plus-option-item { 
+            width: 35px; height: 35px; border-radius: 50%; 
+            border: 2px solid var(--brd); cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            position: relative; font-size: 1.2rem;
+            transition: 0.2s;
+        }
+        /* HIER DIE UMRANDUNG WENN AUSGEWÄHLT */
+        .plus-option-item.selected { 
+            border: 3px solid var(--main); /* Dicke Umrandung */
+            transform: scale(1.15); 
+            box-shadow: 0 0 8px rgba(88, 101, 242, 0.5); 
+        }
+        
+        .plus-option-item.locked { opacity: 0.6; cursor: not-allowed; background: #ddd; }
+        .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; }
+
+        .color-swatch { width: 100%; height: 100%; border-radius: 50%; }
     </style>
 </head>
 <body>
@@ -196,8 +252,49 @@
 
     <div id="settingsView" class="view view-large hidden">
         <h1>Einstellungen</h1>
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-            <button onclick="toggleTheme()" style="width:100%; margin-bottom:15px;">Dunkel / Hell Modus</button>
+        <div class="scroll-area" style="padding-right: 5px;">
+            
+            <div class="chat-plus-container">
+                <div class="chat-plus-header">🌟 Chat Plus</div>
+                <ul class="plus-list">
+                    <li>⚙️ Erhalte Zugriff zu 3 Weiteren Hintergrund Farben</li>
+                    <li>🪧 Ändere die Farbe deines Nametags in Chats</li>
+                    <li>👀 Stelle vor deinen Namen ein Custom Emoji</li>
+                </ul>
+
+                <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
+                <div class="plus-options" id="emojiSelector">
+                    <div class="plus-option-item" data-val="" onclick="setEmoji('')">🚫</div>
+                    <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🗣️" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
+                </div>
+
+                <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
+                <div class="plus-options" id="bgSelector">
+                    <div class="plus-option-item" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
+                    <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon">🔒</span></div>
+                </div>
+
+                <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Nametag Farbe:</p>
+                <div class="plus-options" id="nameColorSelector">
+                    <div class="plus-option-item" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>
+                    <div class="plus-option-item locked" data-val="blue" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="yellow" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                </div>
+
+                <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;">
+                    <input type="text" id="plusCodeInput" placeholder="25-stelligen Code eingeben..." style="border-color: var(--gold);">
+                    <button onclick="redeemCode()" class="gold-btn" style="width:100%;">Code Einlösen</button>
+                </div>
+            </div>
+
+            <button onclick="toggleTheme()" style="width:100%; margin-bottom:10px;">Dunkel / Hell Modus</button>
             <input type="password" id="setNewPass" placeholder="Neues Passwort">
             <button onclick="changePassword()" style="width:100%">Speichern</button>
             <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
@@ -242,6 +339,25 @@
         const db = firebase.database();
         let currentUser = null, activeChatID = null, isGroup = false;
 
+        // Chat Plus Globals
+        let userHasPlus = false;
+        let myEmoji = "";
+        let myNameColor = "";
+        let myBg = "default";
+
+        // 25 Stellige Codes (Validierung)
+        const validCodes = [
+            "A1B2C3D4E5F6G7H8I9J0K1L2M", "X9Y8Z7A6B5C4D3E2F1G0H9I8J", "QWE12RTY34UIO56PAS78DFG90",
+            "MNB09VCX87ZLK65JHG43FDS21", "123ABC456DEF789GHI012JKL3", "POIU0987YTRE6543WQ21ASD00",
+            "LKMJNHBGVFCDXSZAWQER456TY", "ZAQ1XSW2CDE3VFR4BGT5NHY6M", "P0O9I8U7Y6T5R4E3W2Q1A0S9D",
+            "G8H7J6K5L4M3N2B1V0C9X8Z7A", "5TGB6YHN7UJM8IK9OL0P1QAZ2", "WSX3EDC4RFV5TGM6YHN7UJM8K",
+            "PL0OK9IJ8UH7YG6TF5RD4ES3W", "2QW3ER4TY5UI6OP7AS8DF9GH0", "0987654321QWERTYUIOPASDFG",
+            "HJKLZXCVBNM1234567890QWER", "TYUIOPASDFGHJKLZXCVBNM123", "4567890QWERTYUIOPASDFGHJK",
+            "LZXCVBNM1234567890POIUYTR", "REWQ0987654321MNBVCXZLKJH", "GFDSAPOIUYTREWQZXCVBNM098",
+            "7418529630QAZWSXEDCRFVTGB", "YHNUJMIKOLP0987654321QAZW", "SXEDCRFVTGBYHNUJMIKOLP123",
+            "321PLM654OKN987IJB000HUGY"
+        ];
+
         function triggerEmbed(text, type = "success") {
             const embed = document.getElementById('systemEmbed');
             embed.innerText = text;
@@ -266,7 +382,7 @@
             if(!user || !pass || !agbOk) return showAlert("Daten/AGB fehlen!", "danger");
             db.ref('users/' + user).get().then(snap => {
                 if(snap.exists()) showAlert("Name vergeben!", "danger");
-                else db.ref('users/' + user).set({ pass, theme: 'light' }).then(() => { showAlert("Konto erstellt!", "success"); showView('loginView'); });
+                else db.ref('users/' + user).set({ pass, theme: 'light', chatPlus: false }).then(() => { showAlert("Konto erstellt!", "success"); showView('loginView'); });
             });
         }
 
@@ -283,11 +399,21 @@
             });
         }
 
-        function logout() { currentUser = null; document.body.classList.remove('dark-mode'); showView('homeView'); }
+        function logout() { currentUser = null; document.body.classList.remove('dark-mode'); document.body.className = ""; showView('homeView'); }
 
         function startSync() {
             db.ref('users/' + currentUser).on('value', snap => {
                 const data = snap.val(); if(!data) return;
+                
+                // Chat Plus Sync
+                userHasPlus = data.chatPlus === true;
+                myEmoji = data.customEmoji || "";
+                myNameColor = data.nameColor || "";
+                myBg = data.bgGradient || "default";
+                
+                updatePlusUI();
+                applyTheme(data.theme, myBg);
+
                 const rList = document.getElementById('pendingRequests'); rList.innerHTML = "";
                 if(data.requests) Object.keys(data.requests).forEach(s => rList.innerHTML += `<div class="friend-item">${formatName(s)} addet dich <button onclick="accept('${s}')">✔</button></div>`);
                 const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
@@ -300,6 +426,80 @@
                 });
             });
         }
+
+        // --- CHAT PLUS LOGIC ---
+        function updatePlusUI() {
+            // Unlock items if user has plus
+            const items = document.querySelectorAll('.plus-option-item.locked');
+            items.forEach(el => {
+                if(userHasPlus) {
+                    el.classList.remove('locked');
+                    el.querySelector('.lock-icon').style.display = 'none';
+                    el.style.cursor = "pointer";
+                }
+            });
+
+            // Highlight Logic (Umrandung)
+            document.querySelectorAll('.plus-option-item').forEach(el => el.classList.remove('selected'));
+            
+            // Emoji Highlight
+            const emojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val='${myEmoji}']`);
+            if(emojiEl) emojiEl.classList.add('selected');
+
+            // BG Highlight
+            const bgEl = document.querySelector(`#bgSelector .plus-option-item[data-val='${myBg}']`);
+            if(bgEl) bgEl.classList.add('selected');
+
+            // Color Highlight
+            const colEl = document.querySelector(`#nameColorSelector .plus-option-item[data-val='${myNameColor}']`);
+            if(colEl) colEl.classList.add('selected');
+        }
+
+        function redeemCode() {
+            const code = document.getElementById('plusCodeInput').value.trim();
+            
+            if(!validCodes.includes(code)) {
+                triggerEmbed("Falscher Code!", "danger");
+                return;
+            }
+
+            // Check if used via Database API logic
+            db.ref('usedCodes/' + code).once('value', snap => {
+                if(snap.exists()) {
+                    triggerEmbed("Code bereits verwendet!", "danger");
+                } else {
+                    // Code is valid and fresh
+                    db.ref('usedCodes/' + code).set({ usedBy: currentUser, date: Date.now() });
+                    db.ref('users/' + currentUser + '/chatPlus').set(true).then(() => {
+                        triggerEmbed("Erfolgreich Eingelöst", "success");
+                        document.getElementById('plusCodeInput').value = "";
+                    });
+                }
+            });
+        }
+
+        function setEmoji(emoji) {
+            if(emoji !== "" && !userHasPlus) return;
+            db.ref('users/' + currentUser + '/customEmoji').set(emoji);
+        }
+
+        function setBg(bgName) {
+            if(bgName !== "default" && !userHasPlus) return;
+            db.ref('users/' + currentUser + '/bgGradient').set(bgName);
+        }
+
+        function setNameColor(color) {
+            if(color !== "" && !userHasPlus) return;
+            db.ref('users/' + currentUser + '/nameColor').set(color);
+        }
+
+        function applyTheme(baseTheme, plusBg) {
+            document.body.className = ""; // Reset
+            if(baseTheme === 'dark') document.body.classList.add('dark-mode');
+            if(plusBg && plusBg !== 'default') document.body.classList.add('bg-' + plusBg);
+        }
+
+        // --- END CHAT PLUS LOGIC ---
 
         function sendRequest() {
             const target = document.getElementById('targetFriend').value.trim().toLowerCase();
@@ -366,9 +566,17 @@
                     let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
                     let delBtn = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === "knödel")) ? `<span class="del-btn" onclick="showInlineConfirm('${key}')">🗑️</span>` : "";
                     
+                    // Chat Plus Rendering in Message
+                    let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}:</b><br>`;
+                    if(!isSystem && d.plusData) {
+                        const emoji = d.plusData.emoji || "";
+                        const colorClass = d.plusData.color ? "name-" + d.plusData.color : "";
+                        displayNameHTML = `<b class="${colorClass}">${emoji} ${formatName(d.from)}:</b><br>`;
+                    }
+
                     box.innerHTML += `
                         <div class="msg ${isSystem ? 'system-msg' : ''}" id="msg-${key}">
-                            ${isSystem ? '' : `<b>${formatName(d.from)}:</b><br>`}${content}${delBtn}
+                            ${displayNameHTML}${content}${delBtn}
                             <div id="confirm-${key}" class="del-confirm hidden">
                                 <span>Löschen?</span>
                                 <div>
@@ -414,7 +622,16 @@
         function sendMessage() {
             const t = document.getElementById('chatInput').value; if(!t) return;
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-            db.ref(path).push({ from: currentUser, txt: t, type: 'text' });
+            
+            // Mit Chat Plus Daten senden
+            const msgData = { 
+                from: currentUser, 
+                txt: t, 
+                type: 'text',
+                plusData: { emoji: myEmoji, color: myNameColor }
+            };
+            
+            db.ref(path).push(msgData);
             document.getElementById('chatInput').value = "";
         }
 
@@ -423,7 +640,13 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-                db.ref(path).push({ from: currentUser, txt: e.target.result, type: 'img' });
+                const msgData = { 
+                    from: currentUser, 
+                    txt: e.target.result, 
+                    type: 'img',
+                    plusData: { emoji: myEmoji, color: myNameColor }
+                };
+                db.ref(path).push(msgData);
             };
             if(file) reader.readAsDataURL(file);
         }
