@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>John Chat Global</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -11,50 +11,19 @@
         :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; }
         .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
         
-        /* Verhindert Scrollen des Bodys und fixiert das Layout */
-        html, body { 
-            height: 100%; width: 100%; margin: 0; padding: 0; 
-            overflow: hidden; position: fixed;
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--bg); color: var(--txt); 
-            display: flex; justify-content: center; align-items: center; 
-        }
-
-        /* Die Haupt-Box: Skaliert jetzt dynamisch */
-        .view { 
-            animation: fadeIn 0.4s; 
-            width: 95vw;           /* 95% der Bildschirmbreite */
-            max-width: 420px;      /* Aber maximal 420px (perfekt für Querformat/Desktop) */
-            height: 92vh;          /* 92% der Bildschirmlänge */
-            max-height: 800px;     /* Deckelung für sehr lange Screens */
-            background: var(--cont); 
-            border: 1px solid var(--brd); 
-            border-radius: 20px; 
-            padding: 15px;         /* Etwas kleineres Padding für mehr Platz */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            text-align: center; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box;
-        }
-
-        /* Responsive Anpassung für sehr kleine Handys oder Querformat */
-        @media (max-height: 500px) {
-            .view { height: 98vh; padding: 10px; }
-            h1 { font-size: 1.2rem; margin: 5px; }
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; transition: 0.3s; overflow: hidden; }
+        
+        .view { animation: fadeIn 0.4s; width: 90%; max-width: 420px; background: var(--cont); border: 1px solid var(--brd); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        button { padding: 10px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-        button:hover { opacity: 0.9; }
+        button { padding: 12px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
         button.secondary { background: #747f8d; }
+        button.danger { background: var(--danger); padding: 8px 12px; }
         
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; flex-shrink: 0; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; }
         .hidden { display: none !important; }
 
-        /* Modal für Gruppen */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
@@ -62,34 +31,54 @@
         }
         .modal-card {
             background: var(--cont); width: 90%; max-width: 380px;
-            max-height: 85vh; padding: 20px; border-radius: 20px;
-            display: flex; flex-direction: column;
+            padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border: 1px solid var(--brd); text-align: center;
         }
 
-        /* Scrollbereiche optimiert */
-        #messageBox, #scrollAreaMain, .member-grid { 
-            flex: 1; 
-            overflow-y: auto; 
-            margin: 10px 0; 
-            padding: 5px;
-            border-radius: 8px;
+        #systemEmbed {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            min-width: 250px; color: white; padding: 12px 25px; border-radius: 15px;
+            font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
         }
+        #systemEmbed.show { top: 20px; }
         
-        #messageBox { border: 1px solid var(--brd); background: rgba(0,0,0,0.02); text-align: left; display: flex; flex-direction: column; gap: 8px; }
+        .member-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow-y: auto; max-height: 200px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 12px; margin: 10px 0; }
+        .member-card { background: var(--cont); border: 2px solid var(--brd); border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; user-select: none; }
+        .member-card:hover { border-color: var(--main); }
+        .member-card input { display: none; }
+        .member-card.selected { background: var(--main); color: white; border-color: var(--main); }
 
-        .agb-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.85rem; margin: 10px 0; }
+        .agb-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; margin: 15px 0; padding: 10px; background: rgba(88, 101, 242, 0.05); border-radius: 10px; }
+        .agb-row input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
+        .info-blue { color: var(--main); cursor: pointer; text-decoration: underline; font-weight: bold; }
         
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--cont); border-radius: 20px; padding: 20px; 
-            box-sizing: border-box; z-index: 100; display: flex; flex-direction: column; 
+            background: var(--cont); border-radius: 20px; padding: 25px; 
+            box-sizing: border-box; z-index: 100; text-align: left; 
+            display: flex; flex-direction: column; 
         }
+        .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
+        .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
+        .agb-item strong { color: var(--main); display: block; margin-bottom: 3px; }
 
-        /* UI Elemente */
-        .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; font-size: 0.9rem; }
-        .member-card { background: var(--cont); border: 1px solid var(--brd); border-radius: 10px; padding: 8px; display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.8rem; }
-        .friend-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--brd); align-items: center; font-size: 0.9rem; }
-        .chat-input-area { display: flex; gap: 5px; align-items: center; flex-shrink: 0; padding-top: 5px; }
+        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 12px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
+        #messageBox { flex: 1; overflow-y: auto; border: 1px solid var(--brd); border-radius: 8px; padding: 10px; text-align: left; margin-bottom: 10px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; position: relative; }
+        .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
+        .msg .del-btn { float: right; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
+        
+        /* Inline Delete Confirmation UI */
+        .del-confirm { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--danger); border-radius: 5px; margin-top: 5px; padding: 5px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; }
+        .del-confirm button { padding: 4px 8px; font-size: 0.7rem; }
+
+        .friend-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); align-items: center; }
+        .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; }
+        .chat-input-area { display: flex; gap: 5px; align-items: center; }
+        .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -107,23 +96,23 @@
 
     <div id="registerView" class="view hidden">
         <h1>Konto erstellen</h1>
-        <input type="text" id="regUser" placeholder="Benutzername">
+        <input type="text" id="regUser" placeholder="Benutzername" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
         <input type="password" id="regPass" placeholder="Passwort">
         <div class="agb-row">
             <input type="checkbox" id="agbCheck">
-            <span>Ich akzeptiere die <span style="color:var(--main); cursor:pointer; text-decoration:underline;" onclick="toggleAgb(true)">AGB</span></span>
+            <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
         </div>
         <button onclick="register()">Konto erstellen</button>
         <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
-        
         <div id="agbEmbed" class="hidden">
-            <h2>Regeln</h2>
-            <div style="overflow-y:auto; flex:1; text-align:left; font-size:0.8rem;">
-                <p>1. Projekt-Status: Privat.</p>
-                <p>2. Moderation: Vorhanden.</p>
-                <p>3. Daten: Firebase.</p>
+            <h2 style="color:var(--main); margin-top:0;">Regeln & Nutzung</h2>
+            <div class="agb-content">
+                <div class="agb-item"><strong>1. Projekt-Status</strong>Dies ist ein privates Projekt (PV). Die Nutzung erfolgt auf eigene Gefahr.</div>
+                <div class="agb-item"><strong>2. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Verstößen zu prüfen.</div>
+                <div class="agb-item"><strong>3. Datenspeicherung</strong>Bilder und Nachrichten werden über Firebase Storage/Database verarbeitet.</div>
+                <div class="agb-item"><strong>4. Verhalten</strong>Respektloser Umgang führt zum sofortigen Ausschluss.</div>
             </div>
-            <button onclick="toggleAgb(false)">Schließen</button>
+            <button onclick="toggleAgb(false)" style="width:100%;">Schließen</button>
         </div>
     </div>
 
@@ -131,44 +120,59 @@
         <h1>Login</h1>
         <input type="text" id="loginUser" placeholder="Benutzername">
         <input type="password" id="loginPass" placeholder="Passwort">
-        <button onclick="login()">Einloggen</button>
-        <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
+        <button onclick="login()" style="width:100%">Einloggen</button>
+        <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
     </div>
 
     <div id="mainView" class="view hidden">
+        <span class="settings-icon" onclick="showView('settingsView')">⚙️</span>
         <h2 id="userGreeting">Hi</h2>
-        <input type="text" id="targetFriend" placeholder="Username adden...">
-        <button onclick="sendRequest()">Adden</button>
-        <button onclick="openGroupCreator()" class="secondary" style="margin-top:10px;">+ Gruppe erstellen</button>
-        
-        <div id="scrollAreaMain">
-            <div id="pendingRequests"></div>
+        <div style="background: rgba(88, 101, 242, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 10px;">
+            <input type="text" id="targetFriend" placeholder="Username adden..." style="margin:0">
+            <button onclick="sendRequest()" style="width: 100%; margin-top:5px;">Adden</button>
+        </div>
+        <button onclick="openGroupCreator()" class="secondary" style="font-size:0.8rem; margin-bottom:10px;">+ Neue Gruppe erstellen</button>
+        <div id="pendingRequests"></div>
+        <div style="flex:1; overflow-y:auto; border-top:1px solid var(--brd)">
             <div id="friendsList"></div>
             <div id="groupsList"></div>
         </div>
-        
-        <button onclick="logout()" class="secondary">Abmelden</button>
+        <button onclick="logout()" class="secondary" style="width:100%; margin-top:10px;">Abmelden</button>
     </div>
 
     <div id="groupCreator" class="modal-overlay hidden">
         <div class="modal-card">
-            <h2>Neue Gruppe</h2>
-            <input type="text" id="newGroupName" placeholder="Gruppenname">
+            <h2 style="margin-top:0; color:var(--main);">Neue Gruppe</h2>
+            <input type="text" id="newGroupName" placeholder="Name der Gruppe">
+            <p style="font-size:0.9rem; margin:15px 0 5px 0; font-weight:bold; text-align: left;">Freunde einladen:</p>
             <div id="groupMembersList" class="member-grid"></div>
-            <button onclick="createGroup()">Erstellen</button>
-            <button onclick="closeGroupCreator()" class="secondary" style="margin-top:5px;">Abbrechen</button>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button onclick="createGroup()">Gruppe erstellen</button>
+                <button onclick="closeGroupCreator()" class="secondary">Abbrechen</button>
+            </div>
         </div>
     </div>
 
     <div id="chatWindow" class="view hidden">
-        <h3 id="chatWithTitle">Chat</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="chatWithTitle" style="margin:0; font-size:1rem;">Chat</h3>
+            <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.7rem;">Verlassen</button>
+        </div>
         <div id="messageBox"></div>
         <div class="chat-input-area">
-            <label style="cursor:pointer; font-size:1.2rem;">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
-            <input type="text" id="chatInput" placeholder="Nachricht...">
+            <label class="file-label">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
+            <input type="text" id="chatInput" placeholder="Nachricht..." style="margin:0">
             <button onclick="sendMessage()" style="width:50px;">></button>
         </div>
         <button onclick="showView('mainView')" class="secondary" style="margin-top:10px;">Zurück</button>
+    </div>
+
+    <div id="settingsView" class="view hidden">
+        <h1>Einstellungen</h1>
+        <button onclick="toggleTheme()" style="width:100%; margin-bottom:15px;">Dunkel / Hell Modus</button>
+        <input type="password" id="setNewPass" placeholder="Neues Passwort">
+        <button onclick="changePassword()" style="width:100%">Speichern</button>
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
     </div>
 
     <script>
@@ -185,27 +189,56 @@
         const db = firebase.database();
         let currentUser = null, activeChatID = null, isGroup = false;
 
-        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function triggerEmbed(text, type = "success") {
+            const embed = document.getElementById('systemEmbed');
+            embed.innerText = text;
+            embed.style.background = type === "success" ? "var(--success)" : "var(--danger)";
+            embed.classList.add('show');
+            setTimeout(() => embed.classList.remove('show'), 3000);
+        }
+
+        function showAlert(msg, type = "main") {
+            const el = document.getElementById('customAlert');
+            el.innerText = msg; el.style.display = 'block';
+            el.style.background = type === "danger" ? "var(--danger)" : type === "success" ? "var(--success)" : "var(--main)";
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
         function toggleAgb(s) { document.getElementById('agbEmbed').classList.toggle('hidden', !s); }
-        function showAlert(msg, type) { const el = document.getElementById('customAlert'); el.innerText = msg; el.style.display = 'block'; el.style.background = type === "danger" ? "var(--danger)" : "var(--success)"; setTimeout(() => el.style.display = 'none', 3000); }
-        
+        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function formatName(n) { return n.toLowerCase() === "knödel" ? "👑 " + n : n; }
+
+        function register() {
+            const user = document.getElementById('regUser').value.trim().toLowerCase(), pass = document.getElementById('regPass').value, agbOk = document.getElementById('agbCheck').checked;
+            if(!user || !pass || !agbOk) return showAlert("Daten/AGB fehlen!", "danger");
+            db.ref('users/' + user).get().then(snap => {
+                if(snap.exists()) showAlert("Name vergeben!", "danger");
+                else db.ref('users/' + user).set({ pass, theme: 'light' }).then(() => { showAlert("Konto erstellt!", "success"); showView('loginView'); });
+            });
+        }
+
         function login() {
             const user = document.getElementById('loginUser').value.trim().toLowerCase(), pass = document.getElementById('loginPass').value;
             db.ref('users/' + user).get().then(snap => {
                 const data = snap.val();
                 if(data && data.pass === pass) {
                     currentUser = user;
-                    document.getElementById('userGreeting').innerText = "Hi " + user;
+                    document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
+                    if(data.theme === 'dark') document.body.classList.add('dark-mode');
                     startSync(); showView('mainView');
                 } else showAlert("Login falsch!", "danger");
             });
         }
 
+        function logout() { currentUser = null; document.body.classList.remove('dark-mode'); showView('homeView'); }
+
         function startSync() {
             db.ref('users/' + currentUser).on('value', snap => {
                 const data = snap.val(); if(!data) return;
+                const rList = document.getElementById('pendingRequests'); rList.innerHTML = "";
+                if(data.requests) Object.keys(data.requests).forEach(s => rList.innerHTML += `<div class="friend-item">${formatName(s)} addet dich <button onclick="accept('${s}')">✔</button></div>`);
                 const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
-                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div class="friend-item"><span>${f}</span><button onclick="openChat('${f}', false)">Chat</button></div>`);
+                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div class="friend-item"><span>${formatName(f)}</span><div style="display:flex; gap:5px"><button onclick="openChat('${f}', false)">Chat</button><button class="danger" onclick="unfriend('${f}')">X</button></div></div>`);
                 const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
                 if(data.groups) Object.keys(data.groups).forEach(gid => {
                     db.ref('groups/'+gid+'/name').once('value', s => {
@@ -215,16 +248,81 @@
             });
         }
 
+        function sendRequest() {
+            const target = document.getElementById('targetFriend').value.trim().toLowerCase();
+            if(!target || target === currentUser) return;
+            db.ref('users/' + target).once('value').then(snap => {
+                if (snap.exists()) {
+                    db.ref('users/' + target + '/requests/' + currentUser).set(true).then(() => {
+                        triggerEmbed("Erfolgreich gesendet", "success");
+                        document.getElementById('targetFriend').value = "";
+                    });
+                } else { triggerEmbed("Der Account ist nicht Vergeben", "danger"); }
+            });
+        }
+
+        function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true); db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
+        function unfriend(n) { db.ref('users/'+currentUser+'/friends/'+n).remove(); db.ref('users/'+n+'/friends/'+currentUser).remove(); }
+
+        function openGroupCreator() {
+            const list = document.getElementById('groupMembersList'); list.innerHTML = "";
+            db.ref('users/'+currentUser+'/friends').once('value', snap => {
+                if(!snap.exists()) {
+                    list.innerHTML = "<p style='grid-column:1/3; font-size:0.8rem;'>Du brauchst Freunde für eine Gruppe.</p>";
+                    return;
+                }
+                snap.forEach(f => {
+                    const friendName = f.key;
+                    list.innerHTML += `<label class="member-card" id="card-${friendName}"><input type="checkbox" class="g-member" value="${friendName}" onchange="toggleCardSelection('${friendName}', this)"><span style="font-size:1.2rem;">👤</span><span style="font-size:0.9rem;">${formatName(friendName)}</span></label>`;
+                });
+            });
+            document.getElementById('groupCreator').classList.remove('hidden');
+        }
+
+        function toggleCardSelection(name, checkbox) {
+            const card = document.getElementById('card-' + name);
+            if(checkbox.checked) card.classList.add('selected');
+            else card.classList.remove('selected');
+        }
+
+        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden'); }
+        
+        function createGroup() {
+            const name = document.getElementById('newGroupName').value, members = Array.from(document.querySelectorAll('.g-member:checked')).map(c => c.value);
+            if(!name || members.length < 1) return showAlert("Name/Mitglieder fehlen!", "danger");
+            members.push(currentUser);
+            const gid = "group_" + Date.now();
+            db.ref('groups/' + gid).set({ name, members });
+            members.forEach(m => db.ref('users/'+m+'/groups/'+gid).set(true));
+            closeGroupCreator();
+            showAlert("Gruppe erstellt!", "success");
+        }
+
         function openChat(id, isG, gTitle) {
             isGroup = isG; activeChatID = isG ? id : [currentUser, id].sort().join("_");
-            document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : id;
+            document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : formatName(id);
+            document.getElementById('leaveBtn').classList.toggle('hidden', !isG);
             showView('chatWindow');
             const path = isG ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+            db.ref(path).off();
             db.ref(path).on('value', snap => {
                 const box = document.getElementById('messageBox'); box.innerHTML = "";
                 snap.forEach(m => {
-                    const d = m.val();
-                    box.innerHTML += `<div class="msg"><b>${d.from}:</b><br>${d.txt}</div>`;
+                    const d = m.val(), key = m.key;
+                    let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+                    let delBtn = (d.from === currentUser || currentUser.toLowerCase() === "knödel") ? `<span class="del-btn" onclick="showInlineConfirm('${key}')">🗑️</span>` : "";
+                    
+                    box.innerHTML += `
+                        <div class="msg" id="msg-${key}">
+                            <b>${formatName(d.from)}:</b><br>${content}${delBtn}
+                            <div id="confirm-${key}" class="del-confirm hidden">
+                                <span>Löschen?</span>
+                                <div>
+                                    <button class="danger" onclick="deleteMessage('${key}')">Ja</button>
+                                    <button onclick="hideInlineConfirm('${key}')">X</button>
+                                </div>
+                            </div>
+                        </div>`;
                 });
                 box.scrollTop = box.scrollHeight;
             });
@@ -233,22 +331,51 @@
         function sendMessage() {
             const t = document.getElementById('chatInput').value; if(!t) return;
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-            db.ref(path).push({ from: currentUser, txt: t });
+            db.ref(path).push({ from: currentUser, txt: t, type: 'text' });
             document.getElementById('chatInput').value = "";
         }
 
-        function openGroupCreator() {
-            const list = document.getElementById('groupMembersList'); list.innerHTML = "";
-            db.ref('users/'+currentUser+'/friends').once('value', snap => {
-                snap.forEach(f => {
-                    list.innerHTML += `<label class="member-card"><input type="checkbox" class="g-member" value="${f.key}">${f.key}</label>`;
-                });
-            });
-            document.getElementById('groupCreator').classList.remove('hidden');
+        function sendImage() {
+            const file = document.getElementById('imgInput').files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+                db.ref(path).push({ from: currentUser, txt: e.target.result, type: 'img' });
+            };
+            if(file) reader.readAsDataURL(file);
         }
 
-        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden'); }
-        function logout() { location.reload(); }
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            db.ref('users/' + currentUser + '/theme').set(isDark ? 'dark' : 'light');
+        }
+
+        function changePassword() {
+            const newP = document.getElementById('setNewPass').value;
+            if(!newP) return triggerEmbed("Bitte Passwort eingeben", "danger");
+            db.ref('users/' + currentUser + '/pass').set(newP).then(() => {
+                document.getElementById('setNewPass').value = "";
+                triggerEmbed("Erfolgreich Geändert", "success");
+            });
+        }
+
+        // --- NEW IN-APP DELETE LOGIC ---
+        function showInlineConfirm(key) {
+            document.getElementById('confirm-' + key).classList.remove('hidden');
+        }
+
+        function hideInlineConfirm(key) {
+            document.getElementById('confirm-' + key).classList.add('hidden');
+        }
+
+        function deleteMessage(key) {
+            const path = isGroup ? 'groups/'+activeChatID+'/messages/'+key : 'chats/'+activeChatID+'/'+key;
+            db.ref(path).remove().then(() => {
+                triggerEmbed("Nachricht gelöscht", "success");
+            }).catch(e => {
+                triggerEmbed("Fehler beim Löschen", "danger");
+            });
+        }
     </script>
 </body>
 </html>
