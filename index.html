@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>John Chat</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -11,18 +11,23 @@
         :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; }
         .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
         
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: var(--bg); 
             color: var(--txt); 
-            margin: 0; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
-            height: -webkit-fill-available;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
             transition: 0.3s; 
-            overflow: hidden; 
         }
         
         .view { 
@@ -39,7 +44,8 @@
             display: flex; 
             flex-direction: column; 
             box-sizing: border-box;
-            max-height: 90vh; 
+            max-height: 85vh; 
+            margin: auto; /* Sorgt für Zentrierung auf Mobile */
         }
 
         .view-large { height: 85vh; }
@@ -376,7 +382,6 @@
             });
         }
 
-        // --- ÜBERARBEITETE LOGIK FÜR GRUPPE VERLASSEN ---
         function confirmLeaveGroup() {
             document.getElementById('leaveGroupModal').classList.remove('hidden');
         }
@@ -385,22 +390,19 @@
             const gid = activeChatID;
             document.getElementById('leaveGroupModal').classList.add('hidden');
             
-            // 1. Systemnachricht senden
             db.ref('groups/' + gid + '/messages').push({
                 from: "SYSTEM",
                 txt: `${currentUser} hat die Gruppe verlassen`,
                 type: 'text'
             });
 
-            // 2. Aus User-Liste entfernen
             db.ref('users/' + currentUser + '/groups/' + gid).remove();
 
-            // 3. Aus Gruppen-Mitgliederliste entfernen
             db.ref('groups/' + gid + '/members').once('value', snap => {
                 let members = snap.val() || [];
                 let updated = members.filter(m => m !== currentUser);
                 if(updated.length === 0) {
-                    db.ref('groups/' + gid).remove(); // Letzter verlässt -> Gruppe löschen
+                    db.ref('groups/' + gid).remove();
                 } else {
                     db.ref('groups/' + gid + '/members').set(updated);
                 }
@@ -408,7 +410,6 @@
                 triggerEmbed("Gruppe verlassen", "success");
             });
         }
-        // --- ENDE ÜBERARBEITETE LOGIK ---
 
         function sendMessage() {
             const t = document.getElementById('chatInput').value; if(!t) return;
