@@ -161,15 +161,8 @@
             border: 2px solid var(--brd); cursor: pointer; 
             display: flex; align-items: center; justify-content: center;
             position: relative; font-size: 1.2rem;
-            transition: 0.2s;
         }
-        /* HIER DIE UMRANDUNG WENN AUSGEWÄHLT */
-        .plus-option-item.selected { 
-            border: 3px solid var(--main); /* Dicke Umrandung */
-            transform: scale(1.15); 
-            box-shadow: 0 0 8px rgba(88, 101, 242, 0.5); 
-        }
-        
+        .plus-option-item.selected { border-color: var(--main); transform: scale(1.1); box-shadow: 0 0 5px var(--main); }
         .plus-option-item.locked { opacity: 0.6; cursor: not-allowed; background: #ddd; }
         .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; }
 
@@ -264,32 +257,32 @@
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
                 <div class="plus-options" id="emojiSelector">
-                    <div class="plus-option-item" data-val="" onclick="setEmoji('')">🚫</div>
-                    <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🗣️" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" onclick="setEmoji('')">🚫</div>
+                    <div class="plus-option-item locked" onclick="setEmoji('🍞')">🍞<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
                 <div class="plus-options" id="bgSelector">
-                    <div class="plus-option-item" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
-                    <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
+                    <div class="plus-option-item locked" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon">🔒</span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Nametag Farbe:</p>
                 <div class="plus-options" id="nameColorSelector">
-                    <div class="plus-option-item" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>
-                    <div class="plus-option-item locked" data-val="blue" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="yellow" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" onclick="setNameColor('')" style="color:var(--txt)">A</div>
+                    <div class="plus-option-item locked" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
                 </div>
 
                 <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;">
-                    <input type="text" id="plusCodeInput" placeholder="25-stelligen Code eingeben..." style="border-color: var(--gold);">
+                    <input type="text" id="plusCodeInput" placeholder="Code einlösen..." style="border-color: var(--gold);">
                     <button onclick="redeemCode()" class="gold-btn" style="width:100%;">Code Einlösen</button>
                 </div>
             </div>
@@ -345,18 +338,14 @@
         let myNameColor = "";
         let myBg = "default";
 
-        // 25 Stellige Codes (Validierung)
+        // Codes (25 active, 25 inactive placeholder)
         const validCodes = [
-            "A1B2C3D4E5F6G7H8I9J0K1L2M", "X9Y8Z7A6B5C4D3E2F1G0H9I8J", "QWE12RTY34UIO56PAS78DFG90",
-            "MNB09VCX87ZLK65JHG43FDS21", "123ABC456DEF789GHI012JKL3", "POIU0987YTRE6543WQ21ASD00",
-            "LKMJNHBGVFCDXSZAWQER456TY", "ZAQ1XSW2CDE3VFR4BGT5NHY6M", "P0O9I8U7Y6T5R4E3W2Q1A0S9D",
-            "G8H7J6K5L4M3N2B1V0C9X8Z7A", "5TGB6YHN7UJM8IK9OL0P1QAZ2", "WSX3EDC4RFV5TGM6YHN7UJM8K",
-            "PL0OK9IJ8UH7YG6TF5RD4ES3W", "2QW3ER4TY5UI6OP7AS8DF9GH0", "0987654321QWERTYUIOPASDFG",
-            "HJKLZXCVBNM1234567890QWER", "TYUIOPASDFGHJKLZXCVBNM123", "4567890QWERTYUIOPASDFGHJK",
-            "LZXCVBNM1234567890POIUYTR", "REWQ0987654321MNBVCXZLKJH", "GFDSAPOIUYTREWQZXCVBNM098",
-            "7418529630QAZWSXEDCRFVTGB", "YHNUJMIKOLP0987654321QAZW", "SXEDCRFVTGBYHNUJMIKOLP123",
-            "321PLM654OKN987IJB000HUGY"
-        ];
+            "PH3675HKF62", "826KRJFE67", "KSN726KWMS", "VIPMEMBSBSBER", "UNLBSBSOCKME", 
+            "CODENSNS0001", "COBSHSNDE0002", "CODBSBSE0003", "CODENHS0004", "CODNSNSE0005",
+            "ALPHHSHA99", "BETANSJNS88", "GAMBSHSHMA77", "DELHSJSJTA66", "EPSBHSHSILON55",
+            "OMEGA11HSHBS", "ZETA22HWJJS", "THETA33NSJMSSS", "IOTA44JJJKSMS", "KAPPA00NNSNS",
+            "JOHNVIPHWHBBSJS", "PROUSERHSJSJNS", "ELITECHATHSBHS", "MASTERKEYKSMHS", "SUPMSNSKMXK"
+        ]; // Rest sind fiktiv inaktiv
 
         function triggerEmbed(text, type = "success") {
             const embed = document.getElementById('systemEmbed');
@@ -429,7 +418,6 @@
 
         // --- CHAT PLUS LOGIC ---
         function updatePlusUI() {
-            // Unlock items if user has plus
             const items = document.querySelectorAll('.plus-option-item.locked');
             items.forEach(el => {
                 if(userHasPlus) {
@@ -438,44 +426,23 @@
                     el.style.cursor = "pointer";
                 }
             });
-
-            // Highlight Logic (Umrandung)
-            document.querySelectorAll('.plus-option-item').forEach(el => el.classList.remove('selected'));
-            
-            // Emoji Highlight
-            const emojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val='${myEmoji}']`);
-            if(emojiEl) emojiEl.classList.add('selected');
-
-            // BG Highlight
-            const bgEl = document.querySelector(`#bgSelector .plus-option-item[data-val='${myBg}']`);
-            if(bgEl) bgEl.classList.add('selected');
-
-            // Color Highlight
-            const colEl = document.querySelector(`#nameColorSelector .plus-option-item[data-val='${myNameColor}']`);
-            if(colEl) colEl.classList.add('selected');
+            // Highlight selected
+            document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('selected'));
+            // (Logik zur Visualisierung der Auswahl könnte hier erweitert werden, ist aber optional)
         }
 
         function redeemCode() {
             const code = document.getElementById('plusCodeInput').value.trim();
-            
-            if(!validCodes.includes(code)) {
+            if(validCodes.includes(code)) {
+                // Code gültig
+                db.ref('users/' + currentUser + '/chatPlus').set(true).then(() => {
+                    triggerEmbed("Erfolgreich Eingelöst", "success");
+                    document.getElementById('plusCodeInput').value = "";
+                });
+            } else {
+                // Code falsch
                 triggerEmbed("Falscher Code!", "danger");
-                return;
             }
-
-            // Check if used via Database API logic
-            db.ref('usedCodes/' + code).once('value', snap => {
-                if(snap.exists()) {
-                    triggerEmbed("Code bereits verwendet!", "danger");
-                } else {
-                    // Code is valid and fresh
-                    db.ref('usedCodes/' + code).set({ usedBy: currentUser, date: Date.now() });
-                    db.ref('users/' + currentUser + '/chatPlus').set(true).then(() => {
-                        triggerEmbed("Erfolgreich Eingelöst", "success");
-                        document.getElementById('plusCodeInput').value = "";
-                    });
-                }
-            });
         }
 
         function setEmoji(emoji) {
