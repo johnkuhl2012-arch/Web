@@ -15,24 +15,32 @@
         .bg-yellow { --bg: #fff9c4 !important; --cont: #fffde7 !important; }
         .bg-red { --bg: #ffcdd2 !important; --cont: #ffebee !important; }
         .bg-blue { --bg: #bbdefb !important; --cont: #e3f2fd !important; }
+        /* NEU: Lila & Orange */
+        .bg-purple { --bg: #ede7f6 !important; --cont: #f3e5f5 !important; }
+        .bg-orange { --bg: #fff3e0 !important; --cont: #fff8e1 !important; }
+
         .dark-mode.bg-yellow { --bg: #4a4100 !important; --cont: #332d00 !important; }
         .dark-mode.bg-red { --bg: #4a0000 !important; --cont: #330000 !important; }
         .dark-mode.bg-blue { --bg: #001b4a !important; --cont: #001233 !important; }
+        .dark-mode.bg-purple { --bg: #240046 !important; --cont: #1a0033 !important; }
+        .dark-mode.bg-orange { --bg: #4e2c00 !important; --cont: #331d00 !important; }
 
         /* Nametag Colors */
         .name-blue { color: #2196F3 !important; }
         .name-yellow { color: #FBC02D !important; }
         .name-green { color: #4CAF50 !important; }
+        /* NEU: Pink & Teal */
+        .name-pink { color: #e91e63 !important; }
+        .name-teal { color: #009688 !important; }
 
         html, body {
-            height: 100%;
-            margin: 0;
+            height: 100%; margin: 0;
             padding: 0;
             overflow: hidden;
         }
 
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', sans-serif;
             background: var(--bg); 
             color: var(--txt); 
             display: flex; 
@@ -40,25 +48,25 @@
             align-items: center; 
             min-height: 100vh;
             min-height: -webkit-fill-available;
-            transition: 0.3s; 
+            transition: 0.3s;
         }
         
         .view { 
-            animation: fadeIn 0.4s; 
+            animation: fadeIn 0.4s;
             width: 90%; 
             max-width: 420px; 
             background: var(--cont); 
             border: 1px solid var(--brd); 
             border-radius: 20px; 
             padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center; 
             position: relative; 
             display: flex; 
             flex-direction: column; 
             box-sizing: border-box;
             max-height: 85vh; 
-            margin: auto; 
+            margin: auto;
         }
 
         .view-large { height: 85vh; }
@@ -107,7 +115,7 @@
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--cont); border-radius: 20px; padding: 25px; 
-            box-sizing: border-box; z-index: 100; text-align: left; 
+            box-sizing: border-box; z-index: 100; text-align: left;
             display: flex; flex-direction: column; 
         }
         .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
@@ -135,23 +143,12 @@
 
         /* --- CHAT PLUS STYLES --- */
         .chat-plus-container {
-            border: 2px solid var(--gold);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: left;
+            border: 2px solid var(--gold); border-radius: 12px;
+            padding: 15px; margin-bottom: 15px; text-align: left;
             position: relative;
             background: linear-gradient(to bottom, rgba(255, 215, 0, 0.05), transparent);
         }
-        .chat-plus-header {
-            color: #d4af37; /* Darker Gold */
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .chat-plus-header { color: #d4af37; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
         .plus-list { list-style: none; padding: 0; margin: 0 0 15px 0; font-size: 0.9rem; }
         .plus-list li { margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         
@@ -161,12 +158,28 @@
             border: 2px solid var(--brd); cursor: pointer; 
             display: flex; align-items: center; justify-content: center;
             position: relative; font-size: 1.2rem;
+            box-sizing: border-box; /* Wichtig für Border */
         }
-        .plus-option-item.selected { border-color: var(--main); transform: scale(1.1); box-shadow: 0 0 5px var(--main); }
+        /* Visualisierung der Auswahl */
+        .plus-option-item.active-selection {
+            border: 3px solid var(--main);
+            box-shadow: 0 0 8px var(--main);
+            transform: scale(1.1);
+        }
+        
         .plus-option-item.locked { opacity: 0.6; cursor: not-allowed; background: #ddd; }
         .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; }
-
         .color-swatch { width: 100%; height: 100%; border-radius: 50%; }
+        
+        /* Loading Status Styles */
+        #chatLoading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-weight: bold;
+            color: var(--main);
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -236,13 +249,15 @@
             <h3 id="chatWithTitle" style="margin:0; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">Chat</h3>
             <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.7rem;">Verlassen</button>
         </div>
+        <div id="chatLoading">Nachrichten werden geladen...</div>
+        
         <div id="messageBox"></div>
         <div class="chat-input-area">
             <label class="file-label">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
             <input type="text" id="chatInput" placeholder="Nachricht..." style="margin:0">
             <button onclick="sendMessage()" style="width:50px;">></button>
         </div>
-        <button onclick="showView('mainView')" class="secondary" style="margin-top:10px;">Zurück</button>
+        <button onclick="closeChat()" class="secondary" style="margin-top:10px;">Zurück</button>
     </div>
 
     <div id="settingsView" class="view view-large hidden">
@@ -252,35 +267,39 @@
             <div class="chat-plus-container">
                 <div class="chat-plus-header">🌟 Chat Plus</div>
                 <ul class="plus-list">
-                    <li>⚙️ Erhalte Zugriff zu 3 Weiteren Hintergrund Farben</li>
+                    <li>⚙️ Erhalte Zugriff zu 5 Weiteren Hintergrund Farben</li>
                     <li>🪧 Ändere die Farbe deines Nametags in Chats</li>
                     <li>👀 Stelle vor deinen Namen ein Custom Emoji</li>
                 </ul>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
                 <div class="plus-options" id="emojiSelector">
-                    <div class="plus-option-item" onclick="setEmoji('')">🚫</div>
-                    <div class="plus-option-item locked" onclick="setEmoji('🍞')">🍞<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" data-val="" onclick="setEmoji('')">🚫</div>
+                    <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🗣️" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
                 <div class="plus-options" id="bgSelector">
-                    <div class="plus-option-item" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
-                    <div class="plus-option-item locked" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
+                    <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="purple" onclick="setBg('purple')"><div class="color-swatch" style="background:#ede7f6"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="orange" onclick="setBg('orange')"><div class="color-swatch" style="background:#fff3e0"></div><span class="lock-icon">🔒</span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Nametag Farbe:</p>
                 <div class="plus-options" id="nameColorSelector">
-                    <div class="plus-option-item" onclick="setNameColor('')" style="color:var(--txt)">A</div>
-                    <div class="plus-option-item locked" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>
+                    <div class="plus-option-item locked" data-val="blue" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="yellow" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="pink" onclick="setNameColor('pink')"><span style="color:#e91e63; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="teal" onclick="setNameColor('teal')"><span style="color:#009688; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
                 </div>
 
                 <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;">
@@ -340,14 +359,16 @@
         let myNameColor = "";
         let myBg = "default";
 
-        // Codes (25 active, 25 inactive placeholder)
+        let currentChatPath = null;
+
+        // Codes
         const validCodes = [
             "PH3675HKF62", "826KRJFE67", "KSN726KWMS", "ZRFnNFE62661Jg", "UNLBSBSOCKME", 
             "CODENSNS0001", "COBSHSNDE0002", "CODBSBSE0003", "CODENHS0004", "CODNSNSE0005",
             "ALPHHSHA99", "BETANSJNS88", "GAMBSHSHMA77", "DELHSJSJTA66", "EPSBHSHSILON55",
             "OMEGA11HSHBS", "ZETA22HWJJS", "THETA33NSJMSSS", "IOTA44JJJKSMS", "KAPPA00NNSNS",
             "JOHNVIPHWHBBSJS", "PROUSERHSJSJNS", "ELITECHATHSBHS", "MASTERKEYKSMHS", "SUPMSNSKMXK"
-        ]; // Rest sind fiktiv inaktiv
+        ];
 
         function triggerEmbed(text, type = "success") {
             const embed = document.getElementById('systemEmbed');
@@ -390,13 +411,18 @@
             });
         }
 
-        function logout() { currentUser = null; document.body.classList.remove('dark-mode'); document.body.className = ""; showView('homeView'); }
+        function logout() { 
+            currentUser = null; 
+            if(currentChatPath) db.ref(currentChatPath).off();
+            document.body.classList.remove('dark-mode'); 
+            document.body.className = ""; 
+            showView('homeView'); 
+        }
 
         function startSync() {
             db.ref('users/' + currentUser).on('value', snap => {
                 const data = snap.val(); if(!data) return;
                 
-                // Chat Plus Sync
                 userHasPlus = data.chatPlus === true;
                 myEmoji = data.customEmoji || "";
                 myNameColor = data.nameColor || "";
@@ -418,7 +444,7 @@
             });
         }
 
-        // --- CHAT PLUS LOGIC ---
+        // --- CHAT PLUS UI UPDATE ---
         function updatePlusUI() {
             const items = document.querySelectorAll('.plus-option-item.locked');
             items.forEach(el => {
@@ -428,21 +454,32 @@
                     el.style.cursor = "pointer";
                 }
             });
-            // Highlight selected
-            document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('selected'));
-            // (Logik zur Visualisierung der Auswahl könnte hier erweitert werden, ist aber optional)
+            
+            // Selection Visuals - Alle entfernen
+            document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('active-selection'));
+
+            // Aktive markieren
+            // Emoji
+            const activeEmojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val="${myEmoji}"]`);
+            if(activeEmojiEl) activeEmojiEl.classList.add('active-selection');
+            
+            // BG
+            const activeBgEl = document.querySelector(`#bgSelector .plus-option-item[data-val="${myBg}"]`);
+            if(activeBgEl) activeBgEl.classList.add('active-selection');
+
+            // Name Color
+            const activeColorEl = document.querySelector(`#nameColorSelector .plus-option-item[data-val="${myNameColor}"]`);
+            if(activeColorEl) activeColorEl.classList.add('active-selection');
         }
 
         function redeemCode() {
             const code = document.getElementById('plusCodeInput').value.trim();
             if(validCodes.includes(code)) {
-                // Code gültig
                 db.ref('users/' + currentUser + '/chatPlus').set(true).then(() => {
                     triggerEmbed("Erfolgreich Eingelöst", "success");
                     document.getElementById('plusCodeInput').value = "";
                 });
             } else {
-                // Code falsch
                 triggerEmbed("Falscher Code!", "danger");
             }
         }
@@ -463,12 +500,10 @@
         }
 
         function applyTheme(baseTheme, plusBg) {
-            document.body.className = ""; // Reset
+            document.body.className = "";
             if(baseTheme === 'dark') document.body.classList.add('dark-mode');
             if(plusBg && plusBg !== 'default') document.body.classList.add('bg-' + plusBg);
         }
-
-        // --- END CHAT PLUS LOGIC ---
 
         function sendRequest() {
             const target = document.getElementById('targetFriend').value.trim().toLowerCase();
@@ -487,7 +522,8 @@
         function unfriend(n) { db.ref('users/'+currentUser+'/friends/'+n).remove(); db.ref('users/'+n+'/friends/'+currentUser).remove(); }
 
         function openGroupCreator() {
-            const list = document.getElementById('groupMembersList'); list.innerHTML = "";
+            const list = document.getElementById('groupMembersList');
+            list.innerHTML = "";
             db.ref('users/'+currentUser+'/friends').once('value', snap => {
                 if(!snap.exists()) {
                     list.innerHTML = "<p style='grid-column:1/3; font-size:0.8rem;'>Du brauchst Freunde für eine Gruppe.</p>";
@@ -521,21 +557,51 @@
         }
 
         function openChat(id, isG, gTitle) {
-            isGroup = isG; activeChatID = isG ? id : [currentUser, id].sort().join("_");
+            isGroup = isG;
+            activeChatID = isG ? id : [currentUser, id].sort().join("_");
             document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : formatName(id);
             document.getElementById('leaveBtn').classList.toggle('hidden', !isG);
+            
             showView('chatWindow');
-            const path = isG ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-            db.ref(path).off();
+            
+            // Zurücksetzen und Loader anzeigen
+            document.getElementById('messageBox').innerHTML = "";
+            document.getElementById('chatLoading').style.display = 'block';
+
+            loadChatMessages();
+        }
+
+        function closeChat() {
+            if(currentChatPath) db.ref(currentChatPath).off();
+            currentChatPath = null;
+            activeChatID = null;
+            showView('mainView');
+        }
+
+        function loadChatMessages() {
+            const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+            
+            // Bugfix für Chat-Switch (Emily/Kai)
+            if(currentChatPath && currentChatPath !== path) {
+                db.ref(currentChatPath).off();
+            }
+            currentChatPath = path;
+
+            db.ref(path).off(); 
+            // Normales Laden (Kein Limit, scrollt einfach)
             db.ref(path).on('value', snap => {
-                const box = document.getElementById('messageBox'); box.innerHTML = "";
+                const box = document.getElementById('messageBox');
+                box.innerHTML = "";
+                
+                // Loader ausblenden sobald Daten da sind
+                document.getElementById('chatLoading').style.display = 'none';
+
                 snap.forEach(m => {
                     const d = m.val(), key = m.key;
                     let isSystem = d.from === "SYSTEM";
                     let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
                     let delBtn = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === "knödel")) ? `<span class="del-btn" onclick="showInlineConfirm('${key}')">🗑️</span>` : "";
                     
-                    // Chat Plus Rendering in Message
                     let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}:</b><br>`;
                     if(!isSystem && d.plusData) {
                         const emoji = d.plusData.emoji || "";
@@ -555,6 +621,8 @@
                             </div>
                         </div>`;
                 });
+
+                // Immer nach unten scrollen
                 box.scrollTop = box.scrollHeight;
             });
         }
@@ -572,7 +640,6 @@
                 txt: `${currentUser} hat die Gruppe verlassen`,
                 type: 'text'
             });
-
             db.ref('users/' + currentUser + '/groups/' + gid).remove();
 
             db.ref('groups/' + gid + '/members').once('value', snap => {
@@ -583,23 +650,21 @@
                 } else {
                     db.ref('groups/' + gid + '/members').set(updated);
                 }
-                showView('mainView');
+                closeChat();
                 triggerEmbed("Gruppe verlassen", "success");
             });
         }
 
         function sendMessage() {
-            const t = document.getElementById('chatInput').value; if(!t) return;
+            const t = document.getElementById('chatInput').value;
+            if(!t) return;
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-            
-            // Mit Chat Plus Daten senden
             const msgData = { 
                 from: currentUser, 
                 txt: t, 
                 type: 'text',
                 plusData: { emoji: myEmoji, color: myNameColor }
             };
-            
             db.ref(path).push(msgData);
             document.getElementById('chatInput').value = "";
         }
