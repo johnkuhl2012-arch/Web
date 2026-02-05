@@ -15,7 +15,6 @@
         .bg-yellow { --bg: #fff9c4 !important; --cont: #fffde7 !important; }
         .bg-red { --bg: #ffcdd2 !important; --cont: #ffebee !important; }
         .bg-blue { --bg: #bbdefb !important; --cont: #e3f2fd !important; }
-        /* NEU: Lila & Orange */
         .bg-purple { --bg: #ede7f6 !important; --cont: #f3e5f5 !important; }
         .bg-orange { --bg: #fff3e0 !important; --cont: #fff8e1 !important; }
 
@@ -29,7 +28,6 @@
         .name-blue { color: #2196F3 !important; }
         .name-yellow { color: #FBC02D !important; }
         .name-green { color: #4CAF50 !important; }
-        /* NEU: Pink & Teal */
         .name-pink { color: #e91e63 !important; }
         .name-teal { color: #009688 !important; }
 
@@ -158,12 +156,11 @@
             border: 2px solid var(--brd); cursor: pointer; 
             display: flex; align-items: center; justify-content: center;
             position: relative; font-size: 1.2rem;
-            box-sizing: border-box; /* Wichtig für Border */
+            box-sizing: border-box; 
         }
         /* Visualisierung der Auswahl */
         .plus-option-item.active-selection {
-            border: 3px solid var(--main);
-            box-shadow: 0 0 8px var(--main);
+            border: 3px solid var(--main); box-shadow: 0 0 8px var(--main);
             transform: scale(1.1);
         }
         
@@ -173,12 +170,9 @@
         
         /* Loading Status Styles */
         #chatLoading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            font-weight: bold;
-            color: var(--main);
-            font-size: 1.1rem;
+            display: none; text-align: center;
+            padding: 20px; font-weight: bold;
+            color: var(--main); font-size: 1.1rem;
         }
     </style>
 </head>
@@ -224,6 +218,12 @@
         <h1>Login</h1>
         <input type="text" id="loginUser" placeholder="Benutzername">
         <input type="password" id="loginPass" placeholder="Passwort">
+        
+        <div class="agb-row" style="justify-content: flex-start; background: transparent; padding-left: 0;">
+            <input type="checkbox" id="keepLogin">
+            <span>Angemeldet bleiben</span>
+        </div>
+
         <button onclick="login()" style="width:100%">Einloggen</button>
         <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
     </div>
@@ -339,6 +339,17 @@
         </div>
     </div>
 
+    <div id="unfriendModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="margin-top:0; color:var(--danger);">Freund entfernen?</h2>
+            <p>Möchtest du <b id="unfriendNameTarget"></b> wirklich aus deiner Freundesliste entfernen?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button class="danger" onclick="executeUnfriend()">Entfernen</button>
+                <button onclick="closeUnfriendModal()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
@@ -360,6 +371,7 @@
         let myBg = "default";
 
         let currentChatPath = null;
+        let friendToRemove = null; // NEU: Für Entfreunden Logik
 
         // Codes
         const validCodes = [
@@ -369,6 +381,25 @@
             "OMEGA11HSHBS", "ZETA22HWJJS", "THETA33NSJMSSS", "IOTA44JJJKSMS", "KAPPA00NNSNS",
             "JOHNVIPHWHBBSJS", "PROUSERHSJSJNS", "ELITECHATHSBHS", "MASTERKEYKSMHS", "SUPMSNSKMXK"
         ];
+
+        // NEU: Auto-Login beim Start prüfen
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('johnChatUser');
+            if(savedUser) {
+                db.ref('users/' + savedUser).once('value').then(snap => {
+                    if(snap.exists()) {
+                        currentUser = savedUser;
+                        const data = snap.val();
+                        document.getElementById('userGreeting').innerText = "Hi " + formatName(currentUser);
+                        if(data.theme === 'dark') document.body.classList.add('dark-mode');
+                        startSync();
+                        showView('mainView');
+                    } else {
+                        localStorage.removeItem('johnChatUser');
+                    }
+                });
+            }
+        });
 
         function triggerEmbed(text, type = "success") {
             const embed = document.getElementById('systemEmbed');
@@ -404,6 +435,12 @@
                 const data = snap.val();
                 if(data && data.pass === pass) {
                     currentUser = user;
+                    
+                    // NEU: LocalStorage setzen wenn Checkbox aktiv
+                    if(document.getElementById('keepLogin').checked) {
+                        localStorage.setItem('johnChatUser', user);
+                    }
+
                     document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
                     if(data.theme === 'dark') document.body.classList.add('dark-mode');
                     startSync(); showView('mainView');
@@ -412,7 +449,8 @@
         }
 
         function logout() { 
-            currentUser = null; 
+            localStorage.removeItem('johnChatUser'); // NEU: Auto-Login entfernen
+            currentUser = null;
             if(currentChatPath) db.ref(currentChatPath).off();
             document.body.classList.remove('dark-mode'); 
             document.body.className = ""; 
@@ -433,8 +471,11 @@
 
                 const rList = document.getElementById('pendingRequests'); rList.innerHTML = "";
                 if(data.requests) Object.keys(data.requests).forEach(s => rList.innerHTML += `<div class="friend-item">${formatName(s)} addet dich <button onclick="accept('${s}')">✔</button></div>`);
+                
                 const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
-                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div class="friend-item"><span>${formatName(f)}</span><div style="display:flex; gap:5px"><button onclick="openChat('${f}', false)">Chat</button><button class="danger" onclick="unfriend('${f}')">X</button></div></div>`);
+                // GEÄNDERT: Button ruft jetzt askUnfriend auf
+                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div class="friend-item"><span>${formatName(f)}</span><div style="display:flex; gap:5px"><button onclick="openChat('${f}', false)">Chat</button><button class="danger" onclick="askUnfriend('${f}')">X</button></div></div>`);
+                
                 const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
                 if(data.groups) Object.keys(data.groups).forEach(gid => {
                     db.ref('groups/'+gid+'/name').once('value', s => {
@@ -454,20 +495,15 @@
                     el.style.cursor = "pointer";
                 }
             });
-            
-            // Selection Visuals - Alle entfernen
+            // Selection Visuals
             document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('active-selection'));
-
-            // Aktive markieren
-            // Emoji
+            
             const activeEmojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val="${myEmoji}"]`);
             if(activeEmojiEl) activeEmojiEl.classList.add('active-selection');
             
-            // BG
             const activeBgEl = document.querySelector(`#bgSelector .plus-option-item[data-val="${myBg}"]`);
             if(activeBgEl) activeBgEl.classList.add('active-selection');
 
-            // Name Color
             const activeColorEl = document.querySelector(`#nameColorSelector .plus-option-item[data-val="${myNameColor}"]`);
             if(activeColorEl) activeColorEl.classList.add('active-selection');
         }
@@ -519,7 +555,27 @@
         }
 
         function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true); db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
-        function unfriend(n) { db.ref('users/'+currentUser+'/friends/'+n).remove(); db.ref('users/'+n+'/friends/'+currentUser).remove(); }
+        
+        // NEU: Entfreunden Logik mit Modal
+        function askUnfriend(n) {
+            friendToRemove = n;
+            document.getElementById('unfriendNameTarget').innerText = formatName(n);
+            document.getElementById('unfriendModal').classList.remove('hidden');
+        }
+
+        function closeUnfriendModal() {
+            document.getElementById('unfriendModal').classList.add('hidden');
+            friendToRemove = null;
+        }
+
+        function executeUnfriend() {
+            if(!friendToRemove) return;
+            const n = friendToRemove;
+            db.ref('users/'+currentUser+'/friends/'+n).remove(); 
+            db.ref('users/'+n+'/friends/'+currentUser).remove();
+            closeUnfriendModal();
+            triggerEmbed("Freund entfernt", "success");
+        }
 
         function openGroupCreator() {
             const list = document.getElementById('groupMembersList');
@@ -529,6 +585,7 @@
                     list.innerHTML = "<p style='grid-column:1/3; font-size:0.8rem;'>Du brauchst Freunde für eine Gruppe.</p>";
                     return;
                 }
+            
                 snap.forEach(f => {
                     const friendName = f.key;
                     list.innerHTML += `<label class="member-card" id="card-${friendName}"><input type="checkbox" class="g-member" value="${friendName}" onchange="toggleCardSelection('${friendName}', this)"><span style="font-size:1.2rem;">👤</span><span style="font-size:0.9rem;">${formatName(friendName)}</span></label>`;
@@ -561,10 +618,8 @@
             activeChatID = isG ? id : [currentUser, id].sort().join("_");
             document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : formatName(id);
             document.getElementById('leaveBtn').classList.toggle('hidden', !isG);
-            
             showView('chatWindow');
             
-            // Zurücksetzen und Loader anzeigen
             document.getElementById('messageBox').innerHTML = "";
             document.getElementById('chatLoading').style.display = 'block';
 
@@ -581,19 +636,15 @@
         function loadChatMessages() {
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
             
-            // Bugfix für Chat-Switch (Emily/Kai)
             if(currentChatPath && currentChatPath !== path) {
                 db.ref(currentChatPath).off();
             }
             currentChatPath = path;
 
-            db.ref(path).off(); 
-            // Normales Laden (Kein Limit, scrollt einfach)
+            db.ref(path).off();
             db.ref(path).on('value', snap => {
                 const box = document.getElementById('messageBox');
                 box.innerHTML = "";
-                
-                // Loader ausblenden sobald Daten da sind
                 document.getElementById('chatLoading').style.display = 'none';
 
                 snap.forEach(m => {
@@ -621,8 +672,6 @@
                             </div>
                         </div>`;
                 });
-
-                // Immer nach unten scrollen
                 box.scrollTop = box.scrollHeight;
             });
         }
