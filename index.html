@@ -129,15 +129,30 @@
         .msg .del-btn { float: right; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
         .system-msg { color: var(--danger); font-weight: bold; text-align: center; border: none; background: transparent; }
         
+        .msg-time { display: block; font-size: 0.65rem; color: #888; margin-top: 4px; text-align: right; font-style: italic; }
+
         .del-confirm { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--danger); border-radius: 5px; margin-top: 5px; padding: 5px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; }
         .del-confirm button { padding: 4px 8px; font-size: 0.7rem; }
 
-        .friend-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); align-items: center; }
+        .friend-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); align-items: center; position: relative; }
         .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; }
         .chat-input-area { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
         .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
         
         .scroll-area { flex: 1; overflow-y: auto; border-top: 1px solid var(--brd); margin-top: 10px; }
+
+        /* UNREAD BADGE */
+        .unread-badge {
+            background-color: var(--danger); color: white; border-radius: 50%;
+            padding: 2px 6px; font-size: 0.7rem; font-weight: bold;
+            margin-left: 5px; vertical-align: middle; display: none;
+        }
+
+        /* MUTE / NOTIFICATION BUTTONS */
+        .action-btn-group { display: flex; gap: 5px; align-items: center; }
+        .icon-btn { background: transparent; color: var(--txt); padding: 5px; font-size: 1rem; border: 1px solid transparent; }
+        .icon-btn:hover { background: var(--hover); transform: none; }
+        .muted-state { color: var(--danger); opacity: 0.7; }
 
         /* --- CHAT PLUS STYLES --- */
         .chat-plus-container {
@@ -155,25 +170,14 @@
             width: 35px; height: 35px; border-radius: 50%; 
             border: 2px solid var(--brd); cursor: pointer; 
             display: flex; align-items: center; justify-content: center;
-            position: relative; font-size: 1.2rem;
-            box-sizing: border-box; 
+            position: relative; font-size: 1.2rem; box-sizing: border-box; 
         }
-        /* Visualisierung der Auswahl */
-        .plus-option-item.active-selection {
-            border: 3px solid var(--main); box-shadow: 0 0 8px var(--main);
-            transform: scale(1.1);
-        }
-        
+        .plus-option-item.active-selection { border: 3px solid var(--main); box-shadow: 0 0 8px var(--main); transform: scale(1.1); }
         .plus-option-item.locked { opacity: 0.6; cursor: not-allowed; background: #ddd; }
         .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; }
         .color-swatch { width: 100%; height: 100%; border-radius: 50%; }
         
-        /* Loading Status Styles */
-        #chatLoading {
-            display: none; text-align: center;
-            padding: 20px; font-weight: bold;
-            color: var(--main); font-size: 1.1rem;
-        }
+        #chatLoading { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--main); font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -221,7 +225,7 @@
         
         <div class="agb-row" style="justify-content: flex-start; background: transparent; padding-left: 0;">
             <input type="checkbox" id="keepLogin">
-            <span>Angemeldet bleiben</span>
+            <span>Angemeldet bleiben & Push zulassen</span>
         </div>
 
         <button onclick="login()" style="width:100%">Einloggen</button>
@@ -362,6 +366,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
         let currentUser = null, activeChatID = null, isGroup = false;
 
         // Chat Plus Globals
@@ -369,9 +374,13 @@
         let myEmoji = "";
         let myNameColor = "";
         let myBg = "default";
-
         let currentChatPath = null;
-        let friendToRemove = null; // NEU: Für Entfreunden Logik
+        let friendToRemove = null;
+        
+        // NEU: Muted Status und Watcher Management
+        let mutedChats = {};
+        let watchedChats = {}; // Speichert Ref, um nicht doppelt zu hören
+        let appLoadedTime = Date.now();
 
         // Codes
         const validCodes = [
@@ -382,7 +391,6 @@
             "JOHNVIPHWHBBSJS", "PROUSERHSJSJNS", "ELITECHATHSBHS", "MASTERKEYKSMHS", "SUPMSNSKMXK"
         ];
 
-        // NEU: Auto-Login beim Start prüfen
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('johnChatUser');
             if(savedUser) {
@@ -436,9 +444,12 @@
                 if(data && data.pass === pass) {
                     currentUser = user;
                     
-                    // NEU: LocalStorage setzen wenn Checkbox aktiv
                     if(document.getElementById('keepLogin').checked) {
                         localStorage.setItem('johnChatUser', user);
+                        // Push Permission anfragen
+                        if("Notification" in window) {
+                            Notification.requestPermission();
+                        }
                     }
 
                     document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
@@ -449,9 +460,14 @@
         }
 
         function logout() { 
-            localStorage.removeItem('johnChatUser'); // NEU: Auto-Login entfernen
+            localStorage.removeItem('johnChatUser');
             currentUser = null;
             if(currentChatPath) db.ref(currentChatPath).off();
+            // Stop watching watchers
+            for(let id in watchedChats) {
+                db.ref(watchedChats[id]).off();
+            }
+            watchedChats = {};
             document.body.classList.remove('dark-mode'); 
             document.body.className = ""; 
             showView('homeView'); 
@@ -465,24 +481,150 @@
                 myEmoji = data.customEmoji || "";
                 myNameColor = data.nameColor || "";
                 myBg = data.bgGradient || "default";
+                mutedChats = data.muted || {}; // Lade Stumm-Einstellungen
                 
                 updatePlusUI();
                 applyTheme(data.theme, myBg);
 
                 const rList = document.getElementById('pendingRequests'); rList.innerHTML = "";
-                if(data.requests) Object.keys(data.requests).forEach(s => rList.innerHTML += `<div class="friend-item">${formatName(s)} addet dich <button onclick="accept('${s}')">✔</button></div>`);
+                // NEU: Ablehnen Button hinzugefügt
+                if(data.requests) Object.keys(data.requests).forEach(s => {
+                    rList.innerHTML += `
+                    <div class="friend-item">
+                        ${formatName(s)} addet dich 
+                        <div class="action-btn-group">
+                            <button onclick="accept('${s}')" style="padding:5px 10px;">✔</button>
+                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;">X</button>
+                        </div>
+                    </div>`;
+                });
                 
                 const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
-                // GEÄNDERT: Button ruft jetzt askUnfriend auf
-                if(data.friends) Object.keys(data.friends).forEach(f => fList.innerHTML += `<div class="friend-item"><span>${formatName(f)}</span><div style="display:flex; gap:5px"><button onclick="openChat('${f}', false)">Chat</button><button class="danger" onclick="askUnfriend('${f}')">X</button></div></div>`);
+                
+                if(data.friends) Object.keys(data.friends).forEach(f => {
+                    // Chat ID konstruieren
+                    let cid = [currentUser, f].sort().join("_");
+                    let isMuted = mutedChats[cid] === true;
+                    
+                    fList.innerHTML += `
+                    <div class="friend-item" id="row-${cid}">
+                        <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
+                        <div class="action-btn-group">
+                            <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '🔕' : '🔔'}</button>
+                            <button onclick="openChat('${f}', false)">Chat</button>
+                            <button class="danger" onclick="askUnfriend('${f}')">X</button>
+                        </div>
+                    </div>`;
+                    watchChat(cid, 'private', f); // Starte Überwachung
+                });
                 
                 const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
                 if(data.groups) Object.keys(data.groups).forEach(gid => {
                     db.ref('groups/'+gid+'/name').once('value', s => {
-                        if(s.exists()) gList.innerHTML += `<div class="friend-item"><span>👥 ${s.val()}</span><button onclick="openChat('${gid}', true, '${s.val()}')">Chat</button></div>`;
+                        if(s.exists()) {
+                            let gName = s.val();
+                            let isMuted = mutedChats[gid] === true;
+                            
+                            // Check ob Element schon existiert um flackern zu vermeiden, sonst neu bauen
+                            if(!document.getElementById(`row-${gid}`)) {
+                                gList.innerHTML += `
+                                <div class="friend-item" id="row-${gid}">
+                                    <span>👥 ${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
+                                    <div class="action-btn-group">
+                                        <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '🔕' : '🔔'}</button>
+                                        <button onclick="openChat('${gid}', true, '${gName}')">Chat</button>
+                                    </div>
+                                </div>`;
+                            }
+                            watchChat(gid, 'group', gName); // Starte Überwachung
+                        }
                     });
                 });
             });
+        }
+
+        // --- NEU: Chat Überwachung für Zähler und Push ---
+        function watchChat(chatId, type, name) {
+            if(watchedChats[chatId]) return; // Schon überwacht
+            
+            const path = type === 'group' ? `groups/${chatId}/messages` : `chats/${chatId}`;
+            watchedChats[chatId] = path;
+
+            // Hole letzten Lese-Zeitpunkt aus LocalStorage
+            let lastRead = localStorage.getItem('lastRead_' + chatId) || 0;
+            
+            db.ref(path).limitToLast(20).on('child_added', snap => {
+                const msg = snap.val();
+                // Wenn Nachricht neuer als App-Start und nicht von mir -> Potenzieller Push/Ungelesen
+                if(msg.timestamp && msg.timestamp > appLoadedTime && msg.from !== currentUser) {
+                    
+                    // Wenn Chat nicht offen ist:
+                    if(activeChatID !== chatId) {
+                        // Zähler aktualisieren
+                        updateUnreadCount(chatId, msg.timestamp);
+                        
+                        // Push senden (wenn nicht stumm & Browser erlaubt)
+                        if(!mutedChats[chatId]) {
+                            sendPushNotification(type === 'group' ? `Gruppe: ${name}` : name, msg.txt);
+                        }
+                    }
+                }
+                
+                // Initiale Zählung beim Laden der Liste
+                if(msg.timestamp && msg.timestamp > lastRead && msg.from !== currentUser && activeChatID !== chatId) {
+                   incrementBadge(chatId);
+                }
+            });
+        }
+
+        function updateUnreadCount(chatId, msgTime) {
+            let lastRead = localStorage.getItem('lastRead_' + chatId) || 0;
+            if(msgTime > lastRead) {
+                incrementBadge(chatId);
+            }
+        }
+
+        function incrementBadge(chatId) {
+            const badge = document.getElementById(`badge-${chatId}`);
+            if(badge) {
+                let current = parseInt(badge.innerText) || 0;
+                badge.innerText = current + 1;
+                badge.style.display = 'inline-block';
+            }
+        }
+
+        function resetBadge(chatId) {
+            const badge = document.getElementById(`badge-${chatId}`);
+            if(badge) {
+                badge.innerText = "0";
+                badge.style.display = 'none';
+            }
+            // Update Last Read
+            localStorage.setItem('lastRead_' + chatId, Date.now());
+        }
+
+        function toggleMute(chatId) {
+            let isMuted = mutedChats[chatId] === true;
+            // Toggle
+            if(isMuted) {
+                db.ref(`users/${currentUser}/muted/${chatId}`).remove();
+                triggerEmbed("Benachrichtigungen AN", "success");
+            } else {
+                db.ref(`users/${currentUser}/muted/${chatId}`).set(true);
+                triggerEmbed("Benachrichtigungen AUS", "danger");
+            }
+        }
+
+        function sendPushNotification(title, body) {
+            if(!("Notification" in window)) return;
+            if(Notification.permission === "granted") {
+                // Wenn Bild, zeige Text "Foto gesendet"
+                const txt = body.startsWith("data:image") ? "📷 Foto gesendet" : body;
+                new Notification("John Chat - " + title, { 
+                    body: txt,
+                    icon: "https://cdn-icons-png.flaticon.com/512/134/134914.png"
+                });
+            }
         }
 
         // --- CHAT PLUS UI UPDATE ---
@@ -495,9 +637,7 @@
                     el.style.cursor = "pointer";
                 }
             });
-            // Selection Visuals
             document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('active-selection'));
-            
             const activeEmojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val="${myEmoji}"]`);
             if(activeEmojiEl) activeEmojiEl.classList.add('active-selection');
             
@@ -556,7 +696,12 @@
 
         function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true); db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
         
-        // NEU: Entfreunden Logik mit Modal
+        // NEU: Anfrage ablehnen
+        function deny(n) {
+            db.ref('users/'+currentUser+'/requests/'+n).remove();
+            triggerEmbed("Anfrage abgelehnt", "success");
+        }
+        
         function askUnfriend(n) {
             friendToRemove = n;
             document.getElementById('unfriendNameTarget').innerText = formatName(n);
@@ -585,7 +730,6 @@
                     list.innerHTML = "<p style='grid-column:1/3; font-size:0.8rem;'>Du brauchst Freunde für eine Gruppe.</p>";
                     return;
                 }
-            
                 snap.forEach(f => {
                     const friendName = f.key;
                     list.innerHTML += `<label class="member-card" id="card-${friendName}"><input type="checkbox" class="g-member" value="${friendName}" onchange="toggleCardSelection('${friendName}', this)"><span style="font-size:1.2rem;">👤</span><span style="font-size:0.9rem;">${formatName(friendName)}</span></label>`;
@@ -616,6 +760,10 @@
         function openChat(id, isG, gTitle) {
             isGroup = isG;
             activeChatID = isG ? id : [currentUser, id].sort().join("_");
+            
+            // NEU: Badge resetten wenn Chat geöffnet wird
+            resetBadge(activeChatID);
+
             document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : formatName(id);
             document.getElementById('leaveBtn').classList.toggle('hidden', !isG);
             showView('chatWindow');
@@ -627,6 +775,11 @@
         }
 
         function closeChat() {
+            // NEU: Beim Verlassen als gelesen markieren
+            if(activeChatID) {
+                resetBadge(activeChatID);
+            }
+
             if(currentChatPath) db.ref(currentChatPath).off();
             currentChatPath = null;
             activeChatID = null;
@@ -660,9 +813,16 @@
                         displayNameHTML = `<b class="${colorClass}">${emoji} ${formatName(d.from)}:</b><br>`;
                     }
 
+                    // NEU: Zeitstempel formatieren
+                    let timeStr = "";
+                    if(d.timestamp) {
+                        timeStr = new Date(d.timestamp).toLocaleString();
+                    }
+
                     box.innerHTML += `
                         <div class="msg ${isSystem ? 'system-msg' : ''}" id="msg-${key}">
                             ${displayNameHTML}${content}${delBtn}
+                            ${!isSystem ? `<span class="msg-time">${timeStr}</span>` : ''}
                             <div id="confirm-${key}" class="del-confirm hidden">
                                 <span>Löschen?</span>
                                 <div>
@@ -687,7 +847,8 @@
             db.ref('groups/' + gid + '/messages').push({
                 from: "SYSTEM",
                 txt: `${currentUser} hat die Gruppe verlassen`,
-                type: 'text'
+                type: 'text',
+                timestamp: Date.now()
             });
             db.ref('users/' + currentUser + '/groups/' + gid).remove();
 
@@ -712,6 +873,7 @@
                 from: currentUser, 
                 txt: t, 
                 type: 'text',
+                timestamp: Date.now(), // NEU: Zeitstempel
                 plusData: { emoji: myEmoji, color: myNameColor }
             };
             db.ref(path).push(msgData);
@@ -727,6 +889,7 @@
                     from: currentUser, 
                     txt: e.target.result, 
                     type: 'img',
+                    timestamp: Date.now(), // NEU: Zeitstempel
                     plusData: { emoji: myEmoji, color: myNameColor }
                 };
                 db.ref(path).push(msgData);
