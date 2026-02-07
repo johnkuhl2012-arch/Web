@@ -157,11 +157,14 @@
         /* --- PROFILE PIC (PFP) --- */
         .pfp {
             width: 40px; height: 40px; border-radius: 50%; 
-            object-fit: cover; background: #4CAF50; /* Standard Grün */
+            object-fit: cover; background: transparent; /* KEIN GRÜNER HINTERGRUND MEHR */
             border: 2px solid var(--brd); flex-shrink: 0; margin-right: 10px;
+            display: none; /* Standardmäßig ausblenden */
         }
         .pfp-large {
             width: 80px; height: 80px; margin-bottom: 10px; cursor: pointer;
+            display: inline-block; /* Im Settings immer zeigen (ggf. fallback) */
+            background: #4CAF50; /* Nur im Settings Menu grün als Platzhalter */
         }
         .friend-info { display: flex; align-items: center; }
 
@@ -302,6 +305,11 @@
                     <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
                     <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
                     <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="💎" onclick="setEmoji('💎')">💎<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="💰" onclick="setEmoji('💰')">💰<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="📦" onclick="setEmoji('📦')">📦<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="🛎️" onclick="setEmoji('🛎️')">🛎️<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="⏰" onclick="setEmoji('⏰')">⏰<span class="lock-icon">🔒</span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
@@ -399,7 +407,8 @@
         let watchedChats = {}; 
         let appLoadedTime = Date.now();
         let lastMessageTimestamps = {}; 
-        let pfpListeners = {}; // Um doppelte Listener zu vermeiden
+        let pfpListeners = {}; 
+        let pfpCache = {}; // NEU: PFP Cache um Flackern/Verschwinden zu verhindern
         
         const validCodes = [
             "PH3675HKF62", "826KRJFE67", "KSN726KWMS", "ZRFnNFE62661Jg", "UNLBSBSOCKME", 
@@ -419,7 +428,6 @@
                         document.getElementById('userGreeting').innerText = "Hi " + formatName(currentUser);
                         if(data.theme === 'dark') document.body.classList.add('dark-mode');
                         
-                        // Push Permission Check beim Auto-Login
                         if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                             Notification.requestPermission();
                         }
@@ -501,6 +509,7 @@
             // PFP listeners stop
             for(let id in pfpListeners) { db.ref('users/'+id+'/pfp').off(); }
             pfpListeners = {};
+            pfpCache = {};
 
             watchedChats = {};
             document.body.classList.remove('dark-mode'); 
@@ -518,9 +527,8 @@
                 myBg = data.bgGradient || "default";
                 mutedChats = data.muted || {}; 
                 
-                // Mein PFP laden für Settings
                 if(data.pfp) document.getElementById('mySettingsPfp').src = data.pfp;
-                else document.getElementById('mySettingsPfp').src = ""; // Zeigt Grün durch CSS
+                else document.getElementById('mySettingsPfp').src = ""; 
 
                 updatePlusUI();
                 applyTheme(data.theme, myBg);
@@ -543,10 +551,14 @@
                     let cid = [currentUser, f].sort().join("_");
                     let isMuted = mutedChats[cid] === true;
                     
+                    // PFP Cache Logik: Wenn URL im Cache, zeige es sofort. Sonst ausgeblendet lassen.
+                    let pfpSrc = pfpCache[f] || "";
+                    let pfpStyle = pfpSrc ? "display:block;" : "display:none;";
+                    
                     fList.innerHTML += `
                     <div class="friend-item" id="row-${cid}">
                         <div class="friend-info">
-                            <img class="pfp" id="pfp-view-${f}" src="">
+                            <img class="pfp" id="pfp-view-${f}" src="${pfpSrc}" style="${pfpStyle}">
                             <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
                         <div class="action-btn-group">
@@ -556,7 +568,7 @@
                         </div>
                     </div>`;
                     watchChat(cid, 'private', f); 
-                    loadPfp(f); // PFP laden
+                    loadPfp(f); // PFP laden/starten
                 });
 
                 const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
@@ -570,7 +582,7 @@
                                 gList.innerHTML += `
                                 <div class="friend-item" id="row-${gid}">
                                     <div class="friend-info">
-                                        <div class="pfp" style="display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;">👥</div>
+                                        <span style="font-size:1.5rem; margin-right:10px;">👥</span>
                                         <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
                                     </div>
                                     <div class="action-btn-group">
@@ -586,17 +598,33 @@
             });
         }
 
-        // --- PFP LOGIC ---
+        // --- PFP LOGIC MIT CACHE ---
         function loadPfp(userId) {
-            if(pfpListeners[userId]) return; // Schon geladen/hörend
+            // Auch wenn Listener existiert, prüfen ob das Element im DOM leer ist (durch View Wechsel)
+            if(pfpListeners[userId]) {
+                const el = document.getElementById('pfp-view-' + userId);
+                if(el && pfpCache[userId]) {
+                   el.src = pfpCache[userId];
+                   el.style.display = "block";
+                }
+                return;
+            }
+            
             pfpListeners[userId] = true;
             
             db.ref('users/' + userId + '/pfp').on('value', snap => {
                 const url = snap.val();
+                pfpCache[userId] = url; // Cache updaten
+                
                 const el = document.getElementById('pfp-view-' + userId);
                 if(el) {
-                    if(url) el.src = url;
-                    else el.src = ""; // Fallback auf CSS Grün
+                    if(url) {
+                        el.src = url;
+                        el.style.display = "block"; // Zeigen
+                    } else {
+                        el.src = "";
+                        el.style.display = "none"; // Ausblenden (Kein Icon)
+                    }
                 }
             });
         }
@@ -608,7 +636,6 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 const base64 = e.target.result;
-                // Speichern in DB
                 db.ref('users/' + currentUser + '/pfp').set(base64).then(() => {
                     triggerEmbed("Profilbild aktualisiert", "success");
                 });
@@ -616,7 +643,6 @@
             reader.readAsDataURL(file);
         }
 
-        // --- NEU: Chat Überwachung mit Cross-Device Sync & Neuem Push Text ---
         function watchChat(chatId, type, name) {
             if(watchedChats[chatId]) return;
             
@@ -632,7 +658,6 @@
                         if(activeChatID !== chatId) {
                             if(!mutedChats[chatId]) {
                                 if(document.hidden || activeChatID !== chatId) {
-                                    // NEUER PUSH TEXT
                                     const senderName = type === 'group' ? `Gruppe ${name}` : name;
                                     sendPushNotification("John Chat", `Neue Benachrichtigung von ${senderName}`);
                                 }
