@@ -6,6 +6,7 @@
     <title>John Chat</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; --gold: #ffd700; }
@@ -24,54 +25,31 @@
         .dark-mode.bg-purple { --bg: #240046 !important; --cont: #1a0033 !important; }
         .dark-mode.bg-orange { --bg: #4e2c00 !important; --cont: #331d00 !important; }
 
-        /* Nametag Colors (Original + 5 NEW) */
+        /* Nametag Colors */
         .name-blue { color: #2196F3 !important; }
         .name-yellow { color: #FBC02D !important; }
         .name-green { color: #4CAF50 !important; }
         .name-pink { color: #e91e63 !important; }
         .name-teal { color: #009688 !important; }
-        
-        /* NEUE FARBEN */
         .name-red { color: #ff4757 !important; }
         .name-lime { color: #badc58 !important; }
         .name-cyan { color: #00d2d3 !important; }
         .name-indigo { color: #5f27cd !important; }
         .name-brown { color: #795548 !important; }
 
-        html, body {
-            height: 100%; margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
         body { 
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg); 
-            color: var(--txt); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            transition: 0.3s;
+            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s; 
         }
         
         .view { 
-            animation: fadeIn 0.4s;
-            width: 90%; 
-            max-width: 420px; 
-            background: var(--cont); 
-            border: 1px solid var(--brd); 
-            border-radius: 20px; 
-            padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box;
-            max-height: 85vh; 
-            margin: auto;
+            animation: fadeIn 0.4s; width: 90%; max-width: 420px; background: var(--cont); 
+            border: 1px solid var(--brd); border-radius: 20px; padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; 
+            display: flex; flex-direction: column; box-sizing: border-box; max-height: 85vh; margin: auto;
         }
 
         .view-large { height: 85vh; }
@@ -100,9 +78,8 @@
 
         #systemEmbed {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            min-width: 250px; color: white; padding: 12px 25px; border-radius: 15px;
-            font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 10000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 250px; color: white; padding: 12px 25px; border-radius: 15px; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 10000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center;
         }
         #systemEmbed.show { top: 20px; }
@@ -120,16 +97,13 @@
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--cont); border-radius: 20px; padding: 25px; 
-            box-sizing: border-box; z-index: 100; text-align: left;
-            display: flex; flex-direction: column; 
+            box-sizing: border-box; z-index: 100; text-align: left; display: flex; flex-direction: column; 
         }
         .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
         .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
         .agb-item strong { color: var(--main); display: block; margin-bottom: 3px; }
 
-        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 15px 25px; border-radius: 12px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 12px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
         
         #messageBox { flex: 1; overflow-y: auto; border: 1px solid var(--brd); border-radius: 8px; padding: 10px; text-align: left; margin-bottom: 10px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; }
@@ -143,56 +117,34 @@
         .del-confirm button { padding: 4px 8px; font-size: 0.7rem; }
 
         .friend-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); align-items: center; position: relative; }
-        .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; }
+        
+        /* HEADER ICONS */
+        .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; color: var(--txt); }
+        .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); }
+
         .chat-input-area { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
-        .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
+        .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; color: var(--txt); display: flex; align-items: center; justify-content: center; }
         
         .scroll-area { flex: 1; overflow-y: auto; border-top: 1px solid var(--brd); margin-top: 10px; }
 
-        /* UNREAD BADGE */
-        .unread-badge {
-            background-color: var(--danger); color: white; border-radius: 10px;
-            padding: 2px 6px; font-size: 0.7rem; font-weight: bold;
-            margin-left: 5px; vertical-align: middle; display: none;
-        }
+        .unread-badge { background-color: var(--danger); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; margin-left: 5px; vertical-align: middle; display: none; }
 
-        /* MUTE / NOTIFICATION BUTTONS */
         .action-btn-group { display: flex; gap: 5px; align-items: center; }
         .icon-btn { background: transparent; color: var(--txt); padding: 5px; font-size: 1rem; border: 1px solid transparent; }
         .icon-btn:hover { background: var(--hover); transform: none; }
         .muted-state { color: var(--danger); opacity: 0.7; }
 
-        /* --- PROFILE PIC (PFP) --- */
-        .pfp {
-            width: 40px; height: 40px; border-radius: 50%; 
-            object-fit: cover; background: transparent; 
-            border: 2px solid var(--brd); flex-shrink: 0; margin-right: 10px;
-            display: none; 
-        }
-        .pfp-large {
-            width: 80px; height: 80px; margin-bottom: 10px; cursor: pointer;
-            display: inline-block; background: #4CAF50;
-        }
+        .pfp { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: transparent; border: 2px solid var(--brd); flex-shrink: 0; margin-right: 10px; display: none; }
+        .pfp-large { width: 80px; height: 80px; margin-bottom: 10px; cursor: pointer; display: inline-block; background: #4CAF50; }
         .friend-info { display: flex; align-items: center; }
 
-        /* --- CHAT PLUS STYLES --- */
-        .chat-plus-container {
-            border: 2px solid var(--gold); border-radius: 12px;
-            padding: 15px; margin-bottom: 15px; text-align: left;
-            position: relative;
-            background: linear-gradient(to bottom, rgba(255, 215, 0, 0.05), transparent);
-        }
+        .chat-plus-container { border: 2px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: left; position: relative; background: linear-gradient(to bottom, rgba(255, 215, 0, 0.05), transparent); }
         .chat-plus-header { color: #d4af37; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
         .plus-list { list-style: none; padding: 0; margin: 0 0 15px 0; font-size: 0.9rem; }
         .plus-list li { margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         
         .plus-options { display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-start; flex-wrap: wrap; }
-        .plus-option-item { 
-            width: 35px; height: 35px; border-radius: 50%; 
-            border: 2px solid var(--brd); cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-            position: relative; font-size: 1.2rem; box-sizing: border-box; 
-        }
+        .plus-option-item { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--brd); cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; font-size: 1.2rem; box-sizing: border-box; }
         .plus-option-item.active-selection { border: 3px solid var(--main); box-shadow: 0 0 8px var(--main); transform: scale(1.1); }
         .plus-option-item.locked { opacity: 0.6; cursor: not-allowed; background: #ddd; }
         .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; }
@@ -200,29 +152,17 @@
         
         #chatLoading { display: none; text-align: center; padding: 10px; font-weight: bold; color: var(--main); font-size: 0.9rem; }
         
-        /* SPECIAL TAGS */
-        .tag-admin {
-            background: var(--main); color: white; border-radius: 4px; padding: 1px 4px; 
-            font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold;
-        }
-        .tag-owner {
-            background: linear-gradient(45deg, #FFD700, #ff4757); color: white; border-radius: 4px; padding: 1px 4px; 
-            font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        .tag-admin { background: var(--main); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+        .tag-owner { background: linear-gradient(45deg, #FFD700, #ff4757); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .kick-btn {
-            background: var(--danger); color: white; border: none; padding: 2px 6px;
-            border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: auto;
-        }
-        .info-list-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 8px; border-bottom: 1px solid var(--brd); text-align: left;
-        }
+        .kick-btn { background: var(--danger); color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: auto; }
+        .info-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--brd); text-align: left; }
 
-        /* Typing Indicator */
-        #typingIndicator {
-            font-size: 0.7rem; color: #888; text-align: left; padding-left: 5px; 
-            height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic;
+        #typingIndicator { font-size: 0.7rem; color: #888; text-align: left; padding-left: 5px; height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic; }
+
+        /* BANNED SCREEN */
+        #bannedView {
+            background: #ff4757; color: white; z-index: 20000;
         }
     </style>
 </head>
@@ -237,6 +177,13 @@
             <button onclick="showView('loginView')">Anmelden</button>
             <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
+    </div>
+
+    <div id="bannedView" class="view hidden">
+        <h1 style="font-size: 3rem;"><i class="fas fa-ban"></i></h1>
+        <h2>GESPERRT</h2>
+        <p>Dein Account wurde permanent gesperrt.</p>
+        <button onclick="executeLogout()" style="background: white; color: #ff4757; margin-top: 20px;">Abmelden</button>
     </div>
 
     <div id="registerView" class="view hidden">
@@ -257,7 +204,7 @@
                 <div class="agb-item"><strong>2. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Verstößen zu prüfen.</div>
                 <div class="agb-item"><strong>3. Datenspeicherung</strong>Bilder und Nachrichten werden über Firebase Storage/Database verarbeitet.</div>
                 <div class="agb-item"><strong>4. Verhalten</strong>Respektloser Umgang führt zum sofortigen Ausschluss.</div>
-                <div class="agb-item"><strong>5. Sicherheit</strong>John Chat Gewehrleistet absolute Sicherheit, daher bleiben alle ihre Chats Gruppen Passwörter Freunde & Daten Sicher & Privat.</div>
+                <div class="agb-item"><strong>5. Sicherheit</strong>John Chat Gewährleistet absolute Sicherheit, daher bleiben alle ihre Chats Gruppen Passwörter Freunde & Daten Sicher & Privat.</div>
                 <div class="agb-item"><strong>6. Algemeine Regeln</strong>Sexuelle Inhalte sowohl auch Beleidigungen sind in Gruppen und Chats Verboten!</div>
             </div>
             <button onclick="toggleAgb(false)" style="width:100%;">Schließen</button>
@@ -279,11 +226,13 @@
     </div>
 
     <div id="mainView" class="view view-large hidden">
-        <span class="settings-icon" onclick="showView('settingsView')">⚙️</span>
+        <span id="adminBtn" class="admin-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
+        
+        <span class="settings-icon" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
         <h2 id="userGreeting">Hi</h2>
         <div style="background: rgba(88, 101, 242, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 10px;">
             <input type="text" id="targetFriend" placeholder="Username adden..." style="margin:0">
-            <button onclick="sendRequest()" style="width: 100%; margin-top:5px;">Adden</button>
+            <button onclick="sendRequest()" style="width: 100%; margin-top:5px;"><i class="fas fa-user-plus"></i> Adden</button>
         </div>
         <button onclick="openGroupCreator()" class="secondary" style="font-size:0.8rem; margin-bottom:10px;">+ Neue Gruppe erstellen</button>
         <div id="pendingRequests"></div>
@@ -294,11 +243,33 @@
         <button onclick="confirmLogout()" class="secondary" style="width:100%; margin-top:10px;">Abmelden</button>
     </div>
 
+    <div id="adminPanelView" class="view view-large hidden">
+        <h2 style="color: var(--danger);"><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        <p>Nutzer verwalten:</p>
+        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px;">
+            <input type="text" id="adminSearchInput" placeholder="Benutzernamen eingeben...">
+            <button onclick="manualAdminSearch()" style="width: 100%; margin-top: 10px;">Verwalten</button>
+        </div>
+        
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
+    </div>
+
+    <div id="adminUserActionModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 id="adminActionTitle">User verwalten</h2>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button onclick="adminDeletePfp()" class="secondary">Profilbild löschen</button>
+                <button onclick="adminToggleBan()" id="adminBanBtn" class="danger">ACCOUNT SPERREN</button>
+                <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
     <div id="chatWindow" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3 id="chatWithTitle" style="margin:0; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">Chat</h3>
             <div style="display:flex; gap:5px;">
-                <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:0.7rem; padding: 8px;">ℹ️ Info</button>
+                <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:0.7rem; padding: 8px;"><i class="fas fa-info-circle"></i> Info</button>
                 <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.7rem; padding: 8px;">Verlassen</button>
             </div>
         </div>
@@ -308,11 +279,11 @@
         <div id="typingIndicator"></div>
 
         <div class="chat-input-area">
-            <label class="file-label">📷<input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
+            <label class="file-label"><i class="fas fa-camera"></i><input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
             <input type="text" id="chatInput" placeholder="Nachricht..." style="margin:0" oninput="handleTyping()">
-            <button onclick="sendMessage()" style="width:50px;">></button>
+            <button onclick="sendMessage()" style="width:50px;"><i class="fas fa-paper-plane"></i></button>
         </div>
-        <button onclick="closeChat()" class="secondary" style="margin-top:10px;">Zurück</button>
+        <button onclick="closeChat()" class="secondary" style="margin-top:10px;"><i class="fas fa-arrow-left"></i> Zurück</button>
     </div>
 
     <div id="settingsView" class="view view-large hidden">
@@ -327,52 +298,52 @@
             </div>
 
             <div class="chat-plus-container">
-                <div class="chat-plus-header">🌟 Chat Plus</div>
+                <div class="chat-plus-header"><i class="fas fa-star"></i> Chat Plus</div>
                 <ul class="plus-list">
-                    <li>⚙️ Erhalte Zugriff zu 5 Weiteren Hintergrund Farben</li>
-                    <li>🪧 Ändere die Farbe deines Nametags in Chats</li>
-                    <li>👀 Stelle vor deinen Namen ein Custom Emoji</li>
+                    <li><i class="fas fa-palette"></i> Erhalte Zugriff zu 5 Weiteren Hintergrund Farben</li>
+                    <li><i class="fas fa-tag"></i> Ändere die Farbe deines Nametags in Chats</li>
+                    <li><i class="fas fa-smile"></i> Stelle vor deinen Namen ein Custom Emoji</li>
                 </ul>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
                 <div class="plus-options" id="emojiSelector">
-                    <div class="plus-option-item" data-val="" onclick="setEmoji('')">🚫</div>
-                    <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🗣️" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="💎" onclick="setEmoji('💎')">💎<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="💰" onclick="setEmoji('💰')">💰<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="📦" onclick="setEmoji('📦')">📦<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="🛎️" onclick="setEmoji('🛎️')">🛎️<span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="⏰" onclick="setEmoji('⏰')">⏰<span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item" data-val="" onclick="setEmoji('')"><i class="fas fa-ban"></i></div>
+                    <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="🗣️" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="💎" onclick="setEmoji('💎')">💎<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="💰" onclick="setEmoji('💰')">💰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="📦" onclick="setEmoji('📦')">📦<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="🛎️" onclick="setEmoji('🛎️')">🛎️<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="⏰" onclick="setEmoji('⏰')">⏰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
                 <div class="plus-options" id="bgSelector">
                     <div class="plus-option-item" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
-                    <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="purple" onclick="setBg('purple')"><div class="color-swatch" style="background:#ede7f6"></div><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="orange" onclick="setBg('orange')"><div class="color-swatch" style="background:#fff3e0"></div><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="purple" onclick="setBg('purple')"><div class="color-swatch" style="background:#ede7f6"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="orange" onclick="setBg('orange')"><div class="color-swatch" style="background:#fff3e0"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Nametag Farbe:</p>
                 <div class="plus-options" id="nameColorSelector">
                     <div class="plus-option-item" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>
-                    <div class="plus-option-item locked" data-val="blue" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="yellow" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="pink" onclick="setNameColor('pink')"><span style="color:#e91e63; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="teal" onclick="setNameColor('teal')"><span style="color:#009688; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="blue" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="yellow" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="pink" onclick="setNameColor('pink')"><span style="color:#e91e63; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="teal" onclick="setNameColor('teal')"><span style="color:#009688; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     
-                    <div class="plus-option-item locked" data-val="red" onclick="setNameColor('red')"><span style="color:#ff4757; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="lime" onclick="setNameColor('lime')"><span style="color:#badc58; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="cyan" onclick="setNameColor('cyan')"><span style="color:#00d2d3; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="indigo" onclick="setNameColor('indigo')"><span style="color:#5f27cd; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
-                    <div class="plus-option-item locked" data-val="brown" onclick="setNameColor('brown')"><span style="color:#795548; font-weight:bold;">A</span><span class="lock-icon">🔒</span></div>
+                    <div class="plus-option-item locked" data-val="red" onclick="setNameColor('red')"><span style="color:#ff4757; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="lime" onclick="setNameColor('lime')"><span style="color:#badc58; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="cyan" onclick="setNameColor('cyan')"><span style="color:#00d2d3; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="indigo" onclick="setNameColor('indigo')"><span style="color:#5f27cd; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                    <div class="plus-option-item locked" data-val="brown" onclick="setNameColor('brown')"><span style="color:#795548; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                 </div>
 
                 <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;">
@@ -504,7 +475,6 @@
         let lastMessageTimestamps = {}; 
         let pfpListeners = {}; 
         let pfpCache = {};
-        
         // Group & Admin
         let currentGroupAdmin = null; 
         let kickTargetUser = null;
@@ -513,6 +483,10 @@
         // Typing
         let typingTimeout = null;
         let typingListener = null;
+        
+        // ADMIN VARS
+        let adminTargetUser = null;
+        let adminTargetIsBanned = false;
         
         const validCodes = [
             "PH3675HKF62", "826KRJFE67", "KSN726KWMS", "ZRFnNFE62661Jg", "UNLBSBSOCKME", 
@@ -529,8 +503,16 @@
                     if(snap.exists()) {
                         currentUser = savedUser;
                         const data = snap.val();
+                        
+                        // BAN CHECK
+                        if(data.banned === true) {
+                            showView('bannedView');
+                            return;
+                        }
+
                         document.getElementById('userGreeting').innerText = "Hi " + formatName(currentUser);
                         if(data.theme === 'dark') document.body.classList.add('dark-mode');
+                        
                         if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                             Notification.requestPermission();
                         }
@@ -584,6 +566,11 @@
             db.ref('users/' + user).get().then(snap => {
                 const data = snap.val();
                 if(data && data.pass === pass) {
+                    if(data.banned === true) {
+                        showView('bannedView');
+                        return;
+                    }
+
                     currentUser = user;
                     
                     if(document.getElementById('keepLogin').checked) {
@@ -616,7 +603,6 @@
             if(currentUser) db.ref('users/' + currentUser + '/lastRead').off();
             for(let id in pfpListeners) { db.ref('users/'+id+'/pfp').off(); }
             if(typingListener) db.ref(typingListener).off();
-            
             pfpListeners = {};
             pfpCache = {};
             watchedChats = {};
@@ -626,10 +612,24 @@
         }
 
         function startSync() {
+            // ADMIN CHECK
+            if(currentUser.toLowerCase() === OWNER_NAME) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('adminBtn').classList.add('hidden');
+            }
+
             db.ref('users/' + currentUser).on('value', snap => {
-                const data = snap.val(); if(!data) return;
+                const data = snap.val(); 
+                
+                // BAN LIVE CHECK
+                if(!data || data.banned === true) {
+                    showView('bannedView');
+                    if(currentUser.toLowerCase() !== OWNER_NAME) return; 
+                }
                 
                 userHasPlus = data.chatPlus === true;
+                
                 myEmoji = data.customEmoji || "";
                 myNameColor = data.nameColor || "";
                 myBg = data.bgGradient || "default";
@@ -650,8 +650,8 @@
                     <div class="friend-item">
                         ${formatName(s)} addet dich 
                         <div class="action-btn-group">
-                            <button onclick="accept('${s}')" style="padding:5px 10px;">✔</button>
-                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;">X</button>
+                            <button onclick="accept('${s}')" style="padding:5px 10px;"><i class="fas fa-check"></i></button>
+                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;
                 });
@@ -670,9 +670,9 @@
                             <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
                         <div class="action-btn-group">
-                            <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '🔕' : '🔔'}</button>
+                            <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
                             <button onclick="openChat('${f}', false)">Chat</button>
-                            <button class="danger" onclick="askUnfriend('${f}')">X</button>
+                            <button class="danger" onclick="askUnfriend('${f}')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;
                     watchChat(cid, 'private', f); 
@@ -689,11 +689,11 @@
                                 gList.innerHTML += `
                                 <div class="friend-item" id="row-${gid}">
                                     <div class="friend-info">
-                                        <span style="font-size:1.5rem; margin-right:10px;">👥</span>
+                                        <span style="font-size:1.5rem; margin-right:10px;"><i class="fas fa-users"></i></span>
                                         <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
                                     </div>
                                     <div class="action-btn-group">
-                                        <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '🔕' : '🔔'}</button>
+                                        <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
                                         <button onclick="openChat('${gid}', true, '${gName}')">Chat</button>
                                     </div>
                                 </div>`;
@@ -715,7 +715,8 @@
             if(pfpListeners[userId]) {
                 const el = document.getElementById('pfp-view-' + userId);
                 if(el && pfpCache[userId]) {
-                   el.src = pfpCache[userId]; el.style.display = "block";
+                   el.src = pfpCache[userId];
+                   el.style.display = "block";
                 }
                 return;
             }
@@ -746,15 +747,17 @@
             const path = type === 'group' ? `groups/${chatId}/messages` : `chats/${chatId}`;
             watchedChats[chatId] = path;
             
+            // Limit to last 30 for preview listener
             db.ref(path).limitToLast(30).on('value', snap => {
                 const messages = [];
                 snap.forEach(c => messages.push(c.val()));
                 if(messages.length > 0) {
                     const lastMsg = messages[messages.length - 1];
+                
                     if(lastMsg.timestamp > appLoadedTime && lastMsg.from !== currentUser) {
                         if(activeChatID !== chatId && !mutedChats[chatId]) {
                              if(document.hidden || activeChatID !== chatId) {
-                                const senderName = type === 'group' ? `Gruppe ${name}` : name;
+                                 const senderName = type === 'group' ? `Gruppe ${name}` : name;
                                 sendPushNotification("John Chat", `Neue Benachrichtigung von ${senderName}`);
                              }
                         }
@@ -762,7 +765,6 @@
                 }
                 syncBadges(chatId, messages);
             });
-            
             db.ref('users/' + currentUser + '/lastRead/' + chatId).on('value', snap => {
                 const lastReadTime = snap.val() || 0;
                 localStorage.setItem('syncedRead_' + chatId, lastReadTime);
@@ -838,9 +840,12 @@
             }
         }
 
-        function setEmoji(emoji) { if(emoji !== "" && !userHasPlus) return; db.ref('users/' + currentUser + '/customEmoji').set(emoji); }
-        function setBg(bgName) { if(bgName !== "default" && !userHasPlus) return; db.ref('users/' + currentUser + '/bgGradient').set(bgName); }
-        function setNameColor(color) { if(color !== "" && !userHasPlus) return; db.ref('users/' + currentUser + '/nameColor').set(color); }
+        function setEmoji(emoji) { if(emoji !== "" && !userHasPlus) return;
+            db.ref('users/' + currentUser + '/customEmoji').set(emoji); }
+        function setBg(bgName) { if(bgName !== "default" && !userHasPlus) return;
+            db.ref('users/' + currentUser + '/bgGradient').set(bgName); }
+        function setNameColor(color) { if(color !== "" && !userHasPlus) return;
+            db.ref('users/' + currentUser + '/nameColor').set(color); }
 
         function applyTheme(baseTheme, plusBg) {
             document.body.className = "";
@@ -868,7 +873,8 @@
             });
         }
 
-        function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true); db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
+        function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true);
+            db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
         function deny(n) { db.ref('users/'+currentUser+'/requests/'+n).remove(); triggerEmbed("Anfrage abgelehnt", "success"); }
         
         function askUnfriend(n) {
@@ -895,9 +901,10 @@
                     list.innerHTML = "<p style='grid-column:1/3; font-size:0.8rem;'>Du brauchst Freunde für eine Gruppe.</p>";
                     return;
                 }
+            
                 snap.forEach(f => {
                     const friendName = f.key;
-                    list.innerHTML += `<label class="member-card" id="card-${friendName}"><input type="checkbox" class="g-member" value="${friendName}" onchange="toggleCardSelection('${friendName}', this)"><span style="font-size:1.2rem;">👤</span><span style="font-size:0.9rem;">${formatName(friendName)}</span></label>`;
+                    list.innerHTML += `<label class="member-card" id="card-${friendName}"><input type="checkbox" class="g-member" value="${friendName}" onchange="toggleCardSelection('${friendName}', this)"><span style="font-size:1.2rem;"><i class="fas fa-user"></i></span><span style="font-size:0.9rem;">${formatName(friendName)}</span></label>`;
                 });
             });
             document.getElementById('groupCreator').classList.remove('hidden');
@@ -954,7 +961,6 @@
 
         function closeChat() {
             if(activeChatID) db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
-            
             if(currentChatPath) db.ref(currentChatPath).off();
             if(typingListener) db.ref(typingListener).off();
             
@@ -963,66 +969,99 @@
             showView('mainView');
         }
 
-        // --- FULL LOAD MESSAGES (No Lazy Load) ---
+        // ==========================================
+        //  LAG FREE CHAT ENGINE (Fixed)
+        // ==========================================
         function loadChatMessages() {
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
             if(currentChatPath && currentChatPath !== path) db.ref(currentChatPath).off();
             currentChatPath = path;
 
             document.getElementById('chatLoading').style.display = 'block';
-            
+            document.getElementById('messageBox').innerHTML = ""; // Clean start
+
+            // FIX: Using child_added for smooth performance instead of reloading everything
             db.ref(path).off();
-            db.ref(path).on('value', snap => {
+            
+            // 1. Listen for NEW messages (or last 25)
+            db.ref(path).limitToLast(25).on('child_added', snap => {
                 document.getElementById('chatLoading').style.display = 'none';
-                const box = document.getElementById('messageBox');
-                box.innerHTML = "";
-                
-                snap.forEach(m => {
-                    const d = m.val(), key = m.key;
-                    let isSystem = d.from === "SYSTEM";
-                    let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
-                    
-                    // Delete Logic
-                    let canDelete = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === OWNER_NAME));
-                    if(isGroup && currentUser === currentGroupAdmin && !isSystem) canDelete = true; 
-                    
-                    let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')">🗑️</span>` : "";
-                    
-                    // Tags
-                    let tags = "";
-                    if(d.from.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
-                    else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
-                    
-                    let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}${tags}:</b><br>`;
-                    if(!isSystem && d.plusData) {
-                        const emoji = d.plusData.emoji || "";
-                        const colorClass = d.plusData.color ? "name-" + d.plusData.color : "";
-                        displayNameHTML = `<b class="${colorClass}">${emoji} ${formatName(d.from)}${tags}:</b><br>`;
-                    }
+                renderSingleMessage(snap);
+            });
 
-                    let timeStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : "";
+            // 2. Listen for REMOVED messages (Deletion)
+            db.ref(path).limitToLast(25).on('child_removed', snap => {
+                 const key = snap.key;
+                 const el = document.getElementById('msg-' + key);
+                 if(el) el.remove();
+            });
 
-                    box.innerHTML += `
-                        <div class="msg ${isSystem ? 'system-msg' : ''}" id="msg-${key}">
-                            ${displayNameHTML}${content}${delBtn}
-                            ${!isSystem ? `<span class="msg-time">${timeStr}</span>` : ''}
-                            <div id="confirm-${key}" class="del-confirm hidden">
-                                <span>Löschen?</span>
-                                <div>
-                                    <button class="danger" onclick="deleteMessage('${key}', '${d.from}')">Ja</button>
-                                    <button onclick="hideInlineConfirm('${key}')">X</button>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-                
-                // Scroll to bottom
-                box.scrollTop = box.scrollHeight;
-                
-                if(activeChatID) {
-                     db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
+            // 3. Listen for CHANGED messages (Admin deleted text replacement)
+            db.ref(path).limitToLast(25).on('child_changed', snap => {
+                const key = snap.key;
+                const el = document.getElementById('msg-' + key);
+                if(el) {
+                    // Simple hack: Re-render by replacing
+                    const newHtml = buildMessageHTML(snap.val(), key);
+                    el.outerHTML = newHtml;
                 }
             });
+        }
+
+        function renderSingleMessage(snap) {
+            const d = snap.val();
+            const key = snap.key;
+            const box = document.getElementById('messageBox');
+            
+            // Prevent duplicates
+            if(document.getElementById('msg-' + key)) return;
+
+            const html = buildMessageHTML(d, key);
+            box.insertAdjacentHTML('beforeend', html);
+            
+            // Smooth Scroll
+            box.scrollTop = box.scrollHeight;
+            if(activeChatID) {
+                db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
+            }
+        }
+
+        function buildMessageHTML(d, key) {
+            let isSystem = d.from === "SYSTEM";
+            let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+            
+            // Delete Logic
+            let canDelete = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === OWNER_NAME));
+            if(isGroup && currentUser === currentGroupAdmin && !isSystem) canDelete = true; 
+            
+            let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i></span>` : "";
+            
+            // Tags
+            let tags = "";
+            if(d.from.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
+            else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
+
+            let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}${tags}:</b><br>`;
+            if(!isSystem && d.plusData) {
+                const emoji = d.plusData.emoji || "";
+                const colorClass = d.plusData.color ? "name-" + d.plusData.color : "";
+                displayNameHTML = `<b class="${colorClass}">${emoji} ${formatName(d.from)}${tags}:</b><br>`;
+            }
+
+            let timeStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : "";
+
+            return `
+                <div class="msg ${isSystem ? 'system-msg' : ''}" id="msg-${key}">
+                    ${displayNameHTML}${content}${delBtn}
+                    ${!isSystem ? `<span class="msg-time">${timeStr}</span>` : ''}
+                    <div id="confirm-${key}" class="del-confirm hidden">
+                        <span>Löschen?</span>
+                        <div>
+                            <button class="danger" onclick="deleteMessage('${key}', '${d.from}')">Ja</button>
+                            <button onclick="hideInlineConfirm('${key}')">X</button>
+                        </div>
+                    </div>
+                </div>`;
         }
 
         // --- TYPING INDICATOR ---
@@ -1085,7 +1124,7 @@
                     
                     mList.innerHTML += `
                         <div class="info-list-item">
-                            <span>👤 ${formatName(m)}${tags}</span>
+                            <span><i class="fas fa-user"></i> ${formatName(m)}${tags}</span>
                             ${kickBtn}
                         </div>
                     `;
@@ -1254,6 +1293,81 @@
                 triggerEmbed("Fehler beim Löschen", "danger");
             });
         }
+
+        // ==========================================
+        // ADMIN PANEL FUNCTIONS (NEW: MANUAL SEARCH)
+        // ==========================================
+
+        function manualAdminSearch() {
+            const searchName = document.getElementById('adminSearchInput').value.trim().toLowerCase();
+            if(!searchName) {
+                triggerEmbed("Bitte Namen eingeben!", "danger");
+                return;
+            }
+            
+            db.ref('users/' + searchName).once('value', snap => {
+                if(snap.exists()) {
+                    const data = snap.val();
+                    const isBanned = data.banned === true;
+                    openAdminUserAction(searchName, isBanned);
+                } else {
+                    triggerEmbed("Nutzer existiert nicht!", "danger");
+                }
+            });
+        }
+
+        function openAdminUserAction(uname, isBanned) {
+            adminTargetUser = uname;
+            adminTargetIsBanned = isBanned;
+            
+            document.getElementById('adminActionTitle').innerText = "Verwalte: " + uname;
+            const banBtn = document.getElementById('adminBanBtn');
+            
+            if(isBanned) {
+                banBtn.innerText = "ENTSPERREN";
+                banBtn.classList.remove('danger');
+                banBtn.style.background = "var(--success)";
+            } else {
+                banBtn.innerText = "ACCOUNT SPERREN";
+                banBtn.classList.add('danger');
+                banBtn.style.background = "";
+            }
+            
+            document.getElementById('adminUserActionModal').classList.remove('hidden');
+        }
+
+        function closeAdminAction() {
+            document.getElementById('adminUserActionModal').classList.add('hidden');
+            adminTargetUser = null;
+            document.getElementById('adminSearchInput').value = ""; // Clear input
+        }
+
+        function adminDeletePfp() {
+            if(!adminTargetUser) return;
+            db.ref('users/' + adminTargetUser + '/pfp').remove().then(() => {
+                triggerEmbed("Profilbild gelöscht", "success");
+                closeAdminAction();
+            });
+        }
+
+        function adminToggleBan() {
+            if(!adminTargetUser) return;
+            
+            if(adminTargetIsBanned) {
+                // UNBAN
+                db.ref('users/' + adminTargetUser + '/banned').remove().then(() => {
+                    triggerEmbed("User entsperrt", "success");
+                    closeAdminAction();
+                });
+            } else {
+                // BAN
+                db.ref('users/' + adminTargetUser + '/banned').set(true).then(() => {
+                    triggerEmbed("User gesperrt!", "danger");
+                    closeAdminAction();
+                });
+            }
+        }
+
     </script>
 </body>
 </html>
