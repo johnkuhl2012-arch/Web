@@ -40,15 +40,18 @@
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
         body { 
-            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); 
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg); color: var(--txt); 
             display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s; 
+            min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s;
         }
         
         .view { 
-            animation: fadeIn 0.4s; width: 90%; max-width: 420px; background: var(--cont); 
+            animation: fadeIn 0.4s;
+            width: 90%; max-width: 420px; background: var(--cont); 
             border: 1px solid var(--brd); border-radius: 20px; padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center; position: relative; 
             display: flex; flex-direction: column; box-sizing: border-box; max-height: 85vh; margin: auto;
         }
 
@@ -97,7 +100,8 @@
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--cont); border-radius: 20px; padding: 25px; 
-            box-sizing: border-box; z-index: 100; text-align: left; display: flex; flex-direction: column; 
+            box-sizing: border-box; z-index: 100; text-align: left;
+            display: flex; flex-direction: column; 
         }
         .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
         .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
@@ -161,9 +165,10 @@
         #typingIndicator { font-size: 0.7rem; color: #888; text-align: left; padding-left: 5px; height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic; }
 
         /* BANNED SCREEN */
-        #bannedView {
-            background: #ff4757; color: white; z-index: 20000;
-        }
+        #bannedView { background: #ff4757; color: white; z-index: 20000; }
+        
+        /* Email Settings Status */
+        .email-status-box { border: 1px dashed var(--main); background: rgba(88, 101, 242, 0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -227,7 +232,6 @@
 
     <div id="mainView" class="view view-large hidden">
         <span id="adminBtn" class="admin-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
-        
         <span class="settings-icon" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
         <h2 id="userGreeting">Hi</h2>
         <div style="background: rgba(88, 101, 242, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 10px;">
@@ -250,7 +254,6 @@
             <input type="text" id="adminSearchInput" placeholder="Benutzernamen eingeben...">
             <button onclick="manualAdminSearch()" style="width: 100%; margin-top: 10px;">Verwalten</button>
         </div>
-        
         <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
     </div>
 
@@ -351,6 +354,22 @@
                     <button onclick="redeemCode()" class="gold-btn" style="width:100%;">Code Einlösen</button>
                 </div>
             </div>
+            
+            <div style="border-top: 1px solid var(--brd); margin-top:15px; padding-top:15px; margin-bottom: 15px;">
+                <h3><i class="fas fa-envelope"></i> Email Benachrichtigungen</h3>
+                <p style="font-size:0.8rem; color:#888;">Erhalte eine Email bei neuen Nachrichten (nur wenn Chat nicht gemutet ist).</p>
+                
+                <div id="emailDisplayBox" class="email-status-box hidden">
+                    <p style="margin:0; font-size:0.9rem;">Gespeicherte Email:</p>
+                    <b id="savedEmailTxt" style="color:var(--main);"></b>
+                    <button onclick="deleteEmail()" class="danger" style="width:100%; margin-top:10px; font-size:0.8rem;">Email Löschen</button>
+                </div>
+
+                <div id="emailInputBox">
+                    <input type="email" id="emailSettingsInput" placeholder="Deine Email Adresse...">
+                    <button onclick="saveEmail()" style="width:100%;">Speichern</button>
+                </div>
+            </div>
 
             <div style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--brd); padding:10px; border-radius:10px;">
                 <span style="font-size:0.9rem;">Kann Freundschaftsanfragen erhalten</span>
@@ -447,6 +466,9 @@
     </div>
 
     <script>
+        // HIER DEINE API URL EINFÜGEN FÜR EMAILS
+        const EMAIL_API_URL = "https://script.google.com/macros/s/AKfycbzJ1UdWp6bXkbl2QHfk4UqILyT0Y6cG-0cJYyui0mbEUz9IRVTq7UYKuv_sw8lgYOL1/exec";
+
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
             authDomain: "johnchat-97cbf.firebaseapp.com",
@@ -495,7 +517,7 @@
             "OMEGA11HSHBS", "ZETA22HWJJS", "THETA33NSJMSSS", "IOTA44JJJKSMS", "KAPPA00NNSNS",
             "JOHNVIPHWHBBSJS", "PROUSERHSJSJNS", "ELITECHATHSBHS", "MASTERKEYKSMHS", "SUPMSNSKMXK"
         ];
-
+        
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('johnChatUser');
             if(savedUser) {
@@ -584,7 +606,8 @@
 
                     document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
                     if(data.theme === 'dark') document.body.classList.add('dark-mode');
-                    startSync(); showView('mainView');
+                    startSync();
+                    showView('mainView');
                 } else showAlert("Login falsch!", "danger");
             });
         }
@@ -638,13 +661,24 @@
                 // Privacy Setting
                 document.getElementById('requestToggle').checked = (data.allowRequests !== false); // default true
 
+                // Email Settings Sync
+                if(data.email) {
+                    document.getElementById('savedEmailTxt').innerText = data.email;
+                    document.getElementById('emailDisplayBox').classList.remove('hidden');
+                    document.getElementById('emailInputBox').classList.add('hidden');
+                } else {
+                    document.getElementById('emailDisplayBox').classList.add('hidden');
+                    document.getElementById('emailInputBox').classList.remove('hidden');
+                }
+
                 if(data.pfp) document.getElementById('mySettingsPfp').src = data.pfp;
                 else document.getElementById('mySettingsPfp').src = ""; 
 
                 updatePlusUI();
                 applyTheme(data.theme, myBg);
 
-                const rList = document.getElementById('pendingRequests'); rList.innerHTML = "";
+                const rList = document.getElementById('pendingRequests');
+                rList.innerHTML = "";
                 if(data.requests) Object.keys(data.requests).forEach(s => {
                     rList.innerHTML += `
                     <div class="friend-item">
@@ -655,7 +689,6 @@
                         </div>
                     </div>`;
                 });
-                
                 const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
                 if(data.friends) Object.keys(data.friends).forEach(f => {
                     let cid = [currentUser, f].sort().join("_");
@@ -705,6 +738,22 @@
             });
         }
 
+        // --- EMAIL FUNCTIONS ---
+        function saveEmail() {
+            const mail = document.getElementById('emailSettingsInput').value.trim();
+            if(!mail || !mail.includes('@')) return triggerEmbed("Ungültige Email", "danger");
+            db.ref('users/' + currentUser + '/email').set(mail).then(() => {
+                triggerEmbed("Email gespeichert!", "success");
+            });
+        }
+
+        function deleteEmail() {
+            db.ref('users/' + currentUser + '/email').remove().then(() => {
+                triggerEmbed("Email gelöscht", "success");
+                document.getElementById('emailSettingsInput').value = "";
+            });
+        }
+
         // --- REQUEST SETTING ---
         function toggleRequestSetting() {
             const val = document.getElementById('requestToggle').checked;
@@ -746,7 +795,6 @@
             if(watchedChats[chatId]) return;
             const path = type === 'group' ? `groups/${chatId}/messages` : `chats/${chatId}`;
             watchedChats[chatId] = path;
-            
             // Limit to last 30 for preview listener
             db.ref(path).limitToLast(30).on('value', snap => {
                 const messages = [];
@@ -875,14 +923,16 @@
 
         function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true);
             db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
-        function deny(n) { db.ref('users/'+currentUser+'/requests/'+n).remove(); triggerEmbed("Anfrage abgelehnt", "success"); }
+        function deny(n) { db.ref('users/'+currentUser+'/requests/'+n).remove(); triggerEmbed("Anfrage abgelehnt", "success");
+        }
         
         function askUnfriend(n) {
             friendToRemove = n;
             document.getElementById('unfriendNameTarget').innerText = formatName(n);
             document.getElementById('unfriendModal').classList.remove('hidden');
         }
-        function closeUnfriendModal() { document.getElementById('unfriendModal').classList.add('hidden'); friendToRemove = null; }
+        function closeUnfriendModal() { document.getElementById('unfriendModal').classList.add('hidden'); friendToRemove = null;
+        }
 
         function executeUnfriend() {
             if(!friendToRemove) return;
@@ -916,7 +966,8 @@
             else card.classList.remove('selected');
         }
 
-        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden'); }
+        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden');
+        }
         
         function createGroup() {
             const name = document.getElementById('newGroupName').value, members = Array.from(document.querySelectorAll('.g-member:checked')).map(c => c.value);
@@ -970,7 +1021,7 @@
         }
 
         // ==========================================
-        //  LAG FREE CHAT ENGINE (Fixed)
+        //  LAG FREE CHAT ENGINE (OPTIMIZED)
         // ==========================================
         function loadChatMessages() {
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
@@ -978,30 +1029,33 @@
             currentChatPath = path;
 
             document.getElementById('chatLoading').style.display = 'block';
-            document.getElementById('messageBox').innerHTML = ""; // Clean start
-
-            // FIX: Using child_added for smooth performance instead of reloading everything
-            db.ref(path).off();
+            document.getElementById('messageBox').innerHTML = "";
             
-            // 1. Listen for NEW messages (or last 25)
+            const box = document.getElementById('messageBox');
+            
+            // Check if chat is empty first to remove loader quickly
+            db.ref(path).limitToLast(1).once('value', snap => {
+                if(!snap.exists()) document.getElementById('chatLoading').style.display = 'none';
+            });
+
+            db.ref(path).off();
+            // Listen for NEW messages (optimized)
             db.ref(path).limitToLast(25).on('child_added', snap => {
                 document.getElementById('chatLoading').style.display = 'none';
                 renderSingleMessage(snap);
             });
-
-            // 2. Listen for REMOVED messages (Deletion)
+            
+            // Listen for REMOVED messages
             db.ref(path).limitToLast(25).on('child_removed', snap => {
                  const key = snap.key;
                  const el = document.getElementById('msg-' + key);
                  if(el) el.remove();
             });
-
-            // 3. Listen for CHANGED messages (Admin deleted text replacement)
+            // Listen for CHANGED messages
             db.ref(path).limitToLast(25).on('child_changed', snap => {
                 const key = snap.key;
                 const el = document.getElementById('msg-' + key);
                 if(el) {
-                    // Simple hack: Re-render by replacing
                     const newHtml = buildMessageHTML(snap.val(), key);
                     el.outerHTML = newHtml;
                 }
@@ -1015,7 +1069,6 @@
             
             // Prevent duplicates
             if(document.getElementById('msg-' + key)) return;
-
             const html = buildMessageHTML(d, key);
             box.insertAdjacentHTML('beforeend', html);
             
@@ -1029,7 +1082,6 @@
         function buildMessageHTML(d, key) {
             let isSystem = d.from === "SYSTEM";
             let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
-            
             // Delete Logic
             let canDelete = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === OWNER_NAME));
             if(isGroup && currentUser === currentGroupAdmin && !isSystem) canDelete = true; 
@@ -1040,7 +1092,6 @@
             let tags = "";
             if(d.from.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
             else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
-
             let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}${tags}:</b><br>`;
             if(!isSystem && d.plusData) {
                 const emoji = d.plusData.emoji || "";
@@ -1121,7 +1172,6 @@
                     let tags = "";
                     if(m.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
                     else if(m === data.admin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
-                    
                     mList.innerHTML += `
                         <div class="info-list-item">
                             <span><i class="fas fa-user"></i> ${formatName(m)}${tags}</span>
@@ -1133,7 +1183,8 @@
             });
         }
 
-        function closeGroupInfo() { document.getElementById('groupInfoModal').classList.add('hidden'); }
+        function closeGroupInfo() { document.getElementById('groupInfoModal').classList.add('hidden');
+        }
 
         function confirmKick(user) {
             kickTargetUser = user;
@@ -1165,7 +1216,8 @@
             });
         }
 
-        function confirmLeaveGroup() { document.getElementById('leaveGroupModal').classList.remove('hidden'); }
+        function confirmLeaveGroup() { document.getElementById('leaveGroupModal').classList.remove('hidden');
+        }
 
         function executeLeaveGroup() {
             const gid = activeChatID;
@@ -1205,6 +1257,10 @@
             };
             db.ref(path).push(msgData);
             document.getElementById('chatInput').value = "";
+            
+            // EMAIL NOTIFICATION TRIGGER
+            triggerEmailNotification(t, isGroup, activeChatID);
+
             // Stop typing immediately
             const typePath = isGroup ? `groups/${activeChatID}/typing/${currentUser}` : `chats/${activeChatID}/typing/${currentUser}`;
             db.ref(typePath).remove();
@@ -1223,8 +1279,57 @@
                     plusData: { emoji: myEmoji, color: myNameColor }
                 };
                 db.ref(path).push(msgData);
+                
+                triggerEmailNotification("Hat ein Bild gesendet", isGroup, activeChatID);
             };
             if(file) reader.readAsDataURL(file);
+        }
+        
+        // --- EMAIL API TRIGGER LOGIC ---
+        function triggerEmailNotification(msgText, isGroupChat, chatId) {
+            if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return; // API nicht konfiguriert
+
+            // Funktion um an einen User zu senden
+            const checkAndSend = (targetUser) => {
+                db.ref('users/' + targetUser).once('value', snap => {
+                    const uData = snap.val();
+                    if(uData && uData.email) {
+                        // Check if muted
+                        const userMuted = uData.muted && uData.muted[chatId] === true;
+                        
+                        if(!userMuted) {
+                            // Sende API Request
+                            fetch(EMAIL_API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    to: uData.email,
+                                    subject: isGroupChat ? "Neue Gruppen Nachricht" : "Neue Nachricht",
+                                    body: `Du hast eine neue Nachricht von ${currentUser}: "${msgText}"`,
+                                    sender: currentUser,
+                                    isGroup: isGroupChat
+                                })
+                            }).catch(err => console.log("API Error", err));
+                        }
+                    }
+                });
+            };
+
+            if(isGroupChat) {
+                // In Gruppen an alle Mitglieder senden (außer sich selbst)
+                // Achtung: Bei sehr großen Gruppen kann das viele Reads verursachen.
+                db.ref('groups/' + chatId + '/members').once('value', snap => {
+                    snap.forEach(m => {
+                        if(m.val() !== currentUser) checkAndSend(m.val());
+                    });
+                });
+            } else {
+                // Private Chat: Finde den Partner heraus
+                // chatId ist "userA_userB".
+                const parts = chatId.split('_');
+                const partner = parts[0] === currentUser ? parts[1] : parts[0];
+                checkAndSend(partner);
+            }
         }
 
         function toggleTheme() {
@@ -1322,7 +1427,6 @@
             
             document.getElementById('adminActionTitle').innerText = "Verwalte: " + uname;
             const banBtn = document.getElementById('adminBanBtn');
-            
             if(isBanned) {
                 banBtn.innerText = "ENTSPERREN";
                 banBtn.classList.remove('danger');
@@ -1352,7 +1456,6 @@
 
         function adminToggleBan() {
             if(!adminTargetUser) return;
-            
             if(adminTargetIsBanned) {
                 // UNBAN
                 db.ref('users/' + adminTargetUser + '/banned').remove().then(() => {
@@ -1367,7 +1470,6 @@
                 });
             }
         }
-
     </script>
 </body>
 </html>
