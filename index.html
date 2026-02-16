@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>John Chat</title>
+    <title>John Chat v4 (Final Report System)</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,32 +26,20 @@
         .dark-mode.bg-orange { --bg: #4e2c00 !important; --cont: #331d00 !important; }
 
         /* Nametag Colors */
-        .name-blue { color: #2196F3 !important; }
-        .name-yellow { color: #FBC02D !important; }
-        .name-green { color: #4CAF50 !important; }
-        .name-pink { color: #e91e63 !important; }
-        .name-teal { color: #009688 !important; }
-        .name-red { color: #ff4757 !important; }
-        .name-lime { color: #badc58 !important; }
-        .name-cyan { color: #00d2d3 !important; }
-        .name-indigo { color: #5f27cd !important; }
-        .name-brown { color: #795548 !important; }
+        .name-blue { color: #2196F3 !important; } .name-yellow { color: #FBC02D !important; } .name-green { color: #4CAF50 !important; } .name-pink { color: #e91e63 !important; } .name-teal { color: #009688 !important; } .name-red { color: #ff4757 !important; } .name-lime { color: #badc58 !important; } .name-cyan { color: #00d2d3 !important; } .name-indigo { color: #5f27cd !important; } .name-brown { color: #795548 !important; }
 
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
         body { 
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg); color: var(--txt); 
+            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); 
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s;
         }
         
         .view { 
-            animation: fadeIn 0.4s;
-            width: 90%; max-width: 420px; background: var(--cont); 
+            animation: fadeIn 0.4s; width: 90%; max-width: 420px; background: var(--cont); 
             border: 1px solid var(--brd); border-radius: 20px; padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center; position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; 
             display: flex; flex-direction: column; box-sizing: border-box; max-height: 85vh; margin: auto;
         }
 
@@ -61,11 +49,13 @@
         
         button { padding: 12px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
         button:hover { opacity: 0.9; transform: scale(1.02); }
+        button:disabled { opacity: 0.6; transform: none; cursor: not-allowed; background: #999; }
+        
         button.secondary { background: #747f8d; }
         button.danger { background: var(--danger); padding: 8px 12px; }
         button.gold-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; }
         
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; }
         .hidden { display: none !important; }
 
         .modal-overlay {
@@ -100,8 +90,7 @@
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--cont); border-radius: 20px; padding: 25px; 
-            box-sizing: border-box; z-index: 100; text-align: left;
-            display: flex; flex-direction: column; 
+            box-sizing: border-box; z-index: 100; text-align: left; display: flex; flex-direction: column; 
         }
         .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
         .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
@@ -110,7 +99,7 @@
         #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 12px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
         
-        #messageBox { flex: 1; overflow-y: auto; border: 1px solid var(--brd); border-radius: 8px; padding: 10px; text-align: left; margin-bottom: 10px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; }
+        #messageBox { flex: 1; overflow-y: auto; border: 1px solid var(--brd); border-radius: 8px; padding: 10px; text-align: left; margin-bottom: 10px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
         .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; position: relative; }
         .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
         .msg .del-btn { float: right; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
@@ -158,6 +147,7 @@
         
         .tag-admin { background: var(--main); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-owner { background: linear-gradient(45deg, #FFD700, #ff4757); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .tag-global-admin { background: #ff4757; color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         .kick-btn { background: var(--danger); color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: auto; }
         .info-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--brd); text-align: left; }
@@ -169,9 +159,29 @@
         
         /* Email Settings Status */
         .email-status-box { border: 1px dashed var(--main); background: rgba(88, 101, 242, 0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+
+        /* LOADING SPLASH */
+        #globalLoading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); color: var(--txt);
+            z-index: 30000;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .loader-icon { font-size: 4rem; color: var(--main); animation: pulse 1.5s infinite; margin-bottom: 20px; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* REPORT */
+        .report-btn { color: #ff9f43; background: transparent; border: none; font-size: 1rem; cursor: pointer; }
     </style>
 </head>
 <body>
+
+    <div id="globalLoading" class="hidden">
+        <div class="loader-icon"><i class="fas fa-comment-dots"></i></div>
+        <h2 style="margin:0;">John Chat</h2>
+        <p>Chats werden geladen...</p>
+    </div>
 
     <div id="systemEmbed"></div>
     <div id="customAlert"></div>
@@ -179,7 +189,7 @@
     <div id="homeView" class="view">
         <h1>John Chat</h1>
         <div style="display:flex; flex-direction:column; gap:10px;">
-            <button onclick="showView('loginView')">Anmelden</button>
+           <button onclick="showView('loginView')">Anmelden</button>
             <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
     </div>
@@ -249,11 +259,24 @@
 
     <div id="adminPanelView" class="view view-large hidden">
         <h2 style="color: var(--danger);"><i class="fas fa-user-shield"></i> Admin Panel</h2>
-        <p>Nutzer verwalten:</p>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px;">
-            <input type="text" id="adminSearchInput" placeholder="Benutzernamen eingeben...">
-            <button onclick="manualAdminSearch()" style="width: 100%; margin-top: 10px;">Verwalten</button>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button onclick="toggleAdminTab('users')" id="tabBtnUser" style="flex:1;">User</button>
+            <button onclick="toggleAdminTab('reports')" id="tabBtnReport" class="secondary" style="flex:1;">Reports</button>
         </div>
+
+        <div id="adminTabUsers">
+            <p>Nutzer verwalten:</p>
+            <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px;">
+                <input type="text" id="adminSearchInput" placeholder="Benutzernamen eingeben...">
+                <button onclick="manualAdminSearch()" style="width: 100%; margin-top: 10px;">Verwalten</button>
+            </div>
+        </div>
+
+        <div id="adminTabReports" class="hidden scroll-area">
+            <div id="reportsListContainer"></div>
+        </div>
+
         <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
     </div>
 
@@ -263,7 +286,38 @@
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <button onclick="adminDeletePfp()" class="secondary">Profilbild löschen</button>
                 <button onclick="adminToggleBan()" id="adminBanBtn" class="danger">ACCOUNT SPERREN</button>
+                <button id="makeAdminBtn" onclick="initiateMakeAdmin()" class="gold-btn">Zum Admin machen</button>
                 <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="adminCodeModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Admin Code erforderlich</h3>
+            <p>Gib den 4-stelligen Sicherheits-Code ein:</p>
+            <input type="password" id="adminAuthCode" maxlength="4" style="text-align:center; letter-spacing:5px; font-size:1.5rem;">
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                <button onclick="confirmMakeAdmin()">Bestätigen</button>
+                <button onclick="closeAdminCodeModal()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="color: #ff9f43; margin-top:0;">Melden</h2>
+            <p>Du meldest: <b id="reportTargetName"></b></p>
+            <select id="reportReason" style="width:100%; padding:10px; border-radius:8px; margin-bottom:10px;">
+                <option value="Beleidigung">Beleidigung</option>
+                <option value="Drohung">Drohung</option>
+                <option value="Spam">Spam</option>
+                <option value="Sexuelle Inhalte">Sexuelle Inhalte</option>
+                <option value="Anderes">Etwas anderes</option>
+            </select>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                <button onclick="submitReport()" style="background: #ff9f43;">Report Absenden</button>
+                <button onclick="closeReportModal()" class="secondary">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -272,6 +326,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3 id="chatWithTitle" style="margin:0; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">Chat</h3>
             <div style="display:flex; gap:5px;">
+                <button id="reportChatBtn" class="secondary" onclick="openReportModal()" style="font-size:0.7rem; padding:8px; color:#ff9f43;"><i class="fas fa-exclamation-triangle"></i></button>
                 <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:0.7rem; padding: 8px;"><i class="fas fa-info-circle"></i> Info</button>
                 <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.7rem; padding: 8px;">Verlassen</button>
             </div>
@@ -341,7 +396,6 @@
                     <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="pink" onclick="setNameColor('pink')"><span style="color:#e91e63; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="teal" onclick="setNameColor('teal')"><span style="color:#009688; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    
                     <div class="plus-option-item locked" data-val="red" onclick="setNameColor('red')"><span style="color:#ff4757; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="lime" onclick="setNameColor('lime')"><span style="color:#badc58; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="cyan" onclick="setNameColor('cyan')"><span style="color:#00d2d3; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
@@ -456,7 +510,7 @@
     <div id="deleteAccountModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h2 style="margin-top:0; color:var(--danger);">Konto löschen</h2>
-            <p>Diese Aktion kann nicht rückgängig gemacht werden. Bitte bestätige dein Passwort.</p>
+            <p>Diese Aktion kann nicht rückgängig gemacht werden. Dein Chatverlauf bei Freunden wird ebenfalls gelöscht.</p>
             <input type="password" id="delAccPass" placeholder="Dein Passwort">
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
                 <button class="danger" onclick="executeDeleteAccount()">Endgültig löschen</button>
@@ -466,7 +520,7 @@
     </div>
 
     <script>
-        // HIER DEINE API URL EINFÜGEN FÜR EMAILS
+        // HIER DEINE API URL EINFÜGEN FÜR EMAILS UND LOGS
         const EMAIL_API_URL = "https://script.google.com/macros/s/AKfycbzJ1UdWp6bXkbl2QHfk4UqILyT0Y6cG-0cJYyui0mbEUz9IRVTq7UYKuv_sw8lgYOL1/exec";
 
         const firebaseConfig = {
@@ -480,25 +534,26 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
         let currentUser = null, activeChatID = null, isGroup = false;
-
+        
         // Globals
         let userHasPlus = false;
         let myEmoji = "";
         let myNameColor = "";
         let myBg = "default";
+        let userIsGlobalAdmin = false; 
+
         let currentChatPath = null;
         let friendToRemove = null;
-        
         let mutedChats = {};
         let watchedChats = {};
         let appLoadedTime = Date.now();
-        let lastMessageTimestamps = {}; 
         let pfpListeners = {}; 
         let pfpCache = {};
+        let seenMessages = new Set(); 
+
         // Group & Admin
-        let currentGroupAdmin = null; 
+        let currentGroupAdmin = null;
         let kickTargetUser = null;
         const OWNER_NAME = "knödel";
 
@@ -509,6 +564,7 @@
         // ADMIN VARS
         let adminTargetUser = null;
         let adminTargetIsBanned = false;
+        let reportsListener = null; // Fürs saubere Entfernen des Listeners
         
         const validCodes = [
             "PH3675HKF62", "826KRJFE67", "KSN726KWMS", "ZRFnNFE62661Jg", "UNLBSBSOCKME", 
@@ -521,6 +577,9 @@
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('johnChatUser');
             if(savedUser) {
+                // START LOADING SCREEN
+                showGlobalLoading();
+                
                 db.ref('users/' + savedUser).once('value').then(snap => {
                     if(snap.exists()) {
                         currentUser = savedUser;
@@ -528,6 +587,7 @@
                         
                         // BAN CHECK
                         if(data.banned === true) {
+                            hideGlobalLoading();
                             showView('bannedView');
                             return;
                         }
@@ -538,14 +598,28 @@
                         if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                             Notification.requestPermission();
                         }
+                        
                         startSync();
-                        showView('mainView');
+                        setTimeout(() => {
+                            hideGlobalLoading();
+                            showView('mainView');
+                        }, 2500);
                     } else {
+                        hideGlobalLoading();
                         localStorage.removeItem('johnChatUser');
+                        showView('homeView');
                     }
+                }).catch(() => {
+                    hideGlobalLoading();
+                    showView('homeView');
                 });
+            } else {
+                showView('homeView');
             }
         });
+
+        function showGlobalLoading() { document.getElementById('globalLoading').classList.remove('hidden'); }
+        function hideGlobalLoading() { document.getElementById('globalLoading').classList.add('hidden'); }
 
         function triggerEmbed(text, type = "success") {
             const embed = document.getElementById('systemEmbed');
@@ -585,10 +659,13 @@
             const user = document.getElementById('loginUser').value.trim().toLowerCase();
             const pass = document.getElementById('loginPass').value;
             
+            showGlobalLoading(); 
+
             db.ref('users/' + user).get().then(snap => {
                 const data = snap.val();
                 if(data && data.pass === pass) {
                     if(data.banned === true) {
+                        hideGlobalLoading();
                         showView('bannedView');
                         return;
                     }
@@ -598,7 +675,7 @@
                     if(document.getElementById('keepLogin').checked) {
                         localStorage.setItem('johnChatUser', user);
                         if("Notification" in window) {
-                            Notification.requestPermission().then(perm => {
+                             Notification.requestPermission().then(perm => {
                                 if(perm === "granted") triggerEmbed("Push aktiviert", "success");
                             });
                         }
@@ -607,8 +684,15 @@
                     document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
                     if(data.theme === 'dark') document.body.classList.add('dark-mode');
                     startSync();
-                    showView('mainView');
-                } else showAlert("Login falsch!", "danger");
+                    
+                    setTimeout(() => {
+                        hideGlobalLoading();
+                        showView('mainView');
+                    }, 2000);
+                } else {
+                    hideGlobalLoading();
+                    showAlert("Login falsch!", "danger");
+                }
             });
         }
 
@@ -626,22 +710,18 @@
             if(currentUser) db.ref('users/' + currentUser + '/lastRead').off();
             for(let id in pfpListeners) { db.ref('users/'+id+'/pfp').off(); }
             if(typingListener) db.ref(typingListener).off();
+            if(reportsListener) db.ref('reports').off();
+            
             pfpListeners = {};
             pfpCache = {};
             watchedChats = {};
+            seenMessages = new Set();
             document.body.classList.remove('dark-mode'); 
             document.body.className = ""; 
             showView('homeView');
         }
 
         function startSync() {
-            // ADMIN CHECK
-            if(currentUser.toLowerCase() === OWNER_NAME) {
-                document.getElementById('adminBtn').classList.remove('hidden');
-            } else {
-                document.getElementById('adminBtn').classList.add('hidden');
-            }
-
             db.ref('users/' + currentUser).on('value', snap => {
                 const data = snap.val(); 
                 
@@ -652,15 +732,21 @@
                 }
                 
                 userHasPlus = data.chatPlus === true;
+                userIsGlobalAdmin = data.isAdmin === true || currentUser.toLowerCase() === OWNER_NAME; 
                 
+                // ADMIN BUTTON VISIBILITY
+                if(userIsGlobalAdmin) {
+                    document.getElementById('adminBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('adminBtn').classList.add('hidden');
+                }
+
                 myEmoji = data.customEmoji || "";
                 myNameColor = data.nameColor || "";
                 myBg = data.bgGradient || "default";
-                mutedChats = data.muted || {}; 
-                
+                mutedChats = data.muted || {};
                 // Privacy Setting
-                document.getElementById('requestToggle').checked = (data.allowRequests !== false); // default true
-
+                document.getElementById('requestToggle').checked = (data.allowRequests !== false);
                 // Email Settings Sync
                 if(data.email) {
                     document.getElementById('savedEmailTxt').innerText = data.email;
@@ -703,6 +789,7 @@
                             <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
                         <div class="action-btn-group">
+                            <button class="report-btn" onclick="openReportModal('${cid}', 'user', '${f}')"><i class="fas fa-exclamation-triangle"></i></button>
                             <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
                             <button onclick="openChat('${f}', false)">Chat</button>
                             <button class="danger" onclick="askUnfriend('${f}')"><i class="fas fa-times"></i></button>
@@ -726,6 +813,7 @@
                                         <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
                                     </div>
                                     <div class="action-btn-group">
+                                        <button class="report-btn" onclick="openReportModal('${gid}', 'group', '${gName}')"><i class="fas fa-exclamation-triangle"></i></button>
                                         <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
                                         <button onclick="openChat('${gid}', true, '${gName}')">Chat</button>
                                     </div>
@@ -795,7 +883,6 @@
             if(watchedChats[chatId]) return;
             const path = type === 'group' ? `groups/${chatId}/messages` : `chats/${chatId}`;
             watchedChats[chatId] = path;
-            // Limit to last 30 for preview listener
             db.ref(path).limitToLast(30).on('value', snap => {
                 const messages = [];
                 snap.forEach(c => messages.push(c.val()));
@@ -804,10 +891,10 @@
                 
                     if(lastMsg.timestamp > appLoadedTime && lastMsg.from !== currentUser) {
                         if(activeChatID !== chatId && !mutedChats[chatId]) {
-                             if(document.hidden || activeChatID !== chatId) {
-                                 const senderName = type === 'group' ? `Gruppe ${name}` : name;
+                            if(document.hidden || activeChatID !== chatId) {
+                                const senderName = type === 'group' ? `Gruppe ${name}` : name;
                                 sendPushNotification("John Chat", `Neue Benachrichtigung von ${senderName}`);
-                             }
+                            }
                         }
                     }
                 }
@@ -908,7 +995,6 @@
             db.ref('users/' + target).once('value').then(snap => {
                 if (snap.exists()) {
                     const data = snap.val();
-                    // CHECK ALLOW REQUESTS
                     if(data.allowRequests === false) {
                         triggerEmbed("User nimmt keine Anfragen an", "danger");
                         return;
@@ -922,7 +1008,8 @@
         }
 
         function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true);
-            db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove(); }
+            db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove();
+        }
         function deny(n) { db.ref('users/'+currentUser+'/requests/'+n).remove(); triggerEmbed("Anfrage abgelehnt", "success");
         }
         
@@ -939,6 +1026,10 @@
             const n = friendToRemove;
             db.ref('users/'+currentUser+'/friends/'+n).remove(); 
             db.ref('users/'+n+'/friends/'+currentUser).remove();
+            
+            const chatKey = [currentUser, n].sort().join("_");
+            db.ref('chats/' + chatKey).remove();
+
             closeUnfriendModal();
             triggerEmbed("Freund entfernt", "success");
         }
@@ -989,23 +1080,26 @@
             isGroup = isG;
             activeChatID = isG ? id : [currentUser, id].sort().join("_");
             currentGroupAdmin = null; 
-            
+            seenMessages = new Set();
             db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
             const badge = document.getElementById(`badge-${activeChatID}`);
             if(badge) badge.style.display = 'none';
 
-            document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : formatName(id);
+            document.getElementById('chatWithTitle').innerText = isG ?
+            "👥 " + gTitle : formatName(id);
             document.getElementById('leaveBtn').classList.toggle('hidden', !isG);
             document.getElementById('groupInfoBtn').classList.toggle('hidden', !isG);
             
+            const reportBtn = document.getElementById('reportChatBtn');
+            // We pass the RAW ID to the report modal so the duplicate check works correctly
+            reportBtn.setAttribute('onclick', `openReportModal('${activeChatID}', '${isG ? 'group' : 'user'}', '${isG ? gTitle : id}')`);
+
             showView('chatWindow');
             document.getElementById('messageBox').innerHTML = "";
-            
             if(isGroup) {
                 db.ref('groups/'+activeChatID+'/admin').once('value', s => { currentGroupAdmin = s.val(); });
             }
 
-            // Init listeners
             loadChatMessages();
             setupTypingListener();
         }
@@ -1020,39 +1114,29 @@
             showView('mainView');
         }
 
-        // ==========================================
-        //  LAG FREE CHAT ENGINE (OPTIMIZED)
-        // ==========================================
         function loadChatMessages() {
-            const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+            const path = isGroup ?
+            'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
             if(currentChatPath && currentChatPath !== path) db.ref(currentChatPath).off();
             currentChatPath = path;
 
             document.getElementById('chatLoading').style.display = 'block';
             document.getElementById('messageBox').innerHTML = "";
-            
             const box = document.getElementById('messageBox');
             
-            // Check if chat is empty first to remove loader quickly
-            db.ref(path).limitToLast(1).once('value', snap => {
+            db.ref(path).limitToLast(50).once('value', snap => {
                 if(!snap.exists()) document.getElementById('chatLoading').style.display = 'none';
             });
-
-            db.ref(path).off();
-            // Listen for NEW messages (optimized)
-            db.ref(path).limitToLast(25).on('child_added', snap => {
+            db.ref(path).limitToLast(50).on('child_added', snap => {
                 document.getElementById('chatLoading').style.display = 'none';
                 renderSingleMessage(snap);
             });
-            
-            // Listen for REMOVED messages
-            db.ref(path).limitToLast(25).on('child_removed', snap => {
+            db.ref(path).limitToLast(50).on('child_removed', snap => {
                  const key = snap.key;
                  const el = document.getElementById('msg-' + key);
                  if(el) el.remove();
             });
-            // Listen for CHANGED messages
-            db.ref(path).limitToLast(25).on('child_changed', snap => {
+            db.ref(path).limitToLast(50).on('child_changed', snap => {
                 const key = snap.key;
                 const el = document.getElementById('msg-' + key);
                 if(el) {
@@ -1065,14 +1149,14 @@
         function renderSingleMessage(snap) {
             const d = snap.val();
             const key = snap.key;
-            const box = document.getElementById('messageBox');
             
-            // Prevent duplicates
-            if(document.getElementById('msg-' + key)) return;
+            if(seenMessages.has(key) || document.getElementById('msg-' + key)) return;
+            seenMessages.add(key);
+
+            const box = document.getElementById('messageBox');
             const html = buildMessageHTML(d, key);
             box.insertAdjacentHTML('beforeend', html);
             
-            // Smooth Scroll
             box.scrollTop = box.scrollHeight;
             if(activeChatID) {
                 db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
@@ -1082,16 +1166,15 @@
         function buildMessageHTML(d, key) {
             let isSystem = d.from === "SYSTEM";
             let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
-            // Delete Logic
-            let canDelete = (!isSystem && (d.from === currentUser || currentUser.toLowerCase() === OWNER_NAME));
-            if(isGroup && currentUser === currentGroupAdmin && !isSystem) canDelete = true; 
-            
+            let canDelete = (!isSystem && (d.from === currentUser || userIsGlobalAdmin));
+            if(isGroup && currentUser === currentGroupAdmin && !isSystem) canDelete = true;
             let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i></span>` : "";
             
-            // Tags
             let tags = "";
-            if(d.from.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
+            if(d.from && d.from.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
             else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
+            if(d.isAdminSender) tags += `<span class="tag-global-admin">Admin</span>`;
+
             let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}${tags}:</b><br>`;
             if(!isSystem && d.plusData) {
                 const emoji = d.plusData.emoji || "";
@@ -1115,13 +1198,10 @@
                 </div>`;
         }
 
-        // --- TYPING INDICATOR ---
         function handleTyping() {
             if(!activeChatID) return;
             const path = isGroup ? `groups/${activeChatID}/typing/${currentUser}` : `chats/${activeChatID}/typing/${currentUser}`;
-            
             db.ref(path).set(true);
-            
             if(typingTimeout) clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => {
                 db.ref(path).remove();
@@ -1131,7 +1211,6 @@
         function setupTypingListener() {
             const path = isGroup ? `groups/${activeChatID}/typing` : `chats/${activeChatID}/typing`;
             typingListener = path;
-            
             db.ref(path).on('value', snap => {
                 const typers = snap.val() || {};
                 const names = Object.keys(typers).filter(u => u !== currentUser);
@@ -1146,7 +1225,6 @@
             });
         }
 
-        // --- GROUP INFO & ADMIN ACTIONS ---
         function openGroupInfo() {
             if(!isGroup || !activeChatID) return;
             const gid = activeChatID;
@@ -1183,8 +1261,7 @@
             });
         }
 
-        function closeGroupInfo() { document.getElementById('groupInfoModal').classList.add('hidden');
-        }
+        function closeGroupInfo() { document.getElementById('groupInfoModal').classList.add('hidden'); }
 
         function confirmKick(user) {
             kickTargetUser = user;
@@ -1216,8 +1293,7 @@
             });
         }
 
-        function confirmLeaveGroup() { document.getElementById('leaveGroupModal').classList.remove('hidden');
-        }
+        function confirmLeaveGroup() { document.getElementById('leaveGroupModal').classList.remove('hidden'); }
 
         function executeLeaveGroup() {
             const gid = activeChatID;
@@ -1253,15 +1329,17 @@
                 txt: t, 
                 type: 'text',
                 timestamp: Date.now(), 
+                isAdminSender: userIsGlobalAdmin, 
                 plusData: { emoji: myEmoji, color: myNameColor }
             };
             db.ref(path).push(msgData);
             document.getElementById('chatInput').value = "";
             
-            // EMAIL NOTIFICATION TRIGGER
-            triggerEmailNotification(t, isGroup, activeChatID);
+            const box = document.getElementById('messageBox');
+            box.scrollTop = box.scrollHeight;
 
-            // Stop typing immediately
+            triggerEmailNotification(t, isGroup, activeChatID);
+            
             const typePath = isGroup ? `groups/${activeChatID}/typing/${currentUser}` : `chats/${activeChatID}/typing/${currentUser}`;
             db.ref(typePath).remove();
         }
@@ -1276,29 +1354,23 @@
                     txt: e.target.result, 
                     type: 'img',
                     timestamp: Date.now(),
+                    isAdminSender: userIsGlobalAdmin,
                     plusData: { emoji: myEmoji, color: myNameColor }
                 };
                 db.ref(path).push(msgData);
-                
                 triggerEmailNotification("Hat ein Bild gesendet", isGroup, activeChatID);
             };
             if(file) reader.readAsDataURL(file);
         }
         
-        // --- EMAIL API TRIGGER LOGIC ---
         function triggerEmailNotification(msgText, isGroupChat, chatId) {
-            if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return; // API nicht konfiguriert
-
-            // Funktion um an einen User zu senden
+            if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
             const checkAndSend = (targetUser) => {
                 db.ref('users/' + targetUser).once('value', snap => {
                     const uData = snap.val();
                     if(uData && uData.email) {
-                        // Check if muted
                         const userMuted = uData.muted && uData.muted[chatId] === true;
-                        
                         if(!userMuted) {
-                            // Sende API Request
                             fetch(EMAIL_API_URL, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -1316,20 +1388,31 @@
             };
 
             if(isGroupChat) {
-                // In Gruppen an alle Mitglieder senden (außer sich selbst)
-                // Achtung: Bei sehr großen Gruppen kann das viele Reads verursachen.
                 db.ref('groups/' + chatId + '/members').once('value', snap => {
                     snap.forEach(m => {
                         if(m.val() !== currentUser) checkAndSend(m.val());
                     });
                 });
             } else {
-                // Private Chat: Finde den Partner heraus
-                // chatId ist "userA_userB".
                 const parts = chatId.split('_');
                 const partner = parts[0] === currentUser ? parts[1] : parts[0];
                 checkAndSend(partner);
             }
+        }
+
+        function logToApi(type, details) {
+            if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
+            fetch(EMAIL_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'log',
+                    logType: type,
+                    details: details,
+                    user: currentUser,
+                    time: new Date().toLocaleString()
+                })
+            }).catch(e => console.log("Log fail", e));
         }
 
         function toggleTheme() {
@@ -1346,7 +1429,6 @@
             });
         }
         
-        // --- DELETE ACCOUNT ---
         function confirmDeleteAccount() {
             document.getElementById('deleteAccountModal').classList.remove('hidden');
         }
@@ -1355,9 +1437,34 @@
             const pass = document.getElementById('delAccPass').value;
             if(!pass) return triggerEmbed("Passwort fehlt!", "danger");
             
-            // Re-auth
             db.ref('users/' + currentUser + '/pass').once('value').then(snap => {
                 if(snap.val() === pass) {
+                    
+                    db.ref('users/' + currentUser + '/groups').once('value', gSnap => {
+                        if(gSnap.exists()) {
+                            gSnap.forEach(g => {
+                                const gid = g.key;
+                                db.ref('groups/'+gid+'/messages').push({
+                                    from: "SYSTEM", txt: `${currentUser} hat seinen Account gelöscht.`, type: 'text', timestamp: Date.now()
+                                });
+                                db.ref('groups/'+gid+'/members').once('value', mSnap => {
+                                    let mems = mSnap.val() || [];
+                                    mems = mems.filter(m => m !== currentUser);
+                                    db.ref('groups/'+gid+'/members').set(mems);
+                                });
+                            });
+                        }
+                    });
+                    db.ref('users/' + currentUser + '/friends').once('value', fSnap => {
+                        if(fSnap.exists()) {
+                            fSnap.forEach(f => {
+                                const friendName = f.key;
+                                db.ref('users/'+friendName+'/friends/'+currentUser).remove();
+                                const chatKey = [currentUser, friendName].sort().join("_");
+                                db.ref('chats/'+chatKey).remove();
+                            });
+                        }
+                    });
                     db.ref('users/' + currentUser).remove().then(() => {
                         document.getElementById('deleteAccountModal').classList.add('hidden');
                         logoutForDelete();
@@ -1382,15 +1489,19 @@
             
             if(sender === "SYSTEM") return;
 
-            if(isGroup && sender !== currentUser && currentUser === currentGroupAdmin) {
+            if(isGroup && sender !== currentUser && (currentUser === currentGroupAdmin || userIsGlobalAdmin)) {
                  db.ref(path).update({
                      from: "SYSTEM",
-                     txt: "🚫 Nachricht vom Gruppen-Admin gelöscht",
+                     txt: "🚫 Nachricht vom Admin gelöscht",
                      type: 'text',
                      plusData: null
                  }).then(() => triggerEmbed("Gelöscht", "success"));
                  return;
             }
+             if(!isGroup && sender !== currentUser && userIsGlobalAdmin) {
+                 db.ref(path).update({ from: "SYSTEM", txt: "🚫 Admin hat Nachricht entfernt", type: 'text' });
+                 return;
+             }
 
             db.ref(path).remove().then(() => {
                 triggerEmbed("Nachricht gelöscht", "success");
@@ -1400,28 +1511,24 @@
         }
 
         // ==========================================
-        // ADMIN PANEL FUNCTIONS (NEW: MANUAL SEARCH)
+        // 100% WORKING ADMIN PANEL & REPORT LOGIC
         // ==========================================
 
         function manualAdminSearch() {
             const searchName = document.getElementById('adminSearchInput').value.trim().toLowerCase();
-            if(!searchName) {
-                triggerEmbed("Bitte Namen eingeben!", "danger");
-                return;
-            }
+            if(!searchName) return triggerEmbed("Bitte Namen eingeben!", "danger");
             
             db.ref('users/' + searchName).once('value', snap => {
                 if(snap.exists()) {
                     const data = snap.val();
-                    const isBanned = data.banned === true;
-                    openAdminUserAction(searchName, isBanned);
+                    openAdminUserAction(searchName, data.banned === true, data.isAdmin === true);
                 } else {
                     triggerEmbed("Nutzer existiert nicht!", "danger");
                 }
             });
         }
 
-        function openAdminUserAction(uname, isBanned) {
+        function openAdminUserAction(uname, isBanned, isAdmin) {
             adminTargetUser = uname;
             adminTargetIsBanned = isBanned;
             
@@ -1437,13 +1544,30 @@
                 banBtn.style.background = "";
             }
             
+            // ADMIN STATUS BUTTON LOGIC - GREY OUT IF ALREADY ADMIN
+            const makeAdminBtn = document.getElementById('makeAdminBtn');
+            if(isAdmin) {
+                makeAdminBtn.innerText = "Bereits Admin";
+                makeAdminBtn.disabled = true;
+                makeAdminBtn.style.background = "#ccc";
+                makeAdminBtn.style.cursor = "not-allowed";
+                makeAdminBtn.onclick = null;
+            } else {
+                makeAdminBtn.innerText = "Zum Admin machen";
+                makeAdminBtn.disabled = false;
+                makeAdminBtn.className = "gold-btn"; 
+                makeAdminBtn.style.background = ""; 
+                makeAdminBtn.style.cursor = "pointer";
+                makeAdminBtn.onclick = initiateMakeAdmin;
+            }
+
             document.getElementById('adminUserActionModal').classList.remove('hidden');
         }
 
         function closeAdminAction() {
             document.getElementById('adminUserActionModal').classList.add('hidden');
             adminTargetUser = null;
-            document.getElementById('adminSearchInput').value = ""; // Clear input
+            document.getElementById('adminSearchInput').value = ""; 
         }
 
         function adminDeletePfp() {
@@ -1456,20 +1580,219 @@
 
         function adminToggleBan() {
             if(!adminTargetUser) return;
+            const target = adminTargetUser;
+
+            const broadcast = (msg) => {
+                // 1. Notify Groups
+                db.ref('users/' + target + '/groups').once('value', gSnap => {
+                    if(gSnap.exists()) {
+                        gSnap.forEach(g => {
+                            db.ref('groups/' + g.key + '/messages').push({
+                                from: "SYSTEM", txt: msg, type: "text", timestamp: Date.now()
+                            });
+                        });
+                    }
+                });
+                // 2. Notify Private Chats
+                db.ref('users/' + target + '/friends').once('value', fSnap => {
+                    if(fSnap.exists()) {
+                        fSnap.forEach(f => {
+                            const cid = [target, f.key].sort().join('_');
+                            db.ref('chats/' + cid).push({
+                                from: "SYSTEM", txt: msg, type: "text", timestamp: Date.now()
+                            });
+                        });
+                    }
+                });
+            };
+
             if(adminTargetIsBanned) {
-                // UNBAN
-                db.ref('users/' + adminTargetUser + '/banned').remove().then(() => {
+                db.ref('users/' + target + '/banned').remove().then(() => {
+                    broadcast(`✅ ${target} wurde entsperrt.`);
                     triggerEmbed("User entsperrt", "success");
+                    logToApi('AdminAction', `Unbanned ${target}`);
                     closeAdminAction();
                 });
             } else {
-                // BAN
-                db.ref('users/' + adminTargetUser + '/banned').set(true).then(() => {
+                db.ref('users/' + target + '/banned').set(true).then(() => {
+                    broadcast(`🚫 ${target} wurde permanent gesperrt.`);
                     triggerEmbed("User gesperrt!", "danger");
+                    logToApi('AdminAction', `Banned ${target}`);
                     closeAdminAction();
                 });
             }
         }
+
+        function initiateMakeAdmin() {
+            document.getElementById('adminUserActionModal').classList.add('hidden');
+            document.getElementById('adminCodeModal').classList.remove('hidden');
+            document.getElementById('adminAuthCode').value = "";
+        }
+
+        function closeAdminCodeModal() {
+            document.getElementById('adminCodeModal').classList.add('hidden');
+        }
+
+        function confirmMakeAdmin() {
+            const code = document.getElementById('adminAuthCode').value;
+            if(code === "1001") {
+                if(confirm(`Möchtest du ${adminTargetUser} wirklich zum Admin machen?`)) {
+                    db.ref('users/' + adminTargetUser + '/isAdmin').set(true).then(() => {
+                         triggerEmbed(`${adminTargetUser} ist jetzt Admin`, "success");
+                         logToApi('MakeAdmin', `User ${currentUser} made ${adminTargetUser} admin`);
+                         closeAdminCodeModal();
+                    });
+                }
+            } else {
+                triggerEmbed("Falscher Code!", "danger");
+            }
+        }
+
+        // --- REPORT SYSTEM (FIXED & INSTANT SEND) ---
+        let reportTargetID = null;
+        let reportTargetType = null; 
+        let reportTargetName = null;
+
+        function openReportModal(id, type, name = "") {
+            reportTargetID = id;
+            reportTargetType = type;
+            reportTargetName = name || id; 
+            
+            document.getElementById('reportTargetName').innerText = reportTargetName;
+            document.getElementById('reportModal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.add('hidden');
+            reportTargetID = null;
+        }
+
+        function submitReport() {
+            const reason = document.getElementById('reportReason').value;
+            if(!reportTargetID) return;
+            const target = reportTargetID;
+
+            // 1. Check auf Duplikate in der DB
+            db.ref('reports').orderByChild('targetID').equalTo(target).once('value', snap => {
+                if(snap.exists()) {
+                    triggerEmbed("Dieser Chat wurde bereits gemeldet!", "danger");
+                    closeReportModal(); // Trotzdem schließen
+                } else {
+                    // 2. Report Senden
+                    const reportData = {
+                        targetID: target,
+                        targetName: reportTargetName,
+                        type: reportTargetType,
+                        reason: reason,
+                        reporter: currentUser,
+                        timestamp: Date.now()
+                    };
+                    
+                    db.ref('reports').push(reportData).then(() => {
+                        logToApi('Report', `Reported ${reportTargetName} for ${reason}`);
+                        
+                        // System Message in Chat
+                        let msgPath = null;
+                        if(reportTargetType === 'group') {
+                            msgPath = `groups/${target}/messages`;
+                        } else {
+                            // targetID ist bei User-Report bereits die korrekte ID (wird von openChat übergeben)
+                            if(target.includes('_')) {
+                                msgPath = `chats/${target}`;
+                            } else {
+                                // Fallback
+                                const cKey = [currentUser, target].sort().join("_");
+                                msgPath = `chats/${cKey}`;
+                            }
+                        }
+
+                        if(msgPath) {
+                            db.ref(msgPath).push({
+                                from: "SYSTEM",
+                                txt: `⚠️ Dieser Chat wurde gemeldet wegen: ${reason}.`,
+                                type: 'text',
+                                timestamp: Date.now()
+                            });
+                        }
+                        
+                        closeReportModal();
+                        triggerEmbed("Erfolgreich gemeldet", "success");
+                    });
+                }
+            });
+        }
+
+        // --- ADMIN REPORT VIEW (CHAT HISTORY VIEW ADDED) ---
+        function toggleAdminTab(tab) {
+            if(tab === 'users') {
+                document.getElementById('adminTabUsers').classList.remove('hidden');
+                document.getElementById('adminTabReports').classList.add('hidden');
+                document.getElementById('tabBtnUser').classList.remove('secondary');
+                document.getElementById('tabBtnReport').classList.add('secondary');
+                if(reportsListener) db.ref('reports').off(); 
+            } else {
+                document.getElementById('adminTabUsers').classList.add('hidden');
+                document.getElementById('adminTabReports').classList.remove('hidden');
+                document.getElementById('tabBtnUser').classList.add('secondary');
+                document.getElementById('tabBtnReport').classList.remove('secondary');
+                loadReports();
+            }
+        }
+
+        function loadReports() {
+            const container = document.getElementById('reportsListContainer');
+            // Keine Lade-Anzeige, nur Inhalt aktualisieren
+            
+            reportsListener = db.ref('reports').on('value', snap => {
+                container.innerHTML = "";
+                
+                if(!snap.exists()) {
+                    container.innerHTML = "<p>Keine Reports vorhanden.</p>";
+                    return;
+                }
+                
+                snap.forEach(r => {
+                    const d = r.val();
+                    const rid = r.key;
+                    
+                    container.innerHTML += `
+                        <div style="background:white; border:1px solid var(--brd); padding:10px; margin-bottom:10px; border-radius:8px; text-align:left;">
+                             <div style="display:flex; justify-content:space-between;">
+                                <b style="color:var(--danger)">${d.reason}</b>
+                                <button onclick="deleteReport('${rid}')" style="font-size:0.7rem; padding:4px;" class="danger">Löschen</button>
+                             </div>
+                            <p style="margin:5px 0; font-size:0.9rem;">Ziel: <b>${d.targetName}</b> (${d.type})</p>
+                            <p style="margin:5px 0; font-size:0.8rem; color:#666;">Von: ${d.reporter}</p>
+                            <button onclick="viewReportChat('${d.targetID}', '${d.type}', '${d.targetName}')" style="width:100%; margin-top:5px; background:var(--main); color:white; border:none; border-radius:4px; padding:5px;">Chat Verlauf ansehen</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function deleteReport(rid) {
+            db.ref('reports/' + rid).remove().then(() => {
+                triggerEmbed("Report gelöscht", "success");
+            });
+        }
+
+        function viewReportChat(id, type, name) {
+            // Admin-Special-View Function
+            showView('chatWindow'); 
+            activeChatID = id;
+            isGroup = (type === 'group');
+
+            document.getElementById('chatWithTitle').innerText = "🔎 ADMIN VIEW: " + name;
+            document.getElementById('leaveBtn').classList.add('hidden');
+            document.getElementById('groupInfoBtn').classList.add('hidden');
+
+            document.getElementById('chatLoading').style.display = 'block';
+            document.getElementById('messageBox').innerHTML = "";
+            
+            // Force Load messages without joining
+            loadChatMessages();
+        }
+
     </script>
 </body>
 </html>
