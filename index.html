@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>John Chat</title>
+    <title>John Chat v3.1</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; --gold: #ffd700; }
-        .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; }
+        :root { --bg: #ffffff; --txt: #333; --main: #5865F2; --cont: #ffffff; --brd: #ddd; --danger: #ff4757; --success: #43b581; --link: #007bff; --hover: #f1f1f1; --gold: #ffd700; --msg-other: #e5e5ea; --msg-self-txt: #ffffff; }
+        .dark-mode { --bg: #1a1a1a; --txt: #f1f1f1; --cont: #2d2d2d; --brd: #444; --hover: #3d3d3d; --msg-other: #3d3d3d; --msg-self-txt: #ffffff; }
         
         /* Premium Backgrounds */
         .bg-yellow { --bg: #fff9c4 !important; --cont: #fffde7 !important; }
@@ -31,31 +31,37 @@
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
         body { 
-            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--txt); 
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg); color: var(--txt); 
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s;
         }
         
         .view { 
-            animation: fadeIn 0.4s; width: 90%; max-width: 420px; background: var(--cont); 
+            animation: fadeIn 0.4s;
+            width: 90%; max-width: 420px; background: var(--cont); 
             border: 1px solid var(--brd); border-radius: 20px; padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center; position: relative; 
             display: flex; flex-direction: column; box-sizing: border-box; max-height: 85vh; margin: auto;
         }
 
-        .view-large { height: 85vh; }
+        .view-large { height: 85vh; padding: 20px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        button { padding: 12px; border: none; border-radius: 10px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        button { padding: 12px; border: none; border-radius: 12px; background: var(--main); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; font-size: 0.95rem; }
         button:hover { opacity: 0.9; transform: scale(1.02); }
         button:disabled { opacity: 0.6; transform: none; cursor: not-allowed; background: #999; }
         
-        button.secondary { background: #747f8d; }
-        button.danger { background: var(--danger); padding: 8px 12px; }
-        button.gold-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; }
+        button.secondary { background: var(--hover); color: var(--txt); }
+        button.danger { background: var(--danger); color: white; }
+        button.gold-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); }
+        button.green-btn { background: var(--success); color: white; }
         
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--brd); border-radius: 8px; background: var(--cont); color: var(--txt); box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--brd); border-radius: 12px; background: var(--hover); color: var(--txt); box-sizing: border-box; font-family: inherit; transition: 0.2s; border: 1px solid transparent; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--main); background: var(--cont); }
+        
         .hidden { display: none !important; }
 
         .modal-overlay {
@@ -66,12 +72,12 @@
         .modal-card {
             background: var(--cont); width: 90%; max-width: 380px;
             padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            border: 1px solid var(--brd); text-align: center;
+            border: 1px solid var(--brd); text-align: center; max-height: 90vh; overflow-y: auto;
         }
 
         #systemEmbed {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            min-width: 250px; color: white; padding: 12px 25px; border-radius: 15px; font-weight: bold;
+            min-width: 250px; color: white; padding: 12px 25px; border-radius: 50px; font-weight: bold;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 10000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center;
         }
@@ -96,39 +102,101 @@
         .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
         .agb-item strong { color: var(--main); display: block; margin-bottom: 3px; }
 
-        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 12px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 50px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
         
-        #messageBox { flex: 1; overflow-y: auto; border: 1px solid var(--brd); border-radius: 8px; padding: 10px; text-align: left; margin-bottom: 10px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
-        .msg { padding: 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--brd); word-break: break-word; position: relative; }
-        .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
-        .msg .del-btn { float: right; color: var(--danger); cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
-        .system-msg { color: var(--danger); font-weight: bold; text-align: center; border: none; background: transparent; }
-        .msg-time { display: block; font-size: 0.65rem; color: #888; margin-top: 4px; text-align: right; font-style: italic; }
+        /* MODERN CHAT MESSAGES */
+        #messageBox { flex: 1; overflow-y: auto; padding: 10px; text-align: left; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; scroll-behavior: smooth; }
+        
+        .msg { 
+            padding: 10px 14px; 
+            border-radius: 18px; 
+            word-break: break-word; 
+            position: relative; 
+            max-width: 75%; 
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 2px;
+        }
+        
+        .msg.msg-self {
+            background: var(--main);
+            color: var(--msg-self-txt);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .msg.msg-other {
+            background: var(--msg-other);
+            color: var(--txt);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
 
-        .del-confirm { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--danger); border-radius: 5px; margin-top: 5px; padding: 5px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; }
-        .del-confirm button { padding: 4px 8px; font-size: 0.7rem; }
+        .msg img { max-width: 100%; border-radius: 12px; margin-top: 5px; display: block; cursor: pointer; }
+        .msg .del-btn { float: right; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.7rem; margin-left: 8px; padding-top: 2px;}
+        .msg.msg-other .del-btn { color: #ff4757; }
+        
+        .system-msg { color: #888; font-size: 0.8rem; text-align: center; align-self: center; background: transparent; max-width: 90%; margin: 10px 0; }
+        
+        .msg-time { display: block; font-size: 0.65rem; margin-top: 4px; text-align: right; opacity: 0.7; }
+        .msg-sender-name { font-size: 0.75rem; font-weight: bold; margin-bottom: 2px; display: block; color: var(--main); }
+        .msg.msg-self .msg-sender-name { display: none; } /* Hide own name */
 
-        .friend-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); align-items: center; position: relative; }
+        .del-confirm { background: rgba(0,0,0,0.8); color: white; border-radius: 8px; margin-top: 5px; padding: 5px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; z-index: 10; position: absolute; width: 100px; right: 0; box-sizing: border-box;}
+        .del-confirm button { padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; }
+
+        .friend-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--brd); align-items: center; position: relative; transition: 0.2s; border-radius: 12px; margin-bottom: 5px; }
+        .friend-item:hover { background: var(--hover); }
         
         /* HEADER ICONS */
-        .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; color: var(--txt); }
-        .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); }
+        .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; color: var(--txt); padding: 5px; }
+        .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); padding: 5px; }
+        .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 50px; background: rgba(67, 181, 129, 0.1); }
 
-        .chat-input-area { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
-        .file-label { background: var(--hover); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; color: var(--txt); display: flex; align-items: center; justify-content: center; }
+        /* CHAT UI STYLES */
+        .chat-header {
+            display: flex; align-items: center; justify-content: space-between; 
+            padding-bottom: 10px; border-bottom: 1px solid var(--brd); margin-bottom: 10px;
+        }
         
-        .scroll-area { flex: 1; overflow-y: auto; border-top: 1px solid var(--brd); margin-top: 10px; }
+        .chat-input-area { 
+            display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+            background: var(--cont); padding: 5px 0; margin-top: 5px; position: relative;
+        }
+        
+        .chat-input-wrapper {
+            flex: 1; display: flex; align-items: center; background: var(--hover); 
+            border-radius: 25px; padding: 2px 15px; border: 1px solid transparent; transition: 0.2s;
+        }
+        .chat-input-wrapper:focus-within { border-color: var(--main); background: var(--cont); box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.1); }
+
+        .file-label { 
+            color: var(--txt); opacity: 0.7; cursor: pointer; 
+            font-size: 1.2rem; padding: 8px; transition: 0.2s;
+        }
+        .file-label:hover { opacity: 1; color: var(--main); }
+
+        #chatInput { border: none; background: transparent; padding: 10px 5px; margin: 0; width: 100%; }
+        #chatInput:focus { outline: none; }
+        
+        .send-btn {
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0;
+            background: var(--main); color: white; box-shadow: 0 4px 10px rgba(88, 101, 242, 0.3);
+        }
+        .send-btn:hover { transform: scale(1.1); }
+        
+        .scroll-area { flex: 1; overflow-y: auto; margin-top: 10px; }
 
         .unread-badge { background-color: var(--danger); color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; margin-left: 5px; vertical-align: middle; display: none; }
 
         .action-btn-group { display: flex; gap: 5px; align-items: center; }
-        .icon-btn { background: transparent; color: var(--txt); padding: 5px; font-size: 1rem; border: 1px solid transparent; }
-        .icon-btn:hover { background: var(--hover); transform: none; }
+        .icon-btn { background: transparent; color: var(--txt); padding: 8px; font-size: 1rem; border: 1px solid transparent; border-radius: 50%; }
+        .icon-btn:hover { background: var(--hover); }
         .muted-state { color: var(--danger); opacity: 0.7; }
 
-        .pfp { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: transparent; border: 2px solid var(--brd); flex-shrink: 0; margin-right: 10px; display: none; }
-        .pfp-large { width: 80px; height: 80px; margin-bottom: 10px; cursor: pointer; display: inline-block; background: #4CAF50; }
+        .pfp { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; border: 2px solid var(--brd); flex-shrink: 0; margin-right: 10px; display: none; }
+        .pfp-large { width: 80px; height: 80px; margin-bottom: 10px; cursor: pointer; display: inline-block; background: #eee; }
         .friend-info { display: flex; align-items: center; }
 
         .chat-plus-container { border: 2px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: left; position: relative; background: linear-gradient(to bottom, rgba(255, 215, 0, 0.05), transparent); }
@@ -140,7 +208,7 @@
         .plus-option-item { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--brd); cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; font-size: 1.2rem; box-sizing: border-box; }
         .plus-option-item.active-selection { border: 3px solid var(--main); box-shadow: 0 0 8px var(--main); transform: scale(1.1); }
         .plus-option-item.locked { opacity: 0.6; cursor: not-allowed; background: #ddd; }
-        .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; }
+        .lock-icon { font-size: 0.7rem; position: absolute; bottom: -2px; right: -2px; background: white; border-radius: 50%; padding: 1px; color: #333; }
         .color-swatch { width: 100%; height: 100%; border-radius: 50%; }
         
         #chatLoading { display: none; text-align: center; padding: 10px; font-weight: bold; color: var(--main); font-size: 0.9rem; }
@@ -150,9 +218,9 @@
         .tag-global-admin { background: #ff4757; color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         .kick-btn { background: var(--danger); color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: auto; }
-        .info-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--brd); text-align: left; }
+        .info-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); text-align: left; }
 
-        #typingIndicator { font-size: 0.7rem; color: #888; text-align: left; padding-left: 5px; height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic; }
+        #typingIndicator { font-size: 0.7rem; color: #888; text-align: left; padding-left: 15px; height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic; }
 
         /* BANNED SCREEN */
         #bannedView { background: #ff4757; color: white; z-index: 20000; }
@@ -163,16 +231,17 @@
         /* LOADING SPLASH */
         #globalLoading {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); color: var(--txt);
-            z-index: 30000;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            background: var(--bg); color: var(--txt); z-index: 30000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .loader-icon { font-size: 4rem; color: var(--main); animation: pulse 1.5s infinite; margin-bottom: 20px; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 
         /* REPORT */
         .report-btn { color: #ff9f43; background: transparent; border: none; font-size: 1rem; cursor: pointer; }
+
+        /* HISTORY */
+        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--brd); font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -190,14 +259,15 @@
         <h1>John Chat</h1>
         <div style="display:flex; flex-direction:column; gap:10px;">
            <button onclick="showView('loginView')">Anmelden</button>
-            <button onclick="showView('registerView')" class="secondary">Registrieren</button>
+           <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
     </div>
 
     <div id="bannedView" class="view hidden">
         <h1 style="font-size: 3rem;"><i class="fas fa-ban"></i></h1>
         <h2>GESPERRT</h2>
-        <p>Dein Account wurde permanent gesperrt.</p>
+        <p id="banMessage">Dein Account wurde permanent gesperrt.</p>
+        <p id="banReasonDisplay" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-weight: bold;"></p>
         <button onclick="executeLogout()" style="background: white; color: #ff4757; margin-top: 20px;">Abmelden</button>
     </div>
 
@@ -219,11 +289,11 @@
                 <div class="agb-item"><strong>2. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Verstößen zu prüfen.</div>
                 <div class="agb-item"><strong>3. Datenspeicherung</strong>Bilder und Nachrichten werden über Firebase Storage/Database verarbeitet.</div>
                 <div class="agb-item"><strong>4. Verhalten</strong>Respektloser Umgang führt zum sofortigen Ausschluss.</div>
-                <div class="agb-item"><strong>5. Sicherheit</strong>John Chat Gewährleistet absolute Sicherheit, daher bleiben alle ihre Chats Gruppen Passwörter Freunde & Daten Sicher & Privat.</div>
-                <div class="agb-item"><strong>6. Algemeine Regeln</strong>Sexuelle Inhalte sowohl auch Beleidigungen sind in Gruppen und Chats Verboten!</div>
+                <div class="agb-item"><strong>5. Sicherheit</strong>John Chat Gewährleistet absolute Sicherheit.</div>
+                <div class="agb-item"><strong>6. Algemeine Regeln</strong>Sexuelle Inhalte sowie Beleidigungen sind verboten!</div>
             </div>
             <button onclick="toggleAgb(false)" style="width:100%;">Schließen</button>
-        </div>
+         </div>
     </div>
 
     <div id="loginView" class="view hidden">
@@ -243,7 +313,9 @@
     <div id="mainView" class="view view-large hidden">
         <span id="adminBtn" class="admin-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
         <span class="settings-icon" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
+        
         <h2 id="userGreeting">Hi</h2>
+        
         <div style="background: rgba(88, 101, 242, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 10px;">
             <input type="text" id="targetFriend" placeholder="Username adden..." style="margin:0">
             <button onclick="sendRequest()" style="width: 100%; margin-top:5px;"><i class="fas fa-user-plus"></i> Adden</button>
@@ -271,6 +343,10 @@
                 <input type="text" id="adminSearchInput" placeholder="Benutzernamen eingeben...">
                 <button onclick="manualAdminSearch()" style="width: 100%; margin-top: 10px;">Verwalten</button>
             </div>
+            
+            <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--brd);">
+                <button onclick="triggerGlobalRefresh()" class="danger" style="width:100%; font-size:0.8rem;">⚠️ Globalen Refresh erzwingen (Owner)</button>
+            </div>
         </div>
 
         <div id="adminTabReports" class="hidden scroll-area">
@@ -283,22 +359,66 @@
     <div id="adminUserActionModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h2 id="adminActionTitle">User verwalten</h2>
+            
+            <div style="margin-bottom:15px; background: rgba(0,0,0,0.05); padding:10px; border-radius:10px;">
+                <strong>Guthaben verwalten</strong>
+                <p id="adminUserBalanceDisplay" style="margin:5px 0; color:var(--success); font-weight:bold;">0.00€</p>
+                <button onclick="openAdminBalanceModal()" class="green-btn" style="font-size:0.8rem;">Guthaben ändern</button>
+            </div>
+
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <button onclick="adminDeletePfp()" class="secondary">Profilbild löschen</button>
-                <button onclick="adminToggleBan()" id="adminBanBtn" class="danger">ACCOUNT SPERREN</button>
+                <button onclick="openBanModal()" id="adminBanBtn" class="danger">BAN OPTIONEN</button>
                 <button id="makeAdminBtn" onclick="initiateMakeAdmin()" class="gold-btn">Zum Admin machen</button>
+                <button id="removeAdminBtn" onclick="initiateRemoveAdmin()" class="danger hidden">Admin entfernen</button>
                 <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
             </div>
         </div>
     </div>
     
+    <div id="adminBalanceModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Guthaben anpassen</h3>
+            <p>Betrag eingeben (positiv zum Hinzufügen, negativ zum Abziehen):</p>
+            <input type="number" id="adminBalanceInput" placeholder="z.B. 10 oder -5" step="0.01">
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                <button onclick="confirmBalanceChange()">Bestätigen</button>
+                <button onclick="document.getElementById('adminBalanceModal').classList.add('hidden')" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="banOptionsModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="color:var(--danger)">Ban Optionen</h2>
+             <p>Ziel: <b id="banTargetName"></b></p>
+            
+            <label style="text-align:left; display:block; font-size:0.8rem; margin-top:10px;">Dauer:</label>
+            <select id="banDurationSelect">
+                <option value="perm">Permanent</option>
+                <option value="1">1 Tag</option>
+                <option value="3">3 Tage</option>
+                <option value="7">1 Woche</option>
+                 <option value="30">1 Monat</option>
+            </select>
+            
+            <label style="text-align:left; display:block; font-size:0.8rem; margin-top:10px;">Grund (sichtbar für User):</label>
+            <textarea id="banReasonInput" placeholder="Grund für die Sperre..." rows="3"></textarea>
+            
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button class="danger" onclick="executeBan()">Sperre verhängen</button>
+                <button onclick="closeBanModal()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
     <div id="adminCodeModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h3>Admin Code erforderlich</h3>
-            <p>Gib den 4-stelligen Sicherheits-Code ein:</p>
+             <p>Gib den 4-stelligen Sicherheits-Code ein:</p>
             <input type="password" id="adminAuthCode" maxlength="4" style="text-align:center; letter-spacing:5px; font-size:1.5rem;">
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
-                <button onclick="confirmMakeAdmin()">Bestätigen</button>
+                <button id="adminCodeConfirmBtn" onclick="confirmMakeAdmin()">Bestätigen</button>
                 <button onclick="closeAdminCodeModal()" class="secondary">Abbrechen</button>
             </div>
         </div>
@@ -314,7 +434,7 @@
                 <option value="Spam">Spam</option>
                 <option value="Sexuelle Inhalte">Sexuelle Inhalte</option>
                 <option value="Anderes">Etwas anderes</option>
-            </select>
+             </select>
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
                 <button onclick="submitReport()" style="background: #ff9f43;">Report Absenden</button>
                 <button onclick="closeReportModal()" class="secondary">Abbrechen</button>
@@ -323,12 +443,14 @@
     </div>
 
     <div id="chatWindow" class="view view-large hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 id="chatWithTitle" style="margin:0; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">Chat</h3>
+        <div class="chat-header">
+            <button onclick="closeChat()" class="secondary" style="padding: 8px 12px; border-radius: 12px;"><i class="fas fa-chevron-left"></i></button>
+            <h3 id="chatWithTitle" style="margin:0; font-size:1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">Chat</h3>
             <div style="display:flex; gap:5px;">
-                <button id="reportChatBtn" class="secondary" onclick="openReportModal()" style="font-size:0.7rem; padding:8px; color:#ff9f43;"><i class="fas fa-exclamation-triangle"></i></button>
-                <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:0.7rem; padding: 8px;"><i class="fas fa-info-circle"></i> Info</button>
-                <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.7rem; padding: 8px;">Verlassen</button>
+                <button id="reportChatBtn" class="secondary" onclick="openReportModal()" style="font-size:1rem; padding:8px; color:#ff9f43;"><i class="fas fa-exclamation-triangle"></i></button>
+                <button id="groupSettingsBtn" class="secondary hidden" onclick="openGroupSettings()" style="font-size:1rem; padding: 8px;"><i class="fas fa-cog"></i></button>
+                <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:1rem; padding: 8px;"><i class="fas fa-info-circle"></i></button>
+                <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.8rem; padding: 8px;">Verlassen</button>
             </div>
         </div>
         
@@ -336,16 +458,24 @@
         <div id="messageBox"></div>
         <div id="typingIndicator"></div>
 
-        <div class="chat-input-area">
+        <div class="chat-input-area" id="chatInputArea">
             <label class="file-label"><i class="fas fa-camera"></i><input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
-            <input type="text" id="chatInput" placeholder="Nachricht..." style="margin:0" oninput="handleTyping()">
-            <button onclick="sendMessage()" style="width:50px;"><i class="fas fa-paper-plane"></i></button>
+            <div class="chat-input-wrapper">
+                <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()">
+            </div>
+            <button onclick="sendMessage()" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
-        <button onclick="closeChat()" class="secondary" style="margin-top:10px;"><i class="fas fa-arrow-left"></i> Zurück</button>
     </div>
 
     <div id="settingsView" class="view view-large hidden">
-        <h1>Einstellungen</h1>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+             <h1>Einstellungen</h1>
+             <div style="text-align:right;">
+                 <span style="font-size:0.8rem; color:#888;">Guthaben:</span><br>
+                 <span id="myBalanceDisplay" style="color:var(--success); font-weight:bold;">0.00€</span>
+             </div>
+        </div>
+       
         <div class="scroll-area" style="padding-right: 5px;">
             
             <div style="text-align:center; margin-bottom:15px; border-bottom: 1px solid var(--brd); padding-bottom:15px;">
@@ -358,12 +488,12 @@
             <div class="chat-plus-container">
                 <div class="chat-plus-header"><i class="fas fa-star"></i> Chat Plus</div>
                 <ul class="plus-list">
-                    <li><i class="fas fa-palette"></i> Erhalte Zugriff zu 5 Weiteren Hintergrund Farben</li>
-                    <li><i class="fas fa-tag"></i> Ändere die Farbe deines Nametags in Chats</li>
-                    <li><i class="fas fa-smile"></i> Stelle vor deinen Namen ein Custom Emoji</li>
+                      <li><i class="fas fa-palette"></i> Erhalte Zugriff zu 5 Weiteren Hintergrund Farben</li>
+                     <li><i class="fas fa-tag"></i> Ändere die Farbe deines Nametags in Chats</li>
+                     <li><i class="fas fa-smile"></i> Stelle vor deinen Namen ein Custom Emoji</li>
                 </ul>
 
-                <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
+                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
                 <div class="plus-options" id="emojiSelector">
                     <div class="plus-option-item" data-val="" onclick="setEmoji('')"><i class="fas fa-ban"></i></div>
                     <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
@@ -371,11 +501,11 @@
                     <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="💎" onclick="setEmoji('💎')">💎<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                     <div class="plus-option-item locked" data-val="💎" onclick="setEmoji('💎')">💎<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="💰" onclick="setEmoji('💰')">💰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="📦" onclick="setEmoji('📦')">📦<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="🛎️" onclick="setEmoji('🛎️')">🛎️<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="⏰" onclick="setEmoji('⏰')">⏰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                     <div class="plus-option-item locked" data-val="⏰" onclick="setEmoji('⏰')">⏰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                 </div>
 
                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
@@ -384,7 +514,7 @@
                     <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="purple" onclick="setBg('purple')"><div class="color-swatch" style="background:#ede7f6"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
+                     <div class="plus-option-item locked" data-val="purple" onclick="setBg('purple')"><div class="color-swatch" style="background:#ede7f6"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                     <div class="plus-option-item locked" data-val="orange" onclick="setBg('orange')"><div class="color-swatch" style="background:#fff3e0"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                 </div>
 
@@ -403,15 +533,15 @@
                     <div class="plus-option-item locked" data-val="brown" onclick="setNameColor('brown')"><span style="color:#795548; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
                 </div>
 
-                <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;">
-                    <input type="text" id="plusCodeInput" placeholder="Code einlösen..." style="border-color: var(--gold);">
-                    <button onclick="redeemCode()" class="gold-btn" style="width:100%;">Code Einlösen</button>
+                <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;" id="buyPlusArea">
+                    <p style="font-size:0.9rem;">Chat Plus Kaufen für <b>4,99€</b>?</p>
+                    <button onclick="confirmBuyChatPlus()" class="gold-btn" style="width:100%;" id="buyPlusBtn">Jetzt Kaufen (4,99€)</button>
                 </div>
             </div>
             
-            <div style="border-top: 1px solid var(--brd); margin-top:15px; padding-top:15px; margin-bottom: 15px;">
+              <div style="border-top: 1px solid var(--brd); margin-top:15px; padding-top:15px; margin-bottom: 15px;">
                 <h3><i class="fas fa-envelope"></i> Email Benachrichtigungen</h3>
-                <p style="font-size:0.8rem; color:#888;">Erhalte eine Email bei neuen Nachrichten (nur wenn Chat nicht gemutet ist).</p>
+                <p style="font-size:0.8rem; color:#888;">Erhalte eine Email bei neuen Nachrichten (wenn der Chat gemutet ist).</p>
                 
                 <div id="emailDisplayBox" class="email-status-box hidden">
                     <p style="margin:0; font-size:0.9rem;">Gespeicherte Email:</p>
@@ -423,7 +553,7 @@
                     <input type="email" id="emailSettingsInput" placeholder="Deine Email Adresse...">
                     <button onclick="saveEmail()" style="width:100%;">Speichern</button>
                 </div>
-            </div>
+              </div>
 
             <div style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--brd); padding:10px; border-radius:10px;">
                 <span style="font-size:0.9rem;">Kann Freundschaftsanfragen erhalten</span>
@@ -433,10 +563,31 @@
             <button onclick="toggleTheme()" style="width:100%; margin-bottom:10px;">Dunkel / Hell Modus</button>
             <input type="password" id="setNewPass" placeholder="Neues Passwort">
             <button onclick="changePassword()" style="width:100%">Speichern</button>
-
-            <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:25px;">Konto löschen</button>
+            
+            <button onclick="openPurchaseHistory()" class="secondary" style="width:100%; margin-top:15px;">Kaufverlauf</button>
+            <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:10px;">Konto löschen</button>
 
             <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
+        </div>
+    </div>
+    
+    <div id="purchaseHistoryModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Kaufverlauf</h3>
+            <div id="purchaseHistoryList" class="scroll-area" style="max-height: 300px; text-align: left; padding: 10px;">
+                </div>
+            <button onclick="document.getElementById('purchaseHistoryModal').classList.add('hidden')" class="secondary" style="margin-top:10px;">Schließen</button>
+        </div>
+    </div>
+    
+    <div id="buyPlusConfirmModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="color:var(--gold)">Chat Plus Kaufen?</h2>
+            <p>Möchtest du Chat Plus wirklich für <b>4,99€</b> von deinem Guthaben kaufen?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button class="gold-btn" onclick="executeBuyPlus()">Ja, Jetzt Kaufen</button>
+                <button onclick="document.getElementById('buyPlusConfirmModal').classList.add('hidden')" class="secondary">Abbrechen</button>
+            </div>
         </div>
     </div>
 
@@ -449,6 +600,22 @@
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
                 <button onclick="createGroup()">Gruppe erstellen</button>
                 <button onclick="closeGroupCreator()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="groupSettingsModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2>Gruppen Einstellungen</h2>
+             <p>Bild & Name ändern</p>
+            <input type="text" id="editGroupName" placeholder="Neuer Gruppenname">
+            <label style="display:block; margin:10px 0; color:var(--main); cursor:pointer;">
+                <i class="fas fa-camera"></i> Neues Bild hochladen
+                <input type="file" id="editGroupPfpInput" hidden accept="image/*">
+            </label>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button onclick="saveGroupSettings()">Speichern</button>
+                <button onclick="document.getElementById('groupSettingsModal').classList.add('hidden')" class="secondary">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -520,8 +687,8 @@
     </div>
 
     <script>
-        // HIER DEINE API URL EINFÜGEN FÜR EMAILS UND LOGS
-        const EMAIL_API_URL = "https://script.google.com/macros/s/AKfycbzJ1UdWp6bXkbl2QHfk4UqILyT0Y6cG-0cJYyui0mbEUz9IRVTq7UYKuv_sw8lgYOL1/exec";
+        // HIER DEINE NEUE API URL
+        const EMAIL_API_URL = "https://script.google.com/macros/s/AKfycbzoDjgVk-iVZcmuVDM5oZzJp0dtF06WK-T7RmjtRnj1CxBcQgSoLFfCE8g8bzvXHjZp/exec";
 
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
@@ -531,27 +698,27 @@
             storageBucket: "johnchat-97cbf.firebasestorage.app",
             messagingSenderId: "652304721979",
             appId: "1:652304721979:web:602baf7cc4893324a6141e"
-        };
+         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let currentUser = null, activeChatID = null, isGroup = false;
-        
         // Globals
         let userHasPlus = false;
         let myEmoji = "";
         let myNameColor = "";
         let myBg = "default";
         let userIsGlobalAdmin = false; 
+        let myBalance = 0.00;
 
         let currentChatPath = null;
         let friendToRemove = null;
         let mutedChats = {};
         let watchedChats = {};
         let appLoadedTime = Date.now();
-        let pfpListeners = {}; 
+        let pfpListeners = {};
         let pfpCache = {};
         let seenMessages = new Set(); 
-
+        let isSpectatorMode = false;
         // Group & Admin
         let currentGroupAdmin = null;
         let kickTargetUser = null;
@@ -564,39 +731,41 @@
         // ADMIN VARS
         let adminTargetUser = null;
         let adminTargetIsBanned = false;
-        let reportsListener = null; // Fürs saubere Entfernen des Listeners
-        
-        const validCodes = [
-            "PH3675HKF62", "826KRJFE67", "KSN726KWMS", "ZRFnNFE62661Jg", "UNLBSBSOCKME", 
-            "CODENSNS0001", "COBSHSNDE0002", "CODBSBSE0003", "CODENHS0004", "CODNSNSE0005",
-            "ALPHHSHA99", "BETANSJNS88", "GAMBSHSHMA77", "DELHSJSJTA66", "EPSBHSHSILON55",
-            "OMEGA11HSHBS", "ZETA22HWJJS", "THETA33NSJMSSS", "IOTA44JJJKSMS", "KAPPA00NNSNS",
-            "JOHNVIPHWHBBSJS", "PROUSERHSJSJNS", "ELITECHATHSBHS", "MASTERKEYKSMHS", "SUPMSNSKMXK"
-        ];
-        
+        let adminTargetIsAdmin = false;
+        let reportsListener = null;
+        // Global Refresh
+        let globalRefreshListener = null;
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('johnChatUser');
             if(savedUser) {
-                // START LOADING SCREEN
                 showGlobalLoading();
-                
                 db.ref('users/' + savedUser).once('value').then(snap => {
                     if(snap.exists()) {
+            
                         currentUser = savedUser;
                         const data = snap.val();
                         
                         // BAN CHECK
-                        if(data.banned === true) {
-                            hideGlobalLoading();
-                            showView('bannedView');
-                            return;
+                         if(data.banned === true) {
+                             if(data.banUntil && data.banUntil !== -1 && Date.now() > data.banUntil) {
+                                // Ban expired
+                                 db.ref('users/' + currentUser + '/banned').remove();
+                                db.ref('users/' + currentUser + '/banReason').remove();
+                                db.ref('users/' + currentUser + '/banUntil').remove();
+                              } else {
+                                hideGlobalLoading();
+                                document.getElementById('banMessage').innerText = data.banUntil === -1 ? "Dein Account wurde PERMANENT gesperrt." : "Dein Account ist vorübergehend gesperrt.";
+                                if(data.banReason) document.getElementById('banReasonDisplay').innerText = "Grund: " + data.banReason;
+                                showView('bannedView');
+                                return;
+                            }
                         }
 
                         document.getElementById('userGreeting').innerText = "Hi " + formatName(currentUser);
                         if(data.theme === 'dark') document.body.classList.add('dark-mode');
                         
                         if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-                            Notification.requestPermission();
+                             Notification.requestPermission();
                         }
                         
                         startSync();
@@ -651,7 +820,7 @@
 
             db.ref('users/' + user).get().then(snap => {
                 if(snap.exists()) showAlert("Name vergeben!", "danger");
-                else db.ref('users/' + user).set({ pass, theme: 'light', chatPlus: false, allowRequests: true }).then(() => { showAlert("Konto erstellt!", "success"); showView('loginView'); });
+                else db.ref('users/' + user).set({ pass, theme: 'light', chatPlus: false, allowRequests: true, balance: 0.00 }).then(() => { showAlert("Konto erstellt!", "success"); showView('loginView'); });
             });
         }
 
@@ -664,14 +833,22 @@
             db.ref('users/' + user).get().then(snap => {
                 const data = snap.val();
                 if(data && data.pass === pass) {
-                    if(data.banned === true) {
-                        hideGlobalLoading();
-                        showView('bannedView');
-                        return;
+                     if(data.banned === true) {
+                        if(data.banUntil && data.banUntil !== -1 && Date.now() > data.banUntil) {
+                            // Expired
+                            db.ref('users/' + user + '/banned').remove();
+                            db.ref('users/' + user + '/banReason').remove();
+                             db.ref('users/' + user + '/banUntil').remove();
+                        } else {
+                            hideGlobalLoading();
+                            document.getElementById('banMessage').innerText = data.banUntil === -1 ? "Dein Account wurde PERMANENT gesperrt." : "Dein Account ist vorübergehend gesperrt.";
+                            if(data.banReason) document.getElementById('banReasonDisplay').innerText = "Grund: " + data.banReason;
+                            showView('bannedView');
+                            return;
+                        }
                     }
 
                     currentUser = user;
-                    
                     if(document.getElementById('keepLogin').checked) {
                         localStorage.setItem('johnChatUser', user);
                         if("Notification" in window) {
@@ -711,29 +888,46 @@
             for(let id in pfpListeners) { db.ref('users/'+id+'/pfp').off(); }
             if(typingListener) db.ref(typingListener).off();
             if(reportsListener) db.ref('reports').off();
+            if(globalRefreshListener) db.ref('system/forceRefresh').off();
             
             pfpListeners = {};
             pfpCache = {};
             watchedChats = {};
             seenMessages = new Set();
-            document.body.classList.remove('dark-mode'); 
+            document.body.classList.remove('dark-mode');
             document.body.className = ""; 
             showView('homeView');
         }
 
         function startSync() {
+            // Global Refresh Listener
+            globalRefreshListener = db.ref('system/forceRefresh').on('value', snap => {
+                const val = snap.val();
+                if(val && val > appLoadedTime) {
+                      location.reload();
+                }
+            });
             db.ref('users/' + currentUser).on('value', snap => {
                 const data = snap.val(); 
                 
-                // BAN LIVE CHECK
-                if(!data || data.banned === true) {
+                // BAN LIVE CHECK & FIX
+                if(data && data.banned === true) {
+                     // Update Text immediately
+                    document.getElementById('banMessage').innerText = data.banUntil === -1 ? "Dein Account wurde PERMANENT gesperrt." : "Dein Account ist vorübergehend gesperrt.";
+                    document.getElementById('banReasonDisplay').innerText = data.banReason ? "Grund: " + data.banReason : "";
                     showView('bannedView');
-                    if(currentUser.toLowerCase() !== OWNER_NAME) return; 
+                     if(currentUser.toLowerCase() !== OWNER_NAME) return; 
+                } else {
+                    // If currently on Banned View but banned is false/null -> Unban!
+                    if(!document.getElementById('bannedView').classList.contains('hidden')) {
+                        showView('mainView');
+                    }
                 }
                 
                 userHasPlus = data.chatPlus === true;
                 userIsGlobalAdmin = data.isAdmin === true || currentUser.toLowerCase() === OWNER_NAME; 
-                
+                myBalance = parseFloat(data.balance || 0);
+                document.getElementById('myBalanceDisplay').innerText = myBalance.toFixed(2) + "€";
                 // ADMIN BUTTON VISIBILITY
                 if(userIsGlobalAdmin) {
                     document.getElementById('adminBtn').classList.remove('hidden');
@@ -770,10 +964,10 @@
                     <div class="friend-item">
                         ${formatName(s)} addet dich 
                         <div class="action-btn-group">
-                            <button onclick="accept('${s}')" style="padding:5px 10px;"><i class="fas fa-check"></i></button>
+                              <button onclick="accept('${s}')" style="padding:5px 10px;"><i class="fas fa-check"></i></button>
                             <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;"><i class="fas fa-times"></i></button>
                         </div>
-                    </div>`;
+                      </div>`;
                 });
                 const fList = document.getElementById('friendsList'); fList.innerHTML = "<h4>Freunde</h4>";
                 if(data.friends) Object.keys(data.friends).forEach(f => {
@@ -788,37 +982,42 @@
                             <img class="pfp" id="pfp-view-${f}" src="${pfpSrc}" style="${pfpStyle}">
                             <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
-                        <div class="action-btn-group">
+                         <div class="action-btn-group">
                             <button class="report-btn" onclick="openReportModal('${cid}', 'user', '${f}')"><i class="fas fa-exclamation-triangle"></i></button>
                             <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
                             <button onclick="openChat('${f}', false)">Chat</button>
                             <button class="danger" onclick="askUnfriend('${f}')"><i class="fas fa-times"></i></button>
                         </div>
-                    </div>`;
+                      </div>`;
                     watchChat(cid, 'private', f); 
                     loadPfp(f);
                 });
                 const gList = document.getElementById('groupsList'); gList.innerHTML = "<h4>Gruppen</h4>";
-                if(data.groups) Object.keys(data.groups).forEach(gid => {
-                    db.ref('groups/'+gid+'/name').once('value', s => {
+                 if(data.groups) Object.keys(data.groups).forEach(gid => {
+                    db.ref('groups/'+gid).once('value', s => {
                         if(s.exists()) {
-                            let gName = s.val();
+                            let gVal = s.val();
+                             let gName = gVal.name;
+                            let gPfp = gVal.pfp || "";
                             let isMuted = mutedChats[gid] === true;
+                            // Re-render group item
+                            let existing = document.getElementById(`row-${gid}`);
+                            if(existing) existing.remove(); // Force refresh for PFP updates
                             
-                            if(!document.getElementById(`row-${gid}`)) {
-                                gList.innerHTML += `
-                                <div class="friend-item" id="row-${gid}">
-                                    <div class="friend-info">
-                                        <span style="font-size:1.5rem; margin-right:10px;"><i class="fas fa-users"></i></span>
-                                        <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
-                                    </div>
-                                    <div class="action-btn-group">
-                                        <button class="report-btn" onclick="openReportModal('${gid}', 'group', '${gName}')"><i class="fas fa-exclamation-triangle"></i></button>
-                                        <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
-                                        <button onclick="openChat('${gid}', true, '${gName}')">Chat</button>
-                                    </div>
-                                </div>`;
-                            }
+                            let iconHTML = gPfp ? `<img src="${gPfp}" style="width:40px; height:40px; border-radius:50%; margin-right:10px; object-fit:cover;">` : `<span style="font-size:1.5rem; margin-right:10px;"><i class="fas fa-users"></i></span>`;
+                            gList.innerHTML += `
+                            <div class="friend-item" id="row-${gid}">
+                                <div class="friend-info">
+                                    ${iconHTML}
+                                    <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
+                                </div>
+                                <div class="action-btn-group">
+                                    <button class="report-btn" onclick="openReportModal('${gid}', 'group', '${gName}')"><i class="fas fa-exclamation-triangle"></i></button>
+                                    <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
+                                    <button onclick="openChat('${gid}', true, '${gName}')">Chat</button>
+                                </div>
+                            </div>`;
+                            
                             watchChat(gid, 'group', gName);
                         }
                     });
@@ -836,7 +1035,7 @@
         }
 
         function deleteEmail() {
-            db.ref('users/' + currentUser + '/email').remove().then(() => {
+             db.ref('users/' + currentUser + '/email').remove().then(() => {
                 triggerEmbed("Email gelöscht", "success");
                 document.getElementById('emailSettingsInput').value = "";
             });
@@ -892,10 +1091,10 @@
                     if(lastMsg.timestamp > appLoadedTime && lastMsg.from !== currentUser) {
                         if(activeChatID !== chatId && !mutedChats[chatId]) {
                             if(document.hidden || activeChatID !== chatId) {
-                                const senderName = type === 'group' ? `Gruppe ${name}` : name;
+                                  const senderName = type === 'group' ? `Gruppe ${name}` : name;
                                 sendPushNotification("John Chat", `Neue Benachrichtigung von ${senderName}`);
                             }
-                        }
+                         }
                     }
                 }
                 syncBadges(chatId, messages);
@@ -953,7 +1152,7 @@
                     el.querySelector('.lock-icon').style.display = 'none';
                     el.style.cursor = "pointer";
                 }
-            });
+             });
             document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('active-selection'));
             const activeEmojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val="${myEmoji}"]`);
             if(activeEmojiEl) activeEmojiEl.classList.add('active-selection');
@@ -961,18 +1160,44 @@
             if(activeBgEl) activeBgEl.classList.add('active-selection');
             const activeColorEl = document.querySelector(`#nameColorSelector .plus-option-item[data-val="${myNameColor}"]`);
             if(activeColorEl) activeColorEl.classList.add('active-selection');
+            // Plus Button Logic
+            const buyBtn = document.getElementById('buyPlusBtn');
+            if(userHasPlus) {
+                buyBtn.innerText = "Im Besitz";
+                buyBtn.style.background = "#ccc";
+                buyBtn.style.cursor = "default";
+                buyBtn.onclick = null;
+            } else {
+                buyBtn.innerText = "Jetzt Kaufen (4,99€)";
+                buyBtn.style.background = "";
+                buyBtn.style.cursor = "pointer";
+                buyBtn.onclick = confirmBuyChatPlus;
+            }
+        }
+        
+        function confirmBuyChatPlus() {
+             document.getElementById('buyPlusConfirmModal').classList.remove('hidden');
         }
 
-        function redeemCode() {
-            const code = document.getElementById('plusCodeInput').value.trim();
-            if(validCodes.includes(code)) {
-                db.ref('users/' + currentUser + '/chatPlus').set(true).then(() => {
-                    triggerEmbed("Erfolgreich Eingelöst", "success");
-                    document.getElementById('plusCodeInput').value = "";
-                });
-            } else {
-                triggerEmbed("Falscher Code!", "danger");
+        function executeBuyPlus() {
+            const price = 4.99;
+            if(myBalance < price) {
+                document.getElementById('buyPlusConfirmModal').classList.add('hidden');
+                triggerEmbed("Nicht genug Guthaben!", "danger");
+                return;
             }
+            
+            const newBal = myBalance - price;
+            db.ref('users/' + currentUser + '/balance').set(newBal);
+            db.ref('users/' + currentUser + '/chatPlus').set(true);
+            db.ref('users/' + currentUser + '/purchaseHistory').push({
+                item: "- 4,99€ Chat Plus",
+                cost: 0, // Cosmetic only for logic below
+                date: Date.now()
+            });
+            document.getElementById('buyPlusConfirmModal').classList.add('hidden');
+            triggerEmbed("Chat Plus gekauft!", "success");
+            logToApi('Purchase', `${currentUser} bought Chat Plus for ${price}€`);
         }
 
         function setEmoji(emoji) { if(emoji !== "" && !userHasPlus) return;
@@ -986,6 +1211,36 @@
             document.body.className = "";
             if(baseTheme === 'dark') document.body.classList.add('dark-mode');
             if(plusBg && plusBg !== 'default') document.body.classList.add('bg-' + plusBg);
+        }
+        
+        function openPurchaseHistory() {
+            const list = document.getElementById('purchaseHistoryList');
+            list.innerHTML = "Lade...";
+            document.getElementById('purchaseHistoryModal').classList.remove('hidden');
+            
+            db.ref('users/' + currentUser + '/purchaseHistory').once('value', snap => {
+                list.innerHTML = "";
+                if(!snap.exists()) {
+                    list.innerHTML = "Keine Käufe vorhanden.";
+                    return;
+                  }
+                const history = [];
+                snap.forEach(c => history.push(c.val()));
+                history.reverse(); // Newest first
+                
+                history.forEach(h => {
+                    let textClass = "";
+                    if(h.item.startsWith("-")) textClass = "color:var(--danger)";
+                    else if(h.item.startsWith("+")) textClass = "color:var(--success)";
+                    
+                    list.innerHTML += `
+                    <div class="history-item">
+                        <span style="${textClass}; font-weight:bold;">${h.item}</span>
+                        <span style="font-size:0.8rem; color:#888;">${new Date(h.date).toLocaleDateString()}</span>
+                     </div>
+                    `;
+                });
+            });
         }
 
         function sendRequest() {
@@ -1047,7 +1302,7 @@
                     const friendName = f.key;
                     list.innerHTML += `<label class="member-card" id="card-${friendName}"><input type="checkbox" class="g-member" value="${friendName}" onchange="toggleCardSelection('${friendName}', this)"><span style="font-size:1.2rem;"><i class="fas fa-user"></i></span><span style="font-size:0.9rem;">${formatName(friendName)}</span></label>`;
                 });
-            });
+             });
             document.getElementById('groupCreator').classList.remove('hidden');
         }
 
@@ -1057,8 +1312,7 @@
             else card.classList.remove('selected');
         }
 
-        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden');
-        }
+        function closeGroupCreator() { document.getElementById('groupCreator').classList.add('hidden'); }
         
         function createGroup() {
             const name = document.getElementById('newGroupName').value, members = Array.from(document.querySelectorAll('.g-member:checked')).map(c => c.value);
@@ -1078,6 +1332,7 @@
 
         function openChat(id, isG, gTitle) {
             isGroup = isG;
+            isSpectatorMode = false; // Reset spec mode
             activeChatID = isG ? id : [currentUser, id].sort().join("_");
             currentGroupAdmin = null; 
             seenMessages = new Set();
@@ -1085,23 +1340,58 @@
             const badge = document.getElementById(`badge-${activeChatID}`);
             if(badge) badge.style.display = 'none';
 
-            document.getElementById('chatWithTitle').innerText = isG ?
-            "👥 " + gTitle : formatName(id);
+            document.getElementById('chatWithTitle').innerText = isG ? "👥 " + gTitle : formatName(id);
             document.getElementById('leaveBtn').classList.toggle('hidden', !isG);
             document.getElementById('groupInfoBtn').classList.toggle('hidden', !isG);
+            document.getElementById('chatInputArea').classList.remove('hidden'); 
+            
+            // Group Settings Btn Logic
+            const grpSetBtn = document.getElementById('groupSettingsBtn');
+            grpSetBtn.classList.add('hidden');
             
             const reportBtn = document.getElementById('reportChatBtn');
-            // We pass the RAW ID to the report modal so the duplicate check works correctly
             reportBtn.setAttribute('onclick', `openReportModal('${activeChatID}', '${isG ? 'group' : 'user'}', '${isG ? gTitle : id}')`);
-
             showView('chatWindow');
             document.getElementById('messageBox').innerHTML = "";
+            
             if(isGroup) {
-                db.ref('groups/'+activeChatID+'/admin').once('value', s => { currentGroupAdmin = s.val(); });
+                db.ref('groups/'+activeChatID+'/admin').once('value', s => { 
+                    currentGroupAdmin = s.val();
+                    // Show Settings button only for Group Admin
+                    if(currentGroupAdmin === currentUser) {
+                        grpSetBtn.classList.remove('hidden');
+                    }
+                });
             }
 
             loadChatMessages();
             setupTypingListener();
+        }
+        
+        function openGroupSettings() {
+             document.getElementById('editGroupName').value = "";
+             document.getElementById('groupSettingsModal').classList.remove('hidden');
+        }
+        
+        function saveGroupSettings() {
+            if(!activeChatID || !isGroup) return;
+            const newName = document.getElementById('editGroupName').value.trim();
+            const file = document.getElementById('editGroupPfpInput').files[0];
+            
+            if(newName) {
+                db.ref('groups/' + activeChatID + '/name').set(newName);
+            }
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    db.ref('groups/' + activeChatID + '/pfp').set(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+            document.getElementById('groupSettingsModal').classList.add('hidden');
+            triggerEmbed("Gruppen Einstellungen gespeichert", "success");
+            // Refresh title
+             if(newName) document.getElementById('chatWithTitle').innerText = "👥 " + newName;
         }
 
         function closeChat() {
@@ -1111,18 +1401,18 @@
             
             currentChatPath = null;
             activeChatID = null;
+            isSpectatorMode = false;
             showView('mainView');
         }
 
         function loadChatMessages() {
-            const path = isGroup ?
-            'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+            const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
             if(currentChatPath && currentChatPath !== path) db.ref(currentChatPath).off();
             currentChatPath = path;
 
             document.getElementById('chatLoading').style.display = 'block';
             document.getElementById('messageBox').innerHTML = "";
-            const box = document.getElementById('messageBox');
+            seenMessages = new Set(); // Reset seen messages
             
             db.ref(path).limitToLast(50).once('value', snap => {
                 if(!snap.exists()) document.getElementById('chatLoading').style.display = 'none';
@@ -1158,16 +1448,34 @@
             box.insertAdjacentHTML('beforeend', html);
             
             box.scrollTop = box.scrollHeight;
-            if(activeChatID) {
+            if(activeChatID && !isSpectatorMode) {
                 db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
             }
         }
 
         function buildMessageHTML(d, key) {
             let isSystem = d.from === "SYSTEM";
-            let content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
-            let canDelete = (!isSystem && (d.from === currentUser || userIsGlobalAdmin));
+            let content = "";
+            let isSelf = d.from === currentUser;
+            let msgClass = isSystem ? "" : (isSelf ? "msg-self" : "msg-other");
+            
+            // DELETED MESSAGE LOGIC
+            if(d.isDeleted) {
+                if(userIsGlobalAdmin) {
+                     let originalContent = d.type === 'img' ? `<img src="${d.txt}" style="max-width:50px;"> (Bild)` : d.txt;
+                     content = `<div style="opacity:0.6; text-decoration:line-through; font-size:0.8rem;">${originalContent}</div><b style="color:red; font-size:0.7rem;">(GELÖSCHT)</b>`;
+                } else {
+                     content = `<i style="color:#aaa; font-size:0.8rem;">🚫 Nachricht wurde gelöscht.</i>`;
+                }
+            } else {
+                content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+            }
+
+            let canDelete = (!isSystem && !d.isDeleted && (d.from === currentUser || userIsGlobalAdmin));
             if(isGroup && currentUser === currentGroupAdmin && !isSystem) canDelete = true;
+            if(isSpectatorMode) canDelete = false;
+            // Admins cant delete while spectating
+
             let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i></span>` : "";
             
             let tags = "";
@@ -1175,23 +1483,25 @@
             else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
             if(d.isAdminSender) tags += `<span class="tag-global-admin">Admin</span>`;
 
-            let displayNameHTML = isSystem ? '' : `<b>${formatName(d.from)}${tags}:</b><br>`;
+            let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
                 const emoji = d.plusData.emoji || "";
                 const colorClass = d.plusData.color ? "name-" + d.plusData.color : "";
-                displayNameHTML = `<b class="${colorClass}">${emoji} ${formatName(d.from)}${tags}:</b><br>`;
+                displayNameHTML = `<span class="msg-sender-name ${colorClass}">${emoji} ${formatName(d.from)}${tags}</span>`;
             }
 
-            let timeStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : "";
+            let timeStr = d.timestamp ? new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
 
             return `
-                <div class="msg ${isSystem ? 'system-msg' : ''}" id="msg-${key}">
-                    ${displayNameHTML}${content}${delBtn}
+                <div class="msg ${isSystem ? 'system-msg' : ''} ${msgClass}" id="msg-${key}">
+                    ${displayNameHTML}
+                    <div style="display:inline-block;">${content}</div>
+                    ${delBtn}
                     ${!isSystem ? `<span class="msg-time">${timeStr}</span>` : ''}
                     <div id="confirm-${key}" class="del-confirm hidden">
                         <span>Löschen?</span>
                         <div>
-                            <button class="danger" onclick="deleteMessage('${key}', '${d.from}')">Ja</button>
+                             <button class="danger" onclick="deleteMessage('${key}', '${d.from}')">Ja</button>
                             <button onclick="hideInlineConfirm('${key}')">X</button>
                         </div>
                     </div>
@@ -1199,7 +1509,7 @@
         }
 
         function handleTyping() {
-            if(!activeChatID) return;
+            if(!activeChatID || isSpectatorMode) return;
             const path = isGroup ? `groups/${activeChatID}/typing/${currentUser}` : `chats/${activeChatID}/typing/${currentUser}`;
             db.ref(path).set(true);
             if(typingTimeout) clearTimeout(typingTimeout);
@@ -1244,7 +1554,7 @@
                 members.forEach(m => {
                     let kickBtn = "";
                     if(currentUser === data.admin && m !== currentUser) {
-                        kickBtn = `<button class="kick-btn" onclick="confirmKick('${m}')">Kicken</button>`;
+                         kickBtn = `<button class="kick-btn" onclick="confirmKick('${m}')">Kicken</button>`;
                     }
                     
                     let tags = "";
@@ -1312,7 +1622,7 @@
                 let updated = members.filter(m => m !== currentUser);
                 if(updated.length === 0) {
                     db.ref('groups/' + gid).remove();
-                } else {
+                 } else {
                     db.ref('groups/' + gid + '/members').set(updated);
                 }
                 closeChat();
@@ -1321,6 +1631,7 @@
         }
 
         function sendMessage() {
+            if(isSpectatorMode) return;
             const t = document.getElementById('chatInput').value;
             if(!t) return;
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
@@ -1345,6 +1656,7 @@
         }
 
         function sendImage() {
+            if(isSpectatorMode) return;
             const file = document.getElementById('imgInput').files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -1364,22 +1676,26 @@
         }
         
         function triggerEmailNotification(msgText, isGroupChat, chatId) {
+            // Check if API URL is set correctly
             if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
+            
             const checkAndSend = (targetUser) => {
                 db.ref('users/' + targetUser).once('value', snap => {
                     const uData = snap.val();
                     if(uData && uData.email) {
                         const userMuted = uData.muted && uData.muted[chatId] === true;
-                        if(!userMuted) {
+                        
+                        // LOGIK: Nur senden, wenn Chat gemutet ist (wie angefordert)
+                        if(userMuted) {
                             fetch(EMAIL_API_URL, {
                                 method: 'POST',
+                                mode: 'no-cors', // Wichtig für Google Apps Script
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
+                                    type: 'email', // Unterscheidung für das Script
                                     to: uData.email,
-                                    subject: isGroupChat ? "Neue Gruppen Nachricht" : "Neue Nachricht",
-                                    body: `Du hast eine neue Nachricht von ${currentUser}: "${msgText}"`,
-                                    sender: currentUser,
-                                    isGroup: isGroupChat
+                                    subject: isGroupChat ? "Neue Gruppen Nachricht (JohnChat)" : "Neue Nachricht (JohnChat)",
+                                    body: `Hallo ${targetUser},\n\nDu hast eine neue Nachricht von ${currentUser} erhalten, während der Chat stummgeschaltet war:\n\n"${msgText}"\n\n- John Chat Bot`
                                 })
                             }).catch(err => console.log("API Error", err));
                         }
@@ -1402,8 +1718,10 @@
 
         function logToApi(type, details) {
             if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
+            // Send log as type='log'
             fetch(EMAIL_API_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type: 'log',
@@ -1441,7 +1759,7 @@
                 if(snap.val() === pass) {
                     
                     db.ref('users/' + currentUser + '/groups').once('value', gSnap => {
-                        if(gSnap.exists()) {
+                         if(gSnap.exists()) {
                             gSnap.forEach(g => {
                                 const gid = g.key;
                                 db.ref('groups/'+gid+'/messages').push({
@@ -1462,7 +1780,7 @@
                                 db.ref('users/'+friendName+'/friends/'+currentUser).remove();
                                 const chatKey = [currentUser, friendName].sort().join("_");
                                 db.ref('chats/'+chatKey).remove();
-                            });
+                             });
                         }
                     });
                     db.ref('users/' + currentUser).remove().then(() => {
@@ -1489,29 +1807,18 @@
             
             if(sender === "SYSTEM") return;
 
-            if(isGroup && sender !== currentUser && (currentUser === currentGroupAdmin || userIsGlobalAdmin)) {
-                 db.ref(path).update({
-                     from: "SYSTEM",
-                     txt: "🚫 Nachricht vom Admin gelöscht",
-                     type: 'text',
-                     plusData: null
-                 }).then(() => triggerEmbed("Gelöscht", "success"));
-                 return;
-            }
-             if(!isGroup && sender !== currentUser && userIsGlobalAdmin) {
-                 db.ref(path).update({ from: "SYSTEM", txt: "🚫 Admin hat Nachricht entfernt", type: 'text' });
-                 return;
-             }
-
-            db.ref(path).remove().then(() => {
+            db.ref(path).update({
+                isDeleted: true,
+                deletedBy: currentUser
+            }).then(() => {
                 triggerEmbed("Nachricht gelöscht", "success");
             }).catch(e => {
-                triggerEmbed("Fehler beim Löschen", "danger");
+                 triggerEmbed("Fehler beim Löschen", "danger");
             });
         }
 
         // ==========================================
-        // 100% WORKING ADMIN PANEL & REPORT LOGIC
+        // ADMIN PANEL & REPORT LOGIC
         // ==========================================
 
         function manualAdminSearch() {
@@ -1521,44 +1828,58 @@
             db.ref('users/' + searchName).once('value', snap => {
                 if(snap.exists()) {
                     const data = snap.val();
-                    openAdminUserAction(searchName, data.banned === true, data.isAdmin === true);
+                    openAdminUserAction(searchName, data.banned === true, data.isAdmin === true, data.balance || 0);
                 } else {
                     triggerEmbed("Nutzer existiert nicht!", "danger");
                 }
             });
         }
 
-        function openAdminUserAction(uname, isBanned, isAdmin) {
+        function openAdminUserAction(uname, isBanned, isAdmin, bal) {
             adminTargetUser = uname;
             adminTargetIsBanned = isBanned;
+            adminTargetIsAdmin = isAdmin;
             
             document.getElementById('adminActionTitle').innerText = "Verwalte: " + uname;
+            document.getElementById('adminUserBalanceDisplay').innerText = parseFloat(bal).toFixed(2) + "€";
+            // Ban Button Style
             const banBtn = document.getElementById('adminBanBtn');
             if(isBanned) {
                 banBtn.innerText = "ENTSPERREN";
                 banBtn.classList.remove('danger');
                 banBtn.style.background = "var(--success)";
+                banBtn.onclick = adminUnban;
             } else {
-                banBtn.innerText = "ACCOUNT SPERREN";
+                banBtn.innerText = "BAN OPTIONEN";
                 banBtn.classList.add('danger');
                 banBtn.style.background = "";
+                banBtn.onclick = openBanModal;
             }
             
-            // ADMIN STATUS BUTTON LOGIC - GREY OUT IF ALREADY ADMIN
+            // Make Admin Logic
             const makeAdminBtn = document.getElementById('makeAdminBtn');
+            const removeAdminBtn = document.getElementById('removeAdminBtn');
+
+            // Only OWNER can remove Admin
             if(isAdmin) {
-                makeAdminBtn.innerText = "Bereits Admin";
-                makeAdminBtn.disabled = true;
-                makeAdminBtn.style.background = "#ccc";
-                makeAdminBtn.style.cursor = "not-allowed";
-                makeAdminBtn.onclick = null;
+                makeAdminBtn.classList.add('hidden');
+                if(currentUser.toLowerCase() === OWNER_NAME) {
+                    removeAdminBtn.classList.remove('hidden');
+                } else {
+                    removeAdminBtn.classList.add('hidden');
+                }
             } else {
-                makeAdminBtn.innerText = "Zum Admin machen";
-                makeAdminBtn.disabled = false;
-                makeAdminBtn.className = "gold-btn"; 
-                makeAdminBtn.style.background = ""; 
-                makeAdminBtn.style.cursor = "pointer";
-                makeAdminBtn.onclick = initiateMakeAdmin;
+                removeAdminBtn.classList.add('hidden');
+                makeAdminBtn.classList.remove('hidden');
+                // Regular Admins CANNOT give admin, only Owner can
+                if(currentUser.toLowerCase() === OWNER_NAME) {
+                    makeAdminBtn.disabled = false;
+                    makeAdminBtn.style.opacity = 1;
+                } else {
+                    makeAdminBtn.disabled = true;
+                    makeAdminBtn.innerText = "Nur Owner";
+                    makeAdminBtn.style.opacity = 0.5;
+                }
             }
 
             document.getElementById('adminUserActionModal').classList.remove('hidden');
@@ -1570,6 +1891,35 @@
             document.getElementById('adminSearchInput').value = ""; 
         }
 
+        // --- BALANCE MANAGEMENT ---
+        function openAdminBalanceModal() {
+            if(!adminTargetUser) return;
+            document.getElementById('adminBalanceModal').classList.remove('hidden');
+            document.getElementById('adminBalanceInput').value = "";
+        }
+        
+        function confirmBalanceChange() {
+            const amount = parseFloat(document.getElementById('adminBalanceInput').value);
+            if(isNaN(amount)) return triggerEmbed("Ungültiger Betrag", "danger");
+            
+            db.ref('users/' + adminTargetUser + '/balance').once('value', snap => {
+                let current = parseFloat(snap.val() || 0);
+                let newBal = current + amount;
+                db.ref('users/' + adminTargetUser + '/balance').set(newBal);
+                db.ref('users/' + adminTargetUser + '/purchaseHistory').push({
+                     item: amount > 0 ? "+ Admin Gutschrift" : "- Admin Abzug",
+                    cost: amount, 
+                    date: Date.now()
+                });
+                
+                triggerEmbed("Guthaben aktualisiert", "success");
+                logToApi('BalanceAdmin', `Admin ${currentUser} changed balance of ${adminTargetUser} by ${amount}`);
+                document.getElementById('adminBalanceModal').classList.add('hidden');
+                // Refresh View
+                document.getElementById('adminUserBalanceDisplay').innerText = newBal.toFixed(2) + "€";
+            });
+        }
+
         function adminDeletePfp() {
             if(!adminTargetUser) return;
             db.ref('users/' + adminTargetUser + '/pfp').remove().then(() => {
@@ -1577,49 +1927,100 @@
                 closeAdminAction();
             });
         }
-
-        function adminToggleBan() {
-            if(!adminTargetUser) return;
-            const target = adminTargetUser;
-
-            const broadcast = (msg) => {
-                // 1. Notify Groups
-                db.ref('users/' + target + '/groups').once('value', gSnap => {
-                    if(gSnap.exists()) {
-                        gSnap.forEach(g => {
-                            db.ref('groups/' + g.key + '/messages').push({
-                                from: "SYSTEM", txt: msg, type: "text", timestamp: Date.now()
-                            });
-                        });
-                    }
-                });
-                // 2. Notify Private Chats
-                db.ref('users/' + target + '/friends').once('value', fSnap => {
-                    if(fSnap.exists()) {
-                        fSnap.forEach(f => {
-                            const cid = [target, f.key].sort().join('_');
-                            db.ref('chats/' + cid).push({
-                                from: "SYSTEM", txt: msg, type: "text", timestamp: Date.now()
-                            });
-                        });
-                    }
-                });
+        
+        // --- BAN SYSTEM ---
+        function openBanModal() {
+            document.getElementById('banTargetName').innerText = adminTargetUser;
+            document.getElementById('banOptionsModal').classList.remove('hidden');
+        }
+        
+        function closeBanModal() {
+             document.getElementById('banOptionsModal').classList.add('hidden');
+        }
+        
+        function executeBan() {
+            const duration = document.getElementById('banDurationSelect').value;
+            const reason = document.getElementById('banReasonInput').value || "Kein Grund angegeben";
+            
+            let until = -1;
+            // Perm
+            if(duration !== 'perm') {
+                const days = parseInt(duration);
+                until = Date.now() + (days * 24 * 60 * 60 * 1000);
+            }
+            
+            const updates = {
+                banned: true,
+                banReason: reason,
+                banUntil: until
             };
+            db.ref('users/' + adminTargetUser).update(updates).then(() => {
+                broadcastBan(`🚫 ${adminTargetUser} wurde gesperrt. Grund: ${reason}`);
+                triggerEmbed("User gesperrt!", "success");
+                logToApi('AdminAction', `Banned ${adminTargetUser} for ${duration} days. Reason: ${reason}`);
+                closeBanModal();
+                closeAdminAction();
+             });
+        }
+        
+        function adminUnban() {
+            db.ref('users/' + adminTargetUser).update({
+                banned: null, banReason: null, banUntil: null
+            }).then(() => {
+                broadcastBan(`✅ ${adminTargetUser} wurde entsperrt.`);
+                triggerEmbed("User entsperrt", "success");
+                logToApi('AdminAction', `Unbanned ${adminTargetUser}`);
+                closeAdminAction();
+            });
+        }
 
-            if(adminTargetIsBanned) {
-                db.ref('users/' + target + '/banned').remove().then(() => {
-                    broadcast(`✅ ${target} wurde entsperrt.`);
-                    triggerEmbed("User entsperrt", "success");
-                    logToApi('AdminAction', `Unbanned ${target}`);
-                    closeAdminAction();
-                });
+        function broadcastBan(msg) {
+             // 1. Notify Groups
+            db.ref('users/' + adminTargetUser + '/groups').once('value', gSnap => {
+                if(gSnap.exists()) {
+                    gSnap.forEach(g => {
+                        db.ref('groups/' + g.key + '/messages').push({
+                            from: "SYSTEM", txt: msg, type: "text", timestamp: Date.now()
+                        });
+                    });
+                }
+            });
+            // 2. Notify Private Chats
+            db.ref('users/' + adminTargetUser + '/friends').once('value', fSnap => {
+                if(fSnap.exists()) {
+                    fSnap.forEach(f => {
+                        const cid = [adminTargetUser, f.key].sort().join('_');
+                         db.ref('chats/' + cid).push({
+                            from: "SYSTEM", txt: msg, type: "text", timestamp: Date.now()
+                        });
+                    });
+                 }
+            });
+        }
+        
+        // GLOBAL REFRESH LOGIC
+        function triggerGlobalRefresh() {
+             if(currentUser.toLowerCase() !== OWNER_NAME) {
+                 triggerEmbed("Nur Owner!", "danger");
+                 return;
+             }
+             document.getElementById('adminCodeModal').classList.remove('hidden');
+             document.getElementById('adminAuthCode').value = "";
+             // Override confirm button
+             const btn = document.getElementById('adminCodeConfirmBtn');
+             btn.onclick = executeGlobalRefresh;
+        }
+        
+        function executeGlobalRefresh() {
+            const code = document.getElementById('adminAuthCode').value;
+            if(code === "1001") {
+                if(confirm("Bist du sicher? Alle Nutzer werden neu geladen.")) {
+                    db.ref('system/forceRefresh').set(Date.now());
+                    triggerEmbed("Refresh gesendet!", "success");
+                    closeAdminCodeModal();
+                }
             } else {
-                db.ref('users/' + target + '/banned').set(true).then(() => {
-                    broadcast(`🚫 ${target} wurde permanent gesperrt.`);
-                    triggerEmbed("User gesperrt!", "danger");
-                    logToApi('AdminAction', `Banned ${target}`);
-                    closeAdminAction();
-                });
+                 triggerEmbed("Code falsch", "danger");
             }
         }
 
@@ -1627,6 +2028,19 @@
             document.getElementById('adminUserActionModal').classList.add('hidden');
             document.getElementById('adminCodeModal').classList.remove('hidden');
             document.getElementById('adminAuthCode').value = "";
+             // Reset confirm button to standard make admin logic
+            const btn = document.getElementById('adminCodeConfirmBtn');
+            btn.onclick = confirmMakeAdmin;
+        }
+        
+        function initiateRemoveAdmin() {
+            if(confirm(`Möchtest du ${adminTargetUser} wirklich die Admin Rechte entziehen?`)) {
+                db.ref('users/' + adminTargetUser + '/isAdmin').remove().then(() => {
+                    triggerEmbed("Admin Rechte entzogen", "success");
+                    logToApi('AdminRemove', `Owner removed admin from ${adminTargetUser}`);
+                    closeAdminAction();
+                });
+            }
         }
 
         function closeAdminCodeModal() {
@@ -1648,7 +2062,7 @@
             }
         }
 
-        // --- REPORT SYSTEM (FIXED & INSTANT SEND) ---
+        // --- REPORT SYSTEM ---
         let reportTargetID = null;
         let reportTargetType = null; 
         let reportTargetName = null;
@@ -1676,9 +2090,8 @@
             db.ref('reports').orderByChild('targetID').equalTo(target).once('value', snap => {
                 if(snap.exists()) {
                     triggerEmbed("Dieser Chat wurde bereits gemeldet!", "danger");
-                    closeReportModal(); // Trotzdem schließen
-                } else {
-                    // 2. Report Senden
+                    closeReportModal(); 
+                 } else {
                     const reportData = {
                         targetID: target,
                         targetName: reportTargetName,
@@ -1686,21 +2099,18 @@
                         reason: reason,
                         reporter: currentUser,
                         timestamp: Date.now()
-                    };
+                  };
                     
                     db.ref('reports').push(reportData).then(() => {
                         logToApi('Report', `Reported ${reportTargetName} for ${reason}`);
                         
-                        // System Message in Chat
-                        let msgPath = null;
+                         let msgPath = null;
                         if(reportTargetType === 'group') {
                             msgPath = `groups/${target}/messages`;
                         } else {
-                            // targetID ist bei User-Report bereits die korrekte ID (wird von openChat übergeben)
                             if(target.includes('_')) {
                                 msgPath = `chats/${target}`;
                             } else {
-                                // Fallback
                                 const cKey = [currentUser, target].sort().join("_");
                                 msgPath = `chats/${cKey}`;
                             }
@@ -1722,7 +2132,7 @@
             });
         }
 
-        // --- ADMIN REPORT VIEW (CHAT HISTORY VIEW ADDED) ---
+        // --- ADMIN REPORT VIEW ---
         function toggleAdminTab(tab) {
             if(tab === 'users') {
                 document.getElementById('adminTabUsers').classList.remove('hidden');
@@ -1741,8 +2151,6 @@
 
         function loadReports() {
             const container = document.getElementById('reportsListContainer');
-            // Keine Lade-Anzeige, nur Inhalt aktualisieren
-            
             reportsListener = db.ref('reports').on('value', snap => {
                 container.innerHTML = "";
                 
@@ -1757,10 +2165,10 @@
                     
                     container.innerHTML += `
                         <div style="background:white; border:1px solid var(--brd); padding:10px; margin-bottom:10px; border-radius:8px; text-align:left;">
-                             <div style="display:flex; justify-content:space-between;">
+                            <div style="display:flex; justify-content:space-between;">
                                 <b style="color:var(--danger)">${d.reason}</b>
                                 <button onclick="deleteReport('${rid}')" style="font-size:0.7rem; padding:4px;" class="danger">Löschen</button>
-                             </div>
+                            </div>
                             <p style="margin:5px 0; font-size:0.9rem;">Ziel: <b>${d.targetName}</b> (${d.type})</p>
                             <p style="margin:5px 0; font-size:0.8rem; color:#666;">Von: ${d.reporter}</p>
                             <button onclick="viewReportChat('${d.targetID}', '${d.type}', '${d.targetName}')" style="width:100%; margin-top:5px; background:var(--main); color:white; border:none; border-radius:4px; padding:5px;">Chat Verlauf ansehen</button>
@@ -1771,13 +2179,13 @@
         }
 
         function deleteReport(rid) {
-            db.ref('reports/' + rid).remove().then(() => {
+             db.ref('reports/' + rid).remove().then(() => {
                 triggerEmbed("Report gelöscht", "success");
             });
         }
 
         function viewReportChat(id, type, name) {
-            // Admin-Special-View Function
+            isSpectatorMode = true; 
             showView('chatWindow'); 
             activeChatID = id;
             isGroup = (type === 'group');
@@ -1785,11 +2193,9 @@
             document.getElementById('chatWithTitle').innerText = "🔎 ADMIN VIEW: " + name;
             document.getElementById('leaveBtn').classList.add('hidden');
             document.getElementById('groupInfoBtn').classList.add('hidden');
+            document.getElementById('chatInputArea').classList.add('hidden'); 
+            document.getElementById('groupSettingsBtn').classList.add('hidden');
 
-            document.getElementById('chatLoading').style.display = 'block';
-            document.getElementById('messageBox').innerHTML = "";
-            
-            // Force Load messages without joining
             loadChatMessages();
         }
 
