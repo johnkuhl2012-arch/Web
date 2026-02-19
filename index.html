@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>John Chat v3.1</title>
+    <title>John Chat v3.2</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -151,7 +151,24 @@
         
         /* HEADER ICONS */
         .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; color: var(--txt); padding: 5px; }
+        .shop-icon { position: absolute; top: 20px; right: 50px; cursor: pointer; font-size: 1.3rem; color: var(--gold); padding: 5px; }
         .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); padding: 5px; }
+
+        /* SHOP STYLES */
+        .shop-bundle { border: 2px solid var(--brd); border-radius: 16px; padding: 15px; margin-bottom: 12px; text-align: left; position: relative; background: var(--hover); transition: 0.2s; }
+        .shop-bundle:hover { border-color: var(--main); }
+        .shop-bundle-header { font-weight: bold; font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .shop-bundle-price { position: absolute; top: 15px; right: 15px; font-weight: bold; font-size: 1rem; color: var(--success); }
+        .shop-bundle ul { list-style: none; padding: 0; margin: 0 0 10px 0; font-size: 0.82rem; color: var(--txt); }
+        .shop-bundle ul li { margin-bottom: 3px; }
+        .bundle-plus { border-color: var(--gold); background: linear-gradient(to bottom, rgba(255,215,0,0.06), transparent); }
+        .bundle-starter { border-color: #a0c4ff; background: linear-gradient(to bottom, rgba(160,196,255,0.08), transparent); }
+        .bundle-color { border-color: #c77dff; background: linear-gradient(to bottom, rgba(199,125,255,0.08), transparent); }
+        .bundle-emoji { border-color: #ff9f43; background: linear-gradient(to bottom, rgba(255,159,67,0.08), transparent); }
+        .bundle-vip { border-color: #ff4757; background: linear-gradient(to bottom, rgba(255,71,87,0.08), transparent); }
+        .bundle-pro { border-color: #43b581; background: linear-gradient(to bottom, rgba(67,181,129,0.08), transparent); }
+        .bundle-mega { border-color: #ffd700; background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,71,87,0.08), rgba(88,101,242,0.08)); }
+        .bundle-basic { border-color: #888; background: linear-gradient(to bottom, rgba(136,136,136,0.06), transparent); }
         .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 50px; background: rgba(67, 181, 129, 0.1); }
 
         /* CHAT UI STYLES */
@@ -255,6 +272,15 @@
     <div id="systemEmbed"></div>
     <div id="customAlert"></div>
 
+    <!-- Inline Bestätigungs-Embed (kein Gerät-Dialog) -->
+    <div id="adminConfirmEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--main); border-radius:16px; padding:14px 20px; z-index:10001; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:260px; max-width:340px;">
+        <p id="adminConfirmMsg" style="margin:0 0 12px 0; font-size:0.9rem; font-weight:bold; color:var(--txt);"></p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button onclick="confirmAdminAction()" style="padding:8px 18px; font-size:0.85rem; background:var(--main);">✓ Ja</button>
+            <button onclick="cancelAdminAction()" class="secondary" style="padding:8px 18px; font-size:0.85rem;">✕ Nein</button>
+        </div>
+    </div>
+
     <div id="homeView" class="view">
         <h1>John Chat</h1>
         <div style="display:flex; flex-direction:column; gap:10px;">
@@ -312,6 +338,7 @@
 
     <div id="mainView" class="view view-large hidden">
         <span id="adminBtn" class="admin-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
+        <span class="shop-icon" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
         <span class="settings-icon" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
         
         <h2 id="userGreeting">Hi</h2>
@@ -485,58 +512,11 @@
                 <input type="file" id="pfpInput" hidden accept="image/*" onchange="uploadPfp()">
             </div>
 
-            <div class="chat-plus-container">
-                <div class="chat-plus-header"><i class="fas fa-star"></i> Chat Plus</div>
-                <ul class="plus-list">
-                      <li><i class="fas fa-palette"></i> Erhalte Zugriff zu 5 Weiteren Hintergrund Farben</li>
-                     <li><i class="fas fa-tag"></i> Ändere die Farbe deines Nametags in Chats</li>
-                     <li><i class="fas fa-smile"></i> Stelle vor deinen Namen ein Custom Emoji</li>
-                </ul>
-
-                 <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Custom Emoji:</p>
-                <div class="plus-options" id="emojiSelector">
-                    <div class="plus-option-item" data-val="" onclick="setEmoji('')"><i class="fas fa-ban"></i></div>
-                    <div class="plus-option-item locked" data-val="🍞" onclick="setEmoji('🍞')">🍞<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="🗣️" onclick="setEmoji('🗣️')">🗣️<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="🎓" onclick="setEmoji('🎓')">🎓<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="🥞" onclick="setEmoji('🥞')">🥞<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="🍟" onclick="setEmoji('🍟')">🍟<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                     <div class="plus-option-item locked" data-val="💎" onclick="setEmoji('💎')">💎<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="💰" onclick="setEmoji('💰')">💰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="📦" onclick="setEmoji('📦')">📦<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="🛎️" onclick="setEmoji('🛎️')">🛎️<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                     <div class="plus-option-item locked" data-val="⏰" onclick="setEmoji('⏰')">⏰<span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                </div>
-
-                <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Hintergrund Farbe:</p>
-                <div class="plus-options" id="bgSelector">
-                    <div class="plus-option-item" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>
-                    <div class="plus-option-item locked" data-val="yellow" onclick="setBg('yellow')"><div class="color-swatch" style="background:#fff9c4"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="red" onclick="setBg('red')"><div class="color-swatch" style="background:#ffcdd2"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="blue" onclick="setBg('blue')"><div class="color-swatch" style="background:#bbdefb"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                     <div class="plus-option-item locked" data-val="purple" onclick="setBg('purple')"><div class="color-swatch" style="background:#ede7f6"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="orange" onclick="setBg('orange')"><div class="color-swatch" style="background:#fff3e0"></div><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                </div>
-
-                <p style="font-size:0.8rem; font-weight:bold; margin:5px 0;">Nametag Farbe:</p>
-                <div class="plus-options" id="nameColorSelector">
-                    <div class="plus-option-item" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>
-                    <div class="plus-option-item locked" data-val="blue" onclick="setNameColor('blue')"><span style="color:#2196F3; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="yellow" onclick="setNameColor('yellow')"><span style="color:#FBC02D; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="green" onclick="setNameColor('green')"><span style="color:#4CAF50; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="pink" onclick="setNameColor('pink')"><span style="color:#e91e63; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="teal" onclick="setNameColor('teal')"><span style="color:#009688; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="red" onclick="setNameColor('red')"><span style="color:#ff4757; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="lime" onclick="setNameColor('lime')"><span style="color:#badc58; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="cyan" onclick="setNameColor('cyan')"><span style="color:#00d2d3; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="indigo" onclick="setNameColor('indigo')"><span style="color:#5f27cd; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                    <div class="plus-option-item locked" data-val="brown" onclick="setNameColor('brown')"><span style="color:#795548; font-weight:bold;">A</span><span class="lock-icon"><i class="fas fa-lock"></i></span></div>
-                </div>
-
-                <div style="border-top: 1px dashed var(--gold); margin-top:10px; padding-top:10px;" id="buyPlusArea">
-                    <p style="font-size:0.9rem;">Chat Plus Kaufen für <b>4,99€</b>?</p>
-                    <button onclick="confirmBuyChatPlus()" class="gold-btn" style="width:100%;" id="buyPlusBtn">Jetzt Kaufen (4,99€)</button>
-                </div>
+            <div class="chat-plus-container" id="bundleSettingsContainer">
+                <div class="chat-plus-header"><i class="fas fa-store"></i> Meine Pakete</div>
+                <p style="font-size:0.8rem; color:#888; margin-bottom:10px;" id="bundleSettingsHint">Keine Pakete gekauft. Gehe zum <b onclick="showView('shopView')" style="color:var(--gold); cursor:pointer;"><i class="fas fa-store"></i> Shop</b>.</p>
+                <!-- Dynamisch befüllt durch renderBundleSettings() -->
+                <div id="bundleSettingsContent"></div>
             </div>
             
               <div style="border-top: 1px solid var(--brd); margin-top:15px; padding-top:15px; margin-bottom: 15px;">
@@ -571,6 +551,162 @@
         </div>
     </div>
     
+    <!-- SHOP VIEW -->
+    <div id="shopView" class="view view-large hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <h2 style="margin:0;"><i class="fas fa-store" style="color:var(--gold);"></i> Shop</h2>
+            <div style="text-align:right;">
+                <span style="font-size:0.8rem; color:#888;">Guthaben:</span><br>
+                <span id="shopBalanceDisplay" style="color:var(--success); font-weight:bold;">0.00€</span>
+            </div>
+        </div>
+        <p style="font-size:0.8rem; color:#888; margin:0 0 10px 0;">Guthaben wird vom Admin aufgeladen.</p>
+        <div class="scroll-area" style="padding-right:5px;">
+
+            <!-- CHAT PLUS 7,99€ -->
+            <div class="shop-bundle bundle-plus">
+                <div class="shop-bundle-price">7,99€</div>
+                <div class="shop-bundle-header">⭐ Chat Plus</div>
+                <ul>
+                    <li>🎨 5 exklusive Hintergrundfarben (gelb, rot, blau, lila, orange)</li>
+                    <li>🏷️ Nametag-Farbe: Blau, Gelb, Grün, Pink</li>
+                    <li>😊 Custom Emojis: 🍞 🗣️ 🎓</li>
+                    <li>✨ Chat Plus Badge freigeschaltet</li>
+                </ul>
+                <button class="gold-btn" style="width:100%; font-size:0.85rem;" id="shopBtn-chatplus" onclick="confirmBuyBundle('chatplus', 7.99, 'Chat Plus')">Jetzt Kaufen</button>
+            </div>
+
+            <!-- STARTER BUNDLE 2,99€ -->
+            <div class="shop-bundle bundle-starter">
+                <div class="shop-bundle-price">2,99€</div>
+                <div class="shop-bundle-header">🚀 Starter Bundle</div>
+                <ul>
+                    <li>🔵 Nametag-Farbe: Blau</li>
+                    <li>😄 Custom Emoji: 🎓</li>
+                    <li>🌅 Hintergrundfarbe: Blau</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:#a0c4ff; color:#000;" id="shopBtn-starter" onclick="confirmBuyBundle('starter', 2.99, 'Starter Bundle')">Kaufen</button>
+            </div>
+
+            <!-- COLOR PACK 4,99€ -->
+            <div class="shop-bundle bundle-color">
+                <div class="shop-bundle-price">4,99€</div>
+                <div class="shop-bundle-header">🎨 Color Pack</div>
+                <ul>
+                    <li>🟣 Nametag-Farbe: Lila, Pink, Teal</li>
+                    <li>💜 Hintergrund: Lila & Orange</li>
+                    <li>🖌️ 3 exklusive Farbkombinationen</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:#c77dff; color:#fff;" id="shopBtn-colorpack" onclick="confirmBuyBundle('colorpack', 4.99, 'Color Pack')">Kaufen</button>
+            </div>
+
+            <!-- EMOJI PACK 4,99€ -->
+            <div class="shop-bundle bundle-emoji">
+                <div class="shop-bundle-price">4,99€</div>
+                <div class="shop-bundle-header">😎 Emoji Pack</div>
+                <ul>
+                    <li>😋 Emoji: 🍟 🥞 🍞</li>
+                    <li>💰 Emoji: 💰 📦 🛎️</li>
+                    <li>⏰ Emoji: ⏰ 💎 🗣️</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:#ff9f43; color:#fff;" id="shopBtn-emojipack" onclick="confirmBuyBundle('emojipack', 4.99, 'Emoji Pack')">Kaufen</button>
+            </div>
+
+            <!-- VIP BUNDLE 7,99€ -->
+            <div class="shop-bundle bundle-vip">
+                <div class="shop-bundle-price">7,99€</div>
+                <div class="shop-bundle-header">👑 VIP Bundle</div>
+                <ul>
+                    <li>🔴 Nametag-Farbe: Rot & Lime</li>
+                    <li>🌟 Emoji: 💎 💰 🛎️</li>
+                    <li>🟠 Hintergrund: Orange & Rot</li>
+                    <li>🏷️ Exklusiver VIP-Status</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:#ff4757; color:#fff;" id="shopBtn-vip" onclick="confirmBuyBundle('vip', 7.99, 'VIP Bundle')">Kaufen</button>
+            </div>
+
+            <!-- PRO BUNDLE 4,99€ -->
+            <div class="shop-bundle bundle-pro">
+                <div class="shop-bundle-price">4,99€</div>
+                <div class="shop-bundle-header">💼 Pro Bundle</div>
+                <ul>
+                    <li>🟢 Nametag-Farbe: Grün & Cyan</li>
+                    <li>🌿 Hintergrund: Gelb & Blau</li>
+                    <li>⚡ Emoji: 🎓 🗣️</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:#43b581; color:#fff;" id="shopBtn-pro" onclick="confirmBuyBundle('pro', 4.99, 'Pro Bundle')">Kaufen</button>
+            </div>
+
+            <!-- BASIC BUNDLE 4,99€ -->
+            <div class="shop-bundle bundle-basic">
+                <div class="shop-bundle-price">4,99€</div>
+                <div class="shop-bundle-header">📦 Basic Bundle</div>
+                <ul>
+                    <li>🔵 Nametag-Farbe: Indigo & Brown</li>
+                    <li>🎒 Emoji: 📦 🍞</li>
+                    <li>🏠 Hintergrund: Standard (inklusive)</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem;" id="shopBtn-basic" onclick="confirmBuyBundle('basic', 4.99, 'Basic Bundle')">Kaufen</button>
+            </div>
+
+            <!-- NEON BUNDLE 4,99€ -->
+            <div class="shop-bundle" style="border-color:#00d2d3; background:linear-gradient(to bottom,rgba(0,210,211,0.08),transparent);">
+                <div class="shop-bundle-price" style="color:#00d2d3;">4,99€</div>
+                <div class="shop-bundle-header">⚡ Neon Bundle</div>
+                <ul>
+                    <li>🔵 Nametag-Farbe: Cyan, Lime, Teal</li>
+                    <li>🌊 Hintergrund: Blau & Lila</li>
+                    <li>💡 Emoji: ⏰ 🎯 📦 🛎️</li>
+                    <li>✨ 4 Extra Emojis + 3 Nametag-Farben + 2 Hintergründe</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:linear-gradient(45deg,#00d2d3,#5865F2); color:#fff;" id="shopBtn-neon" onclick="confirmBuyBundle('neon', 4.99, 'Neon Bundle')">Kaufen</button>
+            </div>
+
+            <!-- ROYAL BUNDLE 7,99€ -->
+            <div class="shop-bundle" style="border-color:#9b59b6; background:linear-gradient(to bottom,rgba(155,89,182,0.1),transparent);">
+                <div class="shop-bundle-price" style="color:#9b59b6;">7,99€</div>
+                <div class="shop-bundle-header">👸 Royal Bundle</div>
+                <ul>
+                    <li>👑 Nametag-Farbe: Lila, Indigo, Brown, Pink, Gelb</li>
+                    <li>🏰 Hintergrund: Lila, Orange, Gelb & Rot</li>
+                    <li>🌟 Emoji: 💎 👾 🤖 🎓 🥞 🍟</li>
+                    <li>🎖️ 6 Emojis + 5 Nametag-Farben + 4 Hintergründe</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:linear-gradient(45deg,#9b59b6,#FBC02D); color:#fff;" id="shopBtn-royal" onclick="confirmBuyBundle('royal', 7.99, 'Royal Bundle')">Kaufen</button>
+            </div>
+
+            <!-- MEGA BUNDLE 14,99€ -->
+            <div class="shop-bundle bundle-mega">
+                <div class="shop-bundle-price" style="color:#ffd700;">14,99€</div>
+                <div class="shop-bundle-header" style="font-size:1.1rem;">🔥 MEGA BUNDLE</div>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;"><i>Exklusives Bundle – enthält keine anderen Bundles, sondern eigene Inhalte!</i></p>
+                <ul>
+                    <li>🔥 Exklusiver MEGA-Hintergrund: Dunkelrot & Schwarz</li>
+                    <li>💀 Exklusive Nametag-Farben: Dunkelgold & Neongrün</li>
+                    <li>🤖 Exklusive Emojis: 🤖 👾 🔥 💀 🎯</li>
+                    <li>🏆 Einzigartiges MEGA-Badge im Chat</li>
+                    <li>⚡ Exklusiver animierter Nametag-Glow-Effekt</li>
+                    <li>💎 Nur für MEGA-Besitzer sichtbare Features</li>
+                </ul>
+                <button style="width:100%; font-size:0.9rem; background:linear-gradient(45deg,#ffd700,#ff4757,#5865F2); color:#fff; font-weight:bold; box-shadow:0 4px 15px rgba(255,215,0,0.4);" id="shopBtn-mega" onclick="confirmBuyBundle('mega', 14.99, 'MEGA BUNDLE')">🔥 Jetzt kaufen!</button>
+            </div>
+
+        </div>
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
+    </div>
+
+    <!-- SHOP CONFIRM MODAL -->
+    <div id="shopConfirmModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="color:var(--gold);" id="shopConfirmTitle">Bundle kaufen?</h2>
+            <p id="shopConfirmText">Möchtest du dieses Bundle kaufen?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button class="gold-btn" onclick="executeShopBuy()">Ja, Kaufen</button>
+                <button onclick="document.getElementById('shopConfirmModal').classList.add('hidden')" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
     <div id="purchaseHistoryModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h3>Kaufverlauf</h3>
@@ -583,7 +719,7 @@
     <div id="buyPlusConfirmModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h2 style="color:var(--gold)">Chat Plus Kaufen?</h2>
-            <p>Möchtest du Chat Plus wirklich für <b>4,99€</b> von deinem Guthaben kaufen?</p>
+            <p>Möchtest du Chat Plus wirklich für <b>7,99€</b> von deinem Guthaben kaufen?</p>
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
                 <button class="gold-btn" onclick="executeBuyPlus()">Ja, Jetzt Kaufen</button>
                 <button onclick="document.getElementById('buyPlusConfirmModal').classList.add('hidden')" class="secondary">Abbrechen</button>
@@ -606,15 +742,36 @@
     
     <div id="groupSettingsModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h2>Gruppen Einstellungen</h2>
-             <p>Bild & Name ändern</p>
+            <h2 style="margin-top:0; color:var(--main);">⚙️ Gruppen Einstellungen</h2>
+            
+            <!-- Aktuelles Gruppenbild -->
+            <div style="text-align:center; margin-bottom:12px;">
+                <img id="grpSettingsPfp" src="" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid var(--brd); display:none;">
+                <div id="grpSettingsNoPfp" style="width:70px; height:70px; border-radius:50%; background:var(--hover); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto; border:2px solid var(--brd);"><i class="fas fa-users"></i></div>
+                <label style="display:block; margin-top:6px; font-size:0.8rem; color:var(--main); cursor:pointer;">
+                    <i class="fas fa-camera"></i> Bild ändern
+                    <input type="file" id="editGroupPfpInput" hidden accept="image/*" onchange="previewGroupSettingsPfp(this)">
+                </label>
+            </div>
+
+            <!-- Gruppenname -->
             <input type="text" id="editGroupName" placeholder="Neuer Gruppenname">
-            <label style="display:block; margin:10px 0; color:var(--main); cursor:pointer;">
-                <i class="fas fa-camera"></i> Neues Bild hochladen
-                <input type="file" id="editGroupPfpInput" hidden accept="image/*">
-            </label>
-            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
-                <button onclick="saveGroupSettings()">Speichern</button>
+
+            <!-- Neue Mitglieder hinzufügen -->
+            <div style="margin-top:10px; border-top:1px solid var(--brd); padding-top:10px;">
+                <p style="font-size:0.85rem; font-weight:bold; text-align:left; margin:0 0 6px 0;"><i class="fas fa-user-plus"></i> Freunde hinzufügen</p>
+                <div id="addMembersGrid" class="member-grid" style="max-height:140px;"></div>
+                <button onclick="addSelectedMembers()" style="width:100%; margin-top:8px; font-size:0.85rem;" class="green-btn"><i class="fas fa-user-plus"></i> Ausgewählte hinzufügen</button>
+            </div>
+
+            <!-- Admin vergeben / entziehen -->
+            <div style="margin-top:10px; border-top:1px solid var(--brd); padding-top:10px;">
+                <p style="font-size:0.85rem; font-weight:bold; text-align:left; margin:0 0 6px 0;"><i class="fas fa-crown"></i> Admin verwalten</p>
+                <div id="adminManageList" style="max-height:130px; overflow-y:auto; border:1px solid var(--brd); border-radius:10px;"></div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+                <button onclick="saveGroupSettings()"><i class="fas fa-save"></i> Speichern</button>
                 <button onclick="document.getElementById('groupSettingsModal').classList.add('hidden')" class="secondary">Abbrechen</button>
             </div>
         </div>
@@ -709,6 +866,7 @@
         let myBg = "default";
         let userIsGlobalAdmin = false; 
         let myBalance = 0.00;
+        let myBundles = {}; // z.B. { chatplus: true, starter: true, mega: true }
 
         let currentChatPath = null;
         let friendToRemove = null;
@@ -927,6 +1085,7 @@
                 userHasPlus = data.chatPlus === true;
                 userIsGlobalAdmin = data.isAdmin === true || currentUser.toLowerCase() === OWNER_NAME; 
                 myBalance = parseFloat(data.balance || 0);
+                myBundles = data.bundles || {};
                 document.getElementById('myBalanceDisplay').innerText = myBalance.toFixed(2) + "€";
                 // ADMIN BUTTON VISIBILITY
                 if(userIsGlobalAdmin) {
@@ -1096,8 +1255,7 @@
                             }
                          }
                     }
-                }
-                syncBadges(chatId, messages);
+                }                syncBadges(chatId, messages);
             });
             db.ref('users/' + currentUser + '/lastRead/' + chatId).on('value', snap => {
                 const lastReadTime = snap.val() || 0;
@@ -1144,68 +1302,267 @@
             }
         }
 
-        function updatePlusUI() {
-            const items = document.querySelectorAll('.plus-option-item.locked');
-            items.forEach(el => {
-                if(userHasPlus) {
-                    el.classList.remove('locked');
-                    el.querySelector('.lock-icon').style.display = 'none';
-                    el.style.cursor = "pointer";
-                }
-             });
-            document.querySelectorAll('.plus-option-item').forEach(e => e.classList.remove('active-selection'));
-            const activeEmojiEl = document.querySelector(`#emojiSelector .plus-option-item[data-val="${myEmoji}"]`);
-            if(activeEmojiEl) activeEmojiEl.classList.add('active-selection');
-            const activeBgEl = document.querySelector(`#bgSelector .plus-option-item[data-val="${myBg}"]`);
-            if(activeBgEl) activeBgEl.classList.add('active-selection');
-            const activeColorEl = document.querySelector(`#nameColorSelector .plus-option-item[data-val="${myNameColor}"]`);
-            if(activeColorEl) activeColorEl.classList.add('active-selection');
-            // Plus Button Logic
-            const buyBtn = document.getElementById('buyPlusBtn');
-            if(userHasPlus) {
-                buyBtn.innerText = "Im Besitz";
-                buyBtn.style.background = "#ccc";
-                buyBtn.style.cursor = "default";
-                buyBtn.onclick = null;
-            } else {
-                buyBtn.innerText = "Jetzt Kaufen (4,99€)";
-                buyBtn.style.background = "";
-                buyBtn.style.cursor = "pointer";
-                buyBtn.onclick = confirmBuyChatPlus;
+        // === BUNDLE DEFINITIONS ===
+        const BUNDLE_DEFS = {
+            chatplus: {
+                name: "⭐ Chat Plus",
+                emojis: ["🍞","🗣️","🎓"],
+                bgs:    ["yellow","red","blue","purple","orange"],
+                colors: ["blue","yellow","green","pink"]
+            },
+            starter: {
+                name: "🚀 Starter Bundle",
+                emojis: ["🎓"],
+                bgs:    ["blue"],
+                colors: ["blue"]
+            },
+            colorpack: {
+                name: "🎨 Color Pack",
+                emojis: [],
+                bgs:    ["purple","orange"],
+                colors: ["indigo","pink","teal"]
+            },
+            emojipack: {
+                name: "😎 Emoji Pack",
+                emojis: ["🍟","🥞","💰","📦","🛎️","⏰","💎"],
+                bgs:    [],
+                colors: []
+            },
+            vip: {
+                name: "👑 VIP Bundle",
+                emojis: ["💎","💰","🛎️"],
+                bgs:    ["orange","red"],
+                colors: ["red","lime"]
+            },
+            pro: {
+                name: "💼 Pro Bundle",
+                emojis: ["🎓","🗣️"],
+                bgs:    ["yellow","blue"],
+                colors: ["green","cyan"]
+            },
+            basic: {
+                name: "📦 Basic Bundle",
+                emojis: ["📦","🍞"],
+                bgs:    [],
+                colors: ["indigo","brown"]
+            },
+            neon: {
+                name: "⚡ Neon Bundle",
+                emojis: ["⏰","🎯","📦","🛎️"],
+                bgs:    ["blue","purple"],
+                colors: ["cyan","lime","teal"]
+            },
+            royal: {
+                name: "👸 Royal Bundle",
+                emojis: ["💎","👾","🤖","🎓","🥞","🍟"],
+                bgs:    ["purple","orange","yellow","red"],
+                colors: ["indigo","pink","yellow","brown"]
+            },
+            mega: {
+                name: "🔥 MEGA BUNDLE",
+                emojis: ["🤖","👾","🔥","💀","🎯"],
+                bgs:    ["red"],
+                colors: ["lime","cyan"]
             }
+        };
+
+        // Welche Emojis/Farben/BGs sind für den User freigeschaltet?
+        function getUnlockedItems() {
+            let emojis = new Set([""]);
+            let bgs = new Set(["default"]);
+            let colors = new Set([""]);
+            Object.keys(myBundles).forEach(bid => {
+                if(!myBundles[bid]) return;
+                const def = BUNDLE_DEFS[bid];
+                if(!def) return;
+                def.emojis.forEach(e => emojis.add(e));
+                def.bgs.forEach(b => bgs.add(b));
+                def.colors.forEach(c => colors.add(c));
+            });
+            return { emojis, bgs, colors };
+        }
+
+        function updatePlusUI() {
+            const { emojis, bgs, colors } = getUnlockedItems();
+            const shopBal = document.getElementById('shopBalanceDisplay');
+            if(shopBal) shopBal.innerText = myBalance.toFixed(2) + "€";
+            // Shop-Buttons: "Im Besitz" setzen
+            Object.keys(BUNDLE_DEFS).forEach(bid => {
+                const btn = document.getElementById('shopBtn-' + bid);
+                if(btn && myBundles[bid]) {
+                    btn.innerText = "✓ Im Besitz";
+                    btn.style.background = "#888";
+                    btn.style.cursor = "default";
+                    btn.style.color = "white";
+                    btn.onclick = null;
+                }
+            });
+            renderBundleSettings(emojis, bgs, colors);
+        }
+
+        function renderBundleSettings(emojis, bgs, colors) {
+            const container = document.getElementById('bundleSettingsContent');
+            const hint = document.getElementById('bundleSettingsHint');
+            if(!container) return;
+            container.innerHTML = "";
+
+            const purchasedBundles = Object.keys(myBundles).filter(b => myBundles[b]);
+            if(purchasedBundles.length === 0) {
+                hint.classList.remove('hidden');
+                return;
+            }
+            hint.classList.add('hidden');
+
+            // Gekaufte Bundles als Badges
+            let badgeHTML = '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">';
+            purchasedBundles.forEach(bid => {
+                const def = BUNDLE_DEFS[bid];
+                if(def) badgeHTML += `<span style="background:var(--main); color:white; border-radius:20px; padding:3px 10px; font-size:0.75rem; font-weight:bold;">${def.name}</span>`;
+            });
+            badgeHTML += '</div>';
+            container.innerHTML += badgeHTML;
+
+            // Alle Emojis die man besitzt — dynamisch aus BUNDLE_DEFS aufbauen (Reihenfolge & Duplikate vermeiden)
+            if(emojis.size > 1) {
+                // Baue geordnete, deduplizierte Emoji-Liste aus BUNDLE_DEFS
+                const emojiOrder = [];
+                const seen = new Set();
+                Object.keys(BUNDLE_DEFS).forEach(bid => {
+                    BUNDLE_DEFS[bid].emojis.forEach(em => {
+                        if(!seen.has(em)) { seen.add(em); emojiOrder.push(em); }
+                    });
+                });
+                let emojiHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Custom Emoji:</p><div class="plus-options" id="emojiSelector">';
+                emojiHTML += `<div class="plus-option-item ${myEmoji==='' ? 'active-selection':''}" data-val="" onclick="setEmoji('')"><i class="fas fa-ban"></i></div>`;
+                emojiOrder.forEach(em => {
+                    if(emojis.has(em)) {
+                        emojiHTML += `<div class="plus-option-item ${myEmoji===em ? 'active-selection':''}" data-val="${em}" onclick="setEmoji('${em}')">${em}</div>`;
+                    }
+                });
+                emojiHTML += '</div>';
+                container.innerHTML += emojiHTML;
+            }
+
+            // Hintergründe
+            if(bgs.size > 1) {
+                const bgMap = { yellow:'#fff9c4', red:'#ffcdd2', blue:'#bbdefb', purple:'#ede7f6', orange:'#fff3e0' };
+                let bgHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Hintergrund Farbe:</p><div class="plus-options" id="bgSelector">';
+                bgHTML += `<div class="plus-option-item ${myBg==='default'?'active-selection':''}" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>`;
+                Object.keys(bgMap).forEach(bg => {
+                    if(bgs.has(bg)) {
+                        bgHTML += `<div class="plus-option-item ${myBg===bg?'active-selection':''}" data-val="${bg}" onclick="setBg('${bg}')"><div class="color-swatch" style="background:${bgMap[bg]}"></div></div>`;
+                    }
+                });
+                bgHTML += '</div>';
+                container.innerHTML += bgHTML;
+            }
+
+            // Nametag Farben
+            if(colors.size > 1) {
+                const colorMap = { blue:'#2196F3', yellow:'#FBC02D', green:'#4CAF50', pink:'#e91e63', teal:'#009688', red:'#ff4757', lime:'#badc58', cyan:'#00d2d3', indigo:'#5f27cd', brown:'#795548' };
+                let colorHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Nametag Farbe:</p><div class="plus-options" id="nameColorSelector">';
+                colorHTML += `<div class="plus-option-item ${myNameColor===''?'active-selection':''}" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>`;
+                Object.keys(colorMap).forEach(c => {
+                    if(colors.has(c)) {
+                        colorHTML += `<div class="plus-option-item ${myNameColor===c?'active-selection':''}" data-val="${c}" onclick="setNameColor('${c}')"><span style="color:${colorMap[c]}; font-weight:bold;">A</span></div>`;
+                    }
+                });
+                colorHTML += '</div>';
+                container.innerHTML += colorHTML;
+            }
+
+            container.innerHTML += `<div style="border-top:1px dashed var(--gold); margin-top:10px; padding-top:8px;">
+                <p style="font-size:0.8rem; text-align:center; color:#888; margin:0;">Weitere Pakete im <b onclick="showView('shopView')" style="color:var(--gold);cursor:pointer;"><i class="fas fa-store"></i> Shop</b></p>
+            </div>`;
         }
         
         function confirmBuyChatPlus() {
-             document.getElementById('buyPlusConfirmModal').classList.remove('hidden');
+            showView('shopView');
         }
 
         function executeBuyPlus() {
-            const price = 4.99;
-            if(myBalance < price) {
-                document.getElementById('buyPlusConfirmModal').classList.add('hidden');
-                triggerEmbed("Nicht genug Guthaben!", "danger");
-                return;
-            }
-            
-            const newBal = myBalance - price;
-            db.ref('users/' + currentUser + '/balance').set(newBal);
-            db.ref('users/' + currentUser + '/chatPlus').set(true);
-            db.ref('users/' + currentUser + '/purchaseHistory').push({
-                item: "- 4,99€ Chat Plus",
-                cost: 0, // Cosmetic only for logic below
-                date: Date.now()
-            });
-            document.getElementById('buyPlusConfirmModal').classList.add('hidden');
-            triggerEmbed("Chat Plus gekauft!", "success");
-            logToApi('Purchase', `${currentUser} bought Chat Plus for ${price}€`);
+            // Legacy - redirect to shop
+            showView('shopView');
         }
 
-        function setEmoji(emoji) { if(emoji !== "" && !userHasPlus) return;
-            db.ref('users/' + currentUser + '/customEmoji').set(emoji); }
-        function setBg(bgName) { if(bgName !== "default" && !userHasPlus) return;
-            db.ref('users/' + currentUser + '/bgGradient').set(bgName); }
-        function setNameColor(color) { if(color !== "" && !userHasPlus) return;
-            db.ref('users/' + currentUser + '/nameColor').set(color); }
+        // === SHOP BUNDLE LOGIC ===
+        let pendingBundle = null;
+
+        function confirmBuyBundle(bundleId, price, name) {
+            // Doppelkauf verhindern
+            if(myBundles[bundleId]) {
+                triggerEmbed("Du besitzt dieses Bundle bereits!", "danger");
+                return;
+            }
+            pendingBundle = { id: bundleId, price, name };
+            document.getElementById('shopConfirmTitle').innerText = name + " kaufen?";
+            document.getElementById('shopConfirmText').innerText = `Möchtest du "${name}" für ${price.toFixed(2).replace('.',',')}€ kaufen?`;
+            document.getElementById('shopConfirmModal').classList.remove('hidden');
+        }
+
+        function executeShopBuy() {
+            if(!pendingBundle) return;
+            const { id, price, name } = pendingBundle;
+            document.getElementById('shopConfirmModal').classList.add('hidden');
+
+            // Nochmal prüfen (race condition safe)
+            if(myBundles[id]) {
+                triggerEmbed("Du besitzt dieses Bundle bereits!", "danger");
+                pendingBundle = null;
+                return;
+            }
+
+            if(myBalance < price) {
+                triggerEmbed("Nicht genug Guthaben!", "danger");
+                pendingBundle = null;
+                return;
+            }
+
+            const newBal = myBalance - price;
+
+            // Alles in einem Update an Firebase
+            const updates = {};
+            updates['balance'] = newBal;
+            updates[`bundles/${id}`] = true;
+
+            // Chat Plus Flag setzen wenn chatplus oder mega gekauft
+            if(id === 'chatplus') {
+                updates['chatPlus'] = true;
+            }
+
+            db.ref('users/' + currentUser).update(updates);
+            db.ref('users/' + currentUser + '/purchaseHistory').push({
+                item: `- ${price.toFixed(2).replace('.',',')}€ ${name}`,
+                cost: 0,
+                date: Date.now()
+            });
+
+            // Lokal updaten damit UI sofort reagiert
+            myBundles[id] = true;
+            myBalance = newBal;
+            if(id === 'chatplus') userHasPlus = true;
+
+            triggerEmbed(`${name} gekauft!`, "success");
+            logToApi('Purchase', `${currentUser} bought ${name} for ${price}€`);
+            updatePlusUI();
+            pendingBundle = null;
+        }
+
+        function setEmoji(emoji) {
+            const { emojis } = getUnlockedItems();
+            if(!emojis.has(emoji)) { triggerEmbed("Emoji nicht freigeschaltet!", "danger"); return; }
+            db.ref('users/' + currentUser + '/customEmoji').set(emoji);
+        }
+        function setBg(bgName) {
+            const { bgs } = getUnlockedItems();
+            if(!bgs.has(bgName)) { triggerEmbed("Hintergrund nicht freigeschaltet!", "danger"); return; }
+            db.ref('users/' + currentUser + '/bgGradient').set(bgName);
+        }
+        function setNameColor(color) {
+            const { colors } = getUnlockedItems();
+            if(!colors.has(color)) { triggerEmbed("Farbe nicht freigeschaltet!", "danger"); return; }
+            db.ref('users/' + currentUser + '/nameColor').set(color);
+        }
 
         function applyTheme(baseTheme, plusBg) {
             document.body.className = "";
@@ -1357,7 +1714,8 @@
             if(isGroup) {
                 db.ref('groups/'+activeChatID+'/admin').once('value', s => { 
                     currentGroupAdmin = s.val();
-                    // Show Settings button only for Group Admin
+                    // Settings-Button zeigen wenn man selbst Admin ist ODER wenn man Admin vergeben hat
+                    // (currentGroupAdmin wird lokal nicht geändert wenn man Admin vergibt)
                     if(currentGroupAdmin === currentUser) {
                         grpSetBtn.classList.remove('hidden');
                     }
@@ -1369,29 +1727,193 @@
         }
         
         function openGroupSettings() {
-             document.getElementById('editGroupName').value = "";
-             document.getElementById('groupSettingsModal').classList.remove('hidden');
+            if(!activeChatID || !isGroup) return;
+            const gid = activeChatID;
+            document.getElementById('editGroupName').value = "";
+            document.getElementById('editGroupPfpInput').value = "";
+
+            // Aktuelles Gruppen-PFP laden
+            db.ref('groups/' + gid).once('value', snap => {
+                const data = snap.val();
+                if(!data) return;
+                const pfpEl = document.getElementById('grpSettingsPfp');
+                const noPfpEl = document.getElementById('grpSettingsNoPfp');
+                if(data.pfp) {
+                    pfpEl.src = data.pfp;
+                    pfpEl.style.display = "block";
+                    noPfpEl.style.display = "none";
+                } else {
+                    pfpEl.style.display = "none";
+                    noPfpEl.style.display = "flex";
+                }
+
+                const currentMembers = data.members || [];
+                const groupAdmin = data.admin;
+
+                // Freunde die noch nicht in der Gruppe sind zum Hinzufügen anzeigen
+                const addGrid = document.getElementById('addMembersGrid');
+                addGrid.innerHTML = "";
+                db.ref('users/' + currentUser + '/friends').once('value', fSnap => {
+                    let hasFriendsToAdd = false;
+                    if(fSnap.exists()) {
+                        fSnap.forEach(f => {
+                            const fn = f.key;
+                            if(!currentMembers.includes(fn)) {
+                                hasFriendsToAdd = true;
+                                addGrid.innerHTML += `<label class="member-card" id="addcard-${fn}"><input type="checkbox" class="add-member-cb" value="${fn}" onchange="toggleCardSelection2('${fn}', this)"><span style="font-size:1.1rem;"><i class="fas fa-user"></i></span><span style="font-size:0.85rem;">${formatName(fn)}</span></label>`;
+                            }
+                        });
+                    }
+                    if(!hasFriendsToAdd) addGrid.innerHTML = `<p style="font-size:0.8rem; color:#888; grid-column:1/3; margin:5px 0;">Alle Freunde sind bereits in der Gruppe.</p>`;
+                });
+
+                // Admin-Verwaltungs-Liste aufbauen
+                const adminList = document.getElementById('adminManageList');
+                adminList.innerHTML = "";
+                currentMembers.forEach(m => {
+                    if(m === currentUser) return; // sich selbst nicht anzeigen
+                    const isAdminNow = (m === groupAdmin);
+                    adminList.innerHTML += `
+                        <div class="info-list-item" style="padding:8px 10px;">
+                            <span style="font-size:0.9rem;"><i class="fas fa-user"></i> ${formatName(m)} ${isAdminNow ? '<span class="tag-admin">Admin</span>' : ''}</span>
+                            <button onclick="toggleGroupAdmin('${m}', ${isAdminNow})" style="font-size:0.7rem; padding:5px 8px; background:${isAdminNow ? 'var(--danger)' : 'var(--main)'}; color:white; border:none; border-radius:6px; cursor:pointer;">
+                                ${isAdminNow ? 'Admin entziehen' : 'Admin machen'}
+                            </button>
+                        </div>`;
+                });
+                if(currentMembers.filter(m => m !== currentUser).length === 0) {
+                    adminList.innerHTML = `<p style="font-size:0.8rem; color:#888; padding:10px; margin:0;">Keine anderen Mitglieder.</p>`;
+                }
+            });
+
+            document.getElementById('groupSettingsModal').classList.remove('hidden');
+        }
+
+        function toggleCardSelection2(name, checkbox) {
+            const card = document.getElementById('addcard-' + name);
+            if(checkbox.checked) card.classList.add('selected');
+            else card.classList.remove('selected');
+        }
+
+        // Embed-Bestätigung (kein confirm())
+        let pendingAdminAction = null;
+        function showAdminConfirmEmbed(msg, onConfirm) {
+            pendingAdminAction = onConfirm;
+            const embed = document.getElementById('adminConfirmEmbed');
+            document.getElementById('adminConfirmMsg').innerText = msg;
+            embed.classList.remove('hidden');
+        }
+        function confirmAdminAction() {
+            document.getElementById('adminConfirmEmbed').classList.add('hidden');
+            if(pendingAdminAction) { pendingAdminAction(); pendingAdminAction = null; }
+        }
+        function cancelAdminAction() {
+            document.getElementById('adminConfirmEmbed').classList.add('hidden');
+            pendingAdminAction = null;
+        }
+
+        function toggleGroupAdmin(targetUser, isCurrentlyAdmin) {
+            if(!activeChatID || !isGroup) return;
+            const gid = activeChatID;
+            if(isCurrentlyAdmin) {
+                showAdminConfirmEmbed(`${formatName(targetUser)} den Gruppen-Admin entziehen?`, () => {
+                    // Admin entziehen → du bleibst Haupt-Admin
+                    db.ref('groups/' + gid + '/admin').set(currentUser).then(() => {
+                        currentGroupAdmin = currentUser;
+                        triggerEmbed(`${formatName(targetUser)} ist kein Admin mehr`, "success");
+                        db.ref('groups/' + gid + '/messages').push({ from:"SYSTEM", txt:`${formatName(targetUser)} ist nicht mehr Gruppen-Admin.`, type:'text', timestamp:Date.now() });
+                        openGroupSettings();
+                    });
+                });
+            } else {
+                showAdminConfirmEmbed(`${formatName(targetUser)} zum Gruppen-Admin machen? Du bleibst ebenfalls Admin.`, () => {
+                    // Co-Admin: Speichere targetUser als Admin, du kannst Einstellungen aber noch öffnen
+                    // Wir speichern alle Admins als Array
+                    db.ref('groups/' + gid + '/admin').set(targetUser).then(() => {
+                        // currentGroupAdmin bleibt currentUser (du hast die Einstellungen geöffnet = du warst Admin)
+                        // Damit du Settings-Button siehst: currentGroupAdmin nicht ändern
+                        triggerEmbed(`${formatName(targetUser)} ist jetzt Gruppen-Admin`, "success");
+                        db.ref('groups/' + gid + '/messages').push({ from:"SYSTEM", txt:`${formatName(targetUser)} ist jetzt Gruppen-Admin.`, type:'text', timestamp:Date.now() });
+                        openGroupSettings();
+                    });
+                });
+            }
+        }
+
+        function previewGroupSettingsPfp(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const pfpEl = document.getElementById('grpSettingsPfp');
+                const noPfpEl = document.getElementById('grpSettingsNoPfp');
+                pfpEl.src = e.target.result;
+                pfpEl.style.display = 'block';
+                noPfpEl.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addSelectedMembers() {
+            if(!activeChatID || !isGroup) return;
+            const gid = activeChatID;
+            const selected = Array.from(document.querySelectorAll('.add-member-cb:checked')).map(c => c.value);
+            if(selected.length === 0) { triggerEmbed("Niemanden ausgewählt!", "danger"); return; }
+
+            db.ref('groups/' + gid + '/members').once('value', snap => {
+                let members = snap.val() || [];
+                selected.forEach(m => {
+                    if(!members.includes(m)) members.push(m);
+                    db.ref('users/' + m + '/groups/' + gid).set(true);
+                });
+                db.ref('groups/' + gid + '/members').set(members);
+                db.ref('groups/' + gid + '/messages').push({
+                    from: "SYSTEM",
+                    txt: `${selected.map(formatName).join(', ')} wurde(n) zur Gruppe hinzugefügt.`,
+                    type: 'text',
+                    timestamp: Date.now()
+                });
+                triggerEmbed(`${selected.length} Mitglied(er) hinzugefügt!`, "success");
+                openGroupSettings(); // Refresh
+            });
         }
         
         function saveGroupSettings() {
             if(!activeChatID || !isGroup) return;
+            const gid = activeChatID;
             const newName = document.getElementById('editGroupName').value.trim();
             const file = document.getElementById('editGroupPfpInput').files[0];
             
             if(newName) {
-                db.ref('groups/' + activeChatID + '/name').set(newName);
+                db.ref('groups/' + gid + '/name').set(newName);
+                document.getElementById('chatWithTitle').innerText = "👥 " + newName;
             }
             if(file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    db.ref('groups/' + activeChatID + '/pfp').set(e.target.result);
+                    db.ref('groups/' + gid + '/pfp').set(e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
+
+            // Neue Mitglieder hinzufügen
+            const newMembers = Array.from(document.querySelectorAll('.add-member-cb:checked')).map(c => c.value);
+            if(newMembers.length > 0) {
+                db.ref('groups/' + gid + '/members').once('value', snap => {
+                    let members = snap.val() || [];
+                    newMembers.forEach(m => {
+                        if(!members.includes(m)) {
+                            members.push(m);
+                            db.ref('users/' + m + '/groups/' + gid).set(true);
+                            db.ref('groups/' + gid + '/messages').push({ from:"SYSTEM", txt:`${m} wurde zur Gruppe hinzugefügt.`, type:'text', timestamp:Date.now() });
+                        }
+                    });
+                    db.ref('groups/' + gid + '/members').set(members);
+                });
+            }
+
             document.getElementById('groupSettingsModal').classList.add('hidden');
             triggerEmbed("Gruppen Einstellungen gespeichert", "success");
-            // Refresh title
-             if(newName) document.getElementById('chatWithTitle').innerText = "👥 " + newName;
         }
 
         function closeChat() {
@@ -2014,13 +2536,13 @@
         function executeGlobalRefresh() {
             const code = document.getElementById('adminAuthCode').value;
             if(code === "1001") {
-                if(confirm("Bist du sicher? Alle Nutzer werden neu geladen.")) {
+                closeAdminCodeModal();
+                showAdminConfirmEmbed("Bist du sicher? Alle Nutzer werden neu geladen.", () => {
                     db.ref('system/forceRefresh').set(Date.now());
                     triggerEmbed("Refresh gesendet!", "success");
-                    closeAdminCodeModal();
-                }
+                });
             } else {
-                 triggerEmbed("Code falsch", "danger");
+                triggerEmbed("Code falsch", "danger");
             }
         }
 
@@ -2028,19 +2550,18 @@
             document.getElementById('adminUserActionModal').classList.add('hidden');
             document.getElementById('adminCodeModal').classList.remove('hidden');
             document.getElementById('adminAuthCode').value = "";
-             // Reset confirm button to standard make admin logic
             const btn = document.getElementById('adminCodeConfirmBtn');
             btn.onclick = confirmMakeAdmin;
         }
         
         function initiateRemoveAdmin() {
-            if(confirm(`Möchtest du ${adminTargetUser} wirklich die Admin Rechte entziehen?`)) {
+            showAdminConfirmEmbed(`Möchtest du ${adminTargetUser} wirklich die Admin Rechte entziehen?`, () => {
                 db.ref('users/' + adminTargetUser + '/isAdmin').remove().then(() => {
                     triggerEmbed("Admin Rechte entzogen", "success");
                     logToApi('AdminRemove', `Owner removed admin from ${adminTargetUser}`);
                     closeAdminAction();
                 });
-            }
+            });
         }
 
         function closeAdminCodeModal() {
@@ -2050,13 +2571,14 @@
         function confirmMakeAdmin() {
             const code = document.getElementById('adminAuthCode').value;
             if(code === "1001") {
-                if(confirm(`Möchtest du ${adminTargetUser} wirklich zum Admin machen?`)) {
+                closeAdminCodeModal();
+                showAdminConfirmEmbed(`Möchtest du ${adminTargetUser} wirklich zum Admin machen?`, () => {
                     db.ref('users/' + adminTargetUser + '/isAdmin').set(true).then(() => {
-                         triggerEmbed(`${adminTargetUser} ist jetzt Admin`, "success");
-                         logToApi('MakeAdmin', `User ${currentUser} made ${adminTargetUser} admin`);
-                         closeAdminCodeModal();
+                        triggerEmbed(`${adminTargetUser} ist jetzt Admin`, "success");
+                        logToApi('MakeAdmin', `User ${currentUser} made ${adminTargetUser} admin`);
+                        closeAdminAction();
                     });
-                }
+                });
             } else {
                 triggerEmbed("Falscher Code!", "danger");
             }
