@@ -333,6 +333,8 @@
         <div class="loader-icon"><i class="fas fa-comment-dots"></i></div>
         <h2 style="margin:0;">John Chat</h2>
         <p>Chats werden geladen...</p>
+        <button id="loadingLogoutBtn" onclick="executeLogout()" class="danger" style="display:none; margin-top:20px; padding:12px 30px; border-radius:50px; font-size:0.95rem;"><i class="fas fa-sign-out-alt"></i> Abmelden</button>
+        <p id="loadingLogoutHint" style="display:none; font-size:0.8rem; color:#888; margin-top:5px;">Das Laden dauert ungewöhnlich lang...</p>
     </div>
 
     <div id="systemEmbed"></div>
@@ -488,6 +490,8 @@
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <button onclick="adminDeletePfp()" class="secondary">Profilbild löschen</button>
                 <button onclick="openBanModal()" id="adminBanBtn" class="danger">BAN OPTIONEN</button>
+                <button onclick="openChatLockModal()" id="adminChatLockBtn" class="danger" style="background:#e67e22;">💬 CHAT SPERREN</button>
+                <button onclick="adminUnlockChat()" id="adminChatUnlockBtn" class="danger hidden" style="background:var(--success);">💬 CHAT ENTSPERREN</button>
                 <button id="makeAdminBtn" onclick="initiateMakeAdmin()" class="gold-btn">Zum Admin machen</button>
                 <button id="removeAdminBtn" onclick="initiateRemoveAdmin()" class="danger hidden">Admin entfernen</button>
                 <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-envelope"></i> Nachricht senden</button>
@@ -541,6 +545,27 @@
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
                 <button class="danger" onclick="executeBan()">Sperre verhängen</button>
                 <button onclick="closeBanModal()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT LOCK MODAL -->
+    <div id="chatLockModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h2 style="color:#e67e22;">💬 Chat Sperre</h2>
+            <p>Ziel: <b id="chatLockTargetName"></b></p>
+            <p style="font-size:0.85rem; color:#888;">Der Nutzer kann dann keine Nachrichten mehr senden – weder in Chats noch in Gruppen.</p>
+            <label style="text-align:left; display:block; font-size:0.8rem; margin-top:10px;">Dauer:</label>
+            <select id="chatLockDurationSelect">
+                <option value="perm">Permanent</option>
+                <option value="1">1 Tag</option>
+                <option value="3">3 Tage</option>
+                <option value="7">1 Woche</option>
+                <option value="30">1 Monat</option>
+            </select>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button style="background:#e67e22; color:white;" onclick="executeChatLock()">💬 Sperre verhängen</button>
+                <button onclick="document.getElementById('chatLockModal').classList.add('hidden')" class="secondary">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -1009,6 +1034,7 @@
         let myBundles = {}; // z.B. { chatplus: true, starter: true, mega: true }
         let myActiveTags = {}; // z.B. { owner: true, admin: true, mega: true }
         let inboxListener = null;
+        let isChatLocked = false; // Chat-Sperre Status
 
         let currentChatPath = null;
         let friendToRemove = null;
@@ -1087,8 +1113,25 @@
             }
         });
 
-        function showGlobalLoading() { document.getElementById('globalLoading').classList.remove('hidden'); }
-        function hideGlobalLoading() { document.getElementById('globalLoading').classList.add('hidden'); }
+        let loadingTimeoutTimer = null;
+        function showGlobalLoading() { 
+            document.getElementById('globalLoading').classList.remove('hidden'); 
+            document.getElementById('loadingLogoutBtn').style.display = 'none';
+            document.getElementById('loadingLogoutHint').style.display = 'none';
+            // Nach 30 Sekunden Abmelden-Button anzeigen
+            loadingTimeoutTimer = setTimeout(() => {
+                const btn = document.getElementById('loadingLogoutBtn');
+                const hint = document.getElementById('loadingLogoutHint');
+                if(btn) btn.style.display = 'block';
+                if(hint) hint.style.display = 'block';
+            }, 30000);
+        }
+        function hideGlobalLoading() { 
+            document.getElementById('globalLoading').classList.add('hidden'); 
+            if(loadingTimeoutTimer) { clearTimeout(loadingTimeoutTimer); loadingTimeoutTimer = null; }
+            document.getElementById('loadingLogoutBtn').style.display = 'none';
+            document.getElementById('loadingLogoutHint').style.display = 'none';
+        }
 
         function triggerEmbed(text, type = "success") {
             const embed = document.getElementById('systemEmbed');
@@ -1377,6 +1420,22 @@
                     document.getElementById('adminBtn').classList.add('hidden');
                 }
 
+                // CHAT LOCK CHECK
+                if(data.chatLocked === true) {
+                    const lockUntil = data.chatLockUntil;
+                    if(lockUntil === -1 || (lockUntil && Date.now() < lockUntil)) {
+                        isChatLocked = true;
+                    } else {
+                        // Abgelaufen – automatisch entfernen
+                        isChatLocked = false;
+                        db.ref('users/' + currentUser + '/chatLocked').remove();
+                        db.ref('users/' + currentUser + '/chatLockUntil').remove();
+                    }
+                } else {
+                    isChatLocked = false;
+                }
+                updateChatLockUI();
+
                 myEmoji = data.customEmoji || "";
                 myNameColor = data.nameColor || "";
                 myBg = data.bgGradient || "default";
@@ -1470,6 +1529,37 @@
             });
         }
 
+        // --- CHAT LOCK UI ---
+        function updateChatLockUI() {
+            const inputArea = document.getElementById('chatInputArea');
+            let lockNotice = document.getElementById('chatLockNotice');
+            if(isChatLocked) {
+                if(inputArea) inputArea.classList.add('hidden');
+                if(!lockNotice) {
+                    lockNotice = document.createElement('div');
+                    lockNotice.id = 'chatLockNotice';
+                    lockNotice.style.cssText = 'text-align:center; padding:12px; background:rgba(230,126,34,0.1); border:1px solid #e67e22; border-radius:12px; color:#e67e22; font-size:0.88rem; margin-top:5px; flex-shrink:0;';
+                    db.ref('users/' + currentUser + '/chatLockUntil').once('value', snap => {
+                        const until = snap.val();
+                        let msg = '🔇 Ein Administrator hat deinen Chat-Zugang gesperrt.';
+                        if(until && until !== -1) {
+                            const d = new Date(until);
+                            const dateStr = d.toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+                            msg += `<br><small>Wird freigeschaltet am: <b>${dateStr}</b></small>`;
+                        }
+                        lockNotice.innerHTML = msg;
+                    });
+                    if(inputArea && inputArea.parentNode) {
+                        inputArea.parentNode.insertBefore(lockNotice, inputArea.nextSibling);
+                    }
+                }
+                if(lockNotice) lockNotice.style.display = 'block';
+            } else {
+                if(inputArea && !isSpectatorMode) inputArea.classList.remove('hidden');
+                if(lockNotice) lockNotice.style.display = 'none';
+            }
+        }
+
         // --- EMAIL FUNCTIONS ---
         function saveEmail() {
             const mail = document.getElementById('emailSettingsInput').value.trim();
@@ -1492,9 +1582,28 @@
         }
 
         function deleteEmail() {
-             db.ref('users/' + currentUser + '/email').remove().then(() => {
-                triggerEmbed("Email gelöscht", "success");
-                document.getElementById('emailSettingsInput').value = "";
+            // E-Mail zuerst lesen, dann senden und löschen
+            db.ref('users/' + currentUser + '/email').once('value', snap => {
+                const oldMail = snap.val();
+                db.ref('users/' + currentUser + '/email').remove().then(() => {
+                    triggerEmbed("Email gelöscht", "success");
+                    document.getElementById('emailSettingsInput').value = "";
+                    // E-Mail-Benachrichtigung an die alte Adresse
+                    if(oldMail) {
+                        sendEmailViaScript({
+                            to: oldMail,
+                            subject: "📧 E-Mail von John Chat Account getrennt",
+                            htmlBody: buildEmailHtml(
+                                "E-Mail Adresse entfernt",
+                                `Hallo,<br><br>
+                                deine E-Mail-Adresse wurde soeben vom John Chat Account <b>${currentUser}</b> getrennt.<br><br>
+                                Du erhältst ab sofort keine Benachrichtigungen mehr an diese Adresse.<br><br>
+                                Falls du dies nicht selbst gemacht hast, melde dich bitte umgehend bei einem Administrator.`,
+                                "🔒 Sicherheitswarnung · John Chat"
+                            )
+                        });
+                    }
+                });
             });
         }
 
@@ -2558,6 +2667,7 @@
         let voiceBlob = null;
 
         function toggleVoiceRecording() {
+            if(isChatLocked) { triggerEmbed("Dein Chat-Zugang wurde gesperrt!", "danger"); return; }
             if(voiceRecording) {
                 stopVoiceRecording();
             } else {
@@ -2631,6 +2741,7 @@
         }
 
         function sendVoiceMessage() {
+            if(isChatLocked) { triggerEmbed("Dein Chat-Zugang wurde gesperrt!", "danger"); cancelVoiceRecording(); return; }
             if(!voiceBlob) {
                 // Still recording — stop first then send
                 stopVoiceRecording();
@@ -2738,6 +2849,7 @@
 
         function sendMessage() {
             if(isSpectatorMode) return;
+            if(isChatLocked) { triggerEmbed("Dein Chat-Zugang wurde gesperrt!", "danger"); return; }
             const t = document.getElementById('chatInput').value;
             if(!t) return;
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
@@ -2763,6 +2875,7 @@
 
         function sendImage() {
             if(isSpectatorMode) return;
+            if(isChatLocked) { triggerEmbed("Dein Chat-Zugang wurde gesperrt!", "danger"); return; }
             const file = document.getElementById('imgInput').files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -2974,6 +3087,24 @@
                              });
                         }
                     });
+                    // E-Mail senden VOR dem Löschen
+                    db.ref('users/' + currentUser + '/email').once('value', emailSnap => {
+                        const mail = emailSnap.val();
+                        if(mail) {
+                            sendEmailViaScript({
+                                to: mail,
+                                subject: "🗑️ Dein John Chat Account wurde gelöscht",
+                                htmlBody: buildEmailHtml(
+                                    "Account gelöscht",
+                                    `Hallo <b>${currentUser}</b>,<br><br>
+                                    dein John Chat Account wurde soeben <b>erfolgreich gelöscht</b>.<br>
+                                    Alle deine Daten wurden entfernt.<br><br>
+                                    Falls du dies nicht selbst veranlasst hast, wende dich bitte an einen Administrator.`,
+                                    "John Chat · Kontobestätigung"
+                                )
+                            });
+                        }
+                    });
                     db.ref('users/' + currentUser).remove().then(() => {
                         document.getElementById('deleteAccountModal').classList.add('hidden');
                         logoutForDelete();
@@ -3040,6 +3171,15 @@
             db.ref('users/' + uname + '/pass').once('value', snap => {
                 document.getElementById('adminUserPasswordDisplay').innerText = snap.val() || "–";
             });
+            
+            // Chat Lock Status prüfen
+            db.ref('users/' + uname).once('value', snap => {
+                const data = snap.val() || {};
+                const isLocked = data.chatLocked === true && (data.chatLockUntil === -1 || (data.chatLockUntil && Date.now() < data.chatLockUntil));
+                document.getElementById('adminChatLockBtn').classList.toggle('hidden', isLocked);
+                document.getElementById('adminChatUnlockBtn').classList.toggle('hidden', !isLocked);
+            });
+            
             // Ban Button Style
             const banBtn = document.getElementById('adminBanBtn');
             if(isBanned) {
@@ -3215,6 +3355,51 @@
                 broadcastBan(`✅ ${adminTargetUser} wurde entsperrt.`);
                 triggerEmbed("User entsperrt", "success");
                 logToApi('AdminAction', `Unbanned ${adminTargetUser}`);
+                closeAdminAction();
+            });
+        }
+
+        // --- CHAT LOCK SYSTEM ---
+        function openChatLockModal() {
+            if(!adminTargetUser) return;
+            document.getElementById('chatLockTargetName').innerText = adminTargetUser;
+            document.getElementById('chatLockModal').classList.remove('hidden');
+        }
+
+        function executeChatLock() {
+            const duration = document.getElementById('chatLockDurationSelect').value;
+            let until = -1;
+            let dateStr = "permanent";
+            if(duration !== 'perm') {
+                const days = parseInt(duration);
+                until = Date.now() + (days * 24 * 60 * 60 * 1000);
+                const d = new Date(until);
+                dateStr = d.toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+            }
+            db.ref('users/' + adminTargetUser).update({
+                chatLocked: true,
+                chatLockUntil: until
+            }).then(() => {
+                triggerEmbed("Chat gesperrt!", "success");
+                logToApi('AdminAction', `Chat locked ${adminTargetUser} for ${duration}`);
+                // Inbox-Nachricht an User
+                let bodyMsg = duration === 'perm'
+                    ? `Ein Administrator hat deinen Chat-Zugang permanent gesperrt. Du kannst keine Nachrichten mehr senden.`
+                    : `Ein Administrator hat deinen Chat-Zugang gesperrt.<br>Dein Chat wird freigeschaltet am: <b>${dateStr}</b>`;
+                systemInboxMsg(adminTargetUser, '🔇 Dein Chat wurde gesperrt', bodyMsg);
+                document.getElementById('chatLockModal').classList.add('hidden');
+                closeAdminAction();
+            });
+        }
+
+        function adminUnlockChat() {
+            if(!adminTargetUser) return;
+            db.ref('users/' + adminTargetUser).update({
+                chatLocked: null, chatLockUntil: null
+            }).then(() => {
+                triggerEmbed("Chat entsperrt!", "success");
+                logToApi('AdminAction', `Chat unlocked ${adminTargetUser}`);
+                systemInboxMsg(adminTargetUser, '✅ Dein Chat wurde entsperrt', 'Ein Administrator hat deinen Chat-Zugang wieder freigegeben. Du kannst wieder Nachrichten senden.');
                 closeAdminAction();
             });
         }
