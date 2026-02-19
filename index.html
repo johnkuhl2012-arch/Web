@@ -406,7 +406,26 @@
         </div>
 
         <button onclick="login()" style="width:100%">Einloggen</button>
+        <button onclick="showForgotPassword()" style="width:100%; margin-top:10px; background:#888; color:white;">Passwort vergessen</button>
         <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+
+        <!-- Passwort Vergessen Embed -->
+        <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:20px; padding:25px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
+            <h2 style="margin-top:0;"><i class="fas fa-key" style="color:var(--main);"></i> Passwort vergessen</h2>
+            <p style="font-size:0.9rem; color:#888; margin-bottom:15px;">Gib deinen Benutzernamen und deine hinterlegte E-Mail-Adresse ein. Du erhältst dann deinen Zugangscode per E-Mail.</p>
+            <input type="text" id="forgotUser" placeholder="Benutzername *" style="margin-bottom:8px;">
+            <input type="email" id="forgotEmail" placeholder="E-Mail-Adresse *" style="margin-bottom:15px;">
+            <button onclick="submitForgotPassword()" style="width:100%;">Code per E-Mail senden</button>
+            <button onclick="hideForgotPassword()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+
+            <!-- Erfolgs-Embed innerhalb Passwort vergessen -->
+            <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:20px; padding:25px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                <div style="font-size:3rem; margin-bottom:15px;">📧</div>
+                <h2 style="color:var(--success); margin-top:0;">E-Mail gesendet!</h2>
+                <p style="color:#888; font-size:0.9rem;">Wir haben dir eine E-Mail mit deinem Zugangscode zugesendet.</p>
+                <button onclick="hideForgotPassword()" style="width:100%; margin-top:20px;">Zurück zum Login</button>
+            </div>
+        </div>
     </div>
 
     <div id="mainView" class="view view-large hidden">
@@ -432,7 +451,10 @@
     </div>
 
     <div id="adminPanelView" class="view view-large hidden">
-        <h2 style="color: var(--danger);"><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <h2 style="color: var(--danger); margin:0;"><i class="fas fa-user-shield"></i> Admin Panel</h2>
+            <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
         
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <button onclick="toggleAdminTab('users')" id="tabBtnUser" style="flex:1;">User</button>
@@ -1251,6 +1273,7 @@
 
             if(!user || !pass || !agbOk) return showAlert("Daten/AGB fehlen!", "danger");
             if(user.length > 10) return showAlert("Name max 10 Zeichen!", "danger");
+            if(pass.length < 6) return showAlert("Passwort muss mindestens 6 Zeichen haben!", "danger");
 
             db.ref('users/' + user).get().then(snap => {
                 if(snap.exists()) showAlert("Name vergeben!", "danger");
@@ -1382,12 +1405,16 @@
                 }
             });
             // Force Logout Listener (Von allen Geräten abmelden)
+            // Nur Geräte abmelden, die den User im localStorage haben (angemeldet bleiben)
             const forceLogoutTime = appLoadedTime;
             db.ref('users/' + currentUser + '/forceLogout').on('value', snap => {
                 const val = snap.val();
                 if(val && val > forceLogoutTime) {
-                    localStorage.removeItem('johnChatUser');
-                    location.reload();
+                    // Nur auslösen wenn User auf diesem Gerät aktiv angemeldet (localStorage)
+                    if(localStorage.getItem('johnChatUser')) {
+                        localStorage.removeItem('johnChatUser');
+                        location.reload();
+                    }
                 }
             });
             db.ref('users/' + currentUser).on('value', snap => {
@@ -3285,6 +3312,68 @@
                         });
                     }
                 });
+            });
+        }
+
+        // --- PASSWORT VERGESSEN ---
+        function showForgotPassword() {
+            const embed = document.getElementById('forgotPasswordEmbed');
+            embed.classList.remove('hidden');
+            embed.style.display = 'flex';
+            document.getElementById('forgotSuccessEmbed').classList.add('hidden');
+            document.getElementById('forgotUser').value = '';
+            document.getElementById('forgotEmail').value = '';
+        }
+
+        function hideForgotPassword() {
+            const embed = document.getElementById('forgotPasswordEmbed');
+            embed.classList.add('hidden');
+            embed.style.display = 'none';
+        }
+
+        function submitForgotPassword() {
+            const user = document.getElementById('forgotUser').value.trim().toLowerCase();
+            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+
+            if(!user || !email) {
+                triggerEmbed("Bitte alle Felder ausfüllen!", "danger");
+                return;
+            }
+            if(!email.includes('@')) {
+                triggerEmbed("Ungültige E-Mail-Adresse!", "danger");
+                return;
+            }
+
+            db.ref('users/' + user).once('value', snap => {
+                if(!snap.exists()) {
+                    triggerEmbed("Benutzername nicht gefunden!", "danger");
+                    return;
+                }
+                const data = snap.val();
+                if(!data.email) {
+                    triggerEmbed("Auf deinem Account ist keine E-Mail hinterlegt!", "danger");
+                    return;
+                }
+                if(data.email.trim().toLowerCase() !== email) {
+                    triggerEmbed("Benutzername und E-Mail stimmen nicht überein!", "danger");
+                    return;
+                }
+                // Sende Passwort per E-Mail
+                sendEmailViaScript({
+                    to: data.email,
+                    subject: "🔑 Dein John Chat Zugangscode",
+                    htmlBody: buildEmailHtml(
+                        "Dein Zugangscode",
+                        `Hallo <b>${user}</b>,<br><br>
+                        Du hast eine Passwort-Anfrage für deinen John Chat Account gestellt.<br>
+                        <div class="box"><b>Dein aktuelles Passwort:</b> ${data.pass}</div>
+                        Melde dich damit an und ändere dein Passwort anschließend in den Einstellungen.<br><br>
+                        Falls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.`,
+                        "🔒 Passwort-Anfrage · John Chat"
+                    )
+                });
+                // Erfolgs-Embed anzeigen
+                document.getElementById('forgotSuccessEmbed').classList.remove('hidden');
             });
         }
 
