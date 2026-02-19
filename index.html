@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -942,7 +953,7 @@
 
     <script>
         // HIER DEINE NEUE API URL
-        const EMAIL_API_URL = "https://script.google.com/macros/s/AKfycbzoDjgVk-iVZcmuVDM5oZzJp0dtF06WK-T7RmjtRnj1CxBcQgSoLFfCE8g8bzvXHjZp/exec";
+        const EMAIL_API_URL = "https://script.google.com/macros/s/AKfycbw-2c-SWu5EJKHGz84Us97lngunHjK5PwZ-N3XBJdj9Z95CLmzjuXNzzg2edO_PfPgvvw/exec";
 
         const firebaseConfig = {
             apiKey: "AIzaSyApz3w-zlUHvcRUedqsiunJTPZMXYzdvdo",
@@ -1121,7 +1132,7 @@
             });
         }
 
-        // Send system message to user's inbox
+        // Send system message to user's inbox + Email-Benachrichtigung
         function systemInboxMsg(targetUser, title, body) {
             db.ref('users/' + targetUser + '/inbox').push({
                 from: '📬 System',
@@ -1129,6 +1140,8 @@
                 body: body,
                 timestamp: Date.now()
             });
+            // Email senden wenn Email hinterlegt
+            sendInboxEmailNotification(targetUser, title, body);
         }
 
         // Admin: open send message modal
@@ -1382,6 +1395,18 @@
             if(!mail || !mail.includes('@')) return triggerEmbed("Ungültige Email", "danger");
             db.ref('users/' + currentUser + '/email').set(mail).then(() => {
                 triggerEmbed("Email gespeichert!", "success");
+                // Bestätigungs-Email senden
+                sendEmailViaScript({
+                    to: mail,
+                    subject: "✅ Email mit John Chat Account verbunden",
+                    htmlBody: buildEmailHtml(
+                        "E-Mail verbunden!",
+                        `Deine E-Mail-Adresse wurde erfolgreich mit dem <b>John Chat Account „${currentUser}"</b> verknüpft.<br><br>
+                        Ab sofort erhältst du eine E-Mail, wenn du im Chat oder einer Gruppe eine neue Nachricht bekommst – aber immer nur <b>eine pro Chat</b>, damit du nicht überflutet wirst.<br><br>
+                        Wenn du die E-Mail-Adresse nicht mehr möchtest, kannst du sie jederzeit in den Einstellungen löschen.`,
+                        "🎉 Alles eingerichtet!"
+                    )
+                });
             });
         }
 
@@ -2653,30 +2678,74 @@
             if(file) reader.readAsDataURL(file);
         }
         
+        // Tracking: Welche Chats haben bereits eine Email gesendet (wird bei App-Load zurückgesetzt)
+        const emailSentForChat = {};
+
+        function buildEmailHtml(title, content, footer) {
+            return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+                body{margin:0;padding:0;background:#f0f2f5;font-family:'Segoe UI',Arial,sans-serif;}
+                .wrap{max-width:520px;margin:30px auto;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);}
+                .header{background:linear-gradient(135deg,#5865F2,#7289DA);padding:28px 30px;text-align:center;}
+                .header h1{color:#fff;margin:0;font-size:1.5rem;letter-spacing:1px;}
+                .header .logo{font-size:2rem;margin-bottom:6px;}
+                .body{padding:28px 30px;color:#333;font-size:0.97rem;line-height:1.7;}
+                .body h2{color:#5865F2;font-size:1.15rem;margin-top:0;}
+                .box{background:#f0f2f5;border-radius:12px;padding:15px 18px;margin:16px 0;border-left:4px solid #5865F2;font-size:0.95rem;color:#444;}
+                .footer{background:#f8f9fa;padding:16px 30px;text-align:center;color:#999;font-size:0.8rem;border-top:1px solid #eee;}
+                .badge{display:inline-block;background:#5865F2;color:#fff;border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:bold;margin-bottom:10px;}
+            </style></head><body>
+            <div class="wrap">
+                <div class="header"><div class="logo">💬</div><h1>John Chat</h1></div>
+                <div class="body">
+                    <span class="badge">Benachrichtigung</span>
+                    <h2>${title}</h2>
+                    <p>${content}</p>
+                </div>
+                <div class="footer">${footer || 'John Chat · Automatische Benachrichtigung'}</div>
+            </div></body></html>`;
+        }
+
+        function sendEmailViaScript(payload) {
+            if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
+            fetch(EMAIL_API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'email', ...payload })
+            }).catch(err => console.log("API Error", err));
+        }
+
         function triggerEmailNotification(msgText, isGroupChat, chatId) {
-            // Check if API URL is set correctly
             if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
             
             const checkAndSend = (targetUser) => {
+                // Pro Chat nur EINE Email senden (bis App neu geladen wird)
+                const trackKey = targetUser + '_' + chatId;
+                if(emailSentForChat[trackKey]) return;
+
                 db.ref('users/' + targetUser).once('value', snap => {
                     const uData = snap.val();
                     if(uData && uData.email) {
-                        const userMuted = uData.muted && uData.muted[chatId] === true;
-                        
-                        // LOGIK: Nur senden, wenn Chat gemutet ist (wie angefordert)
-                        if(userMuted) {
-                            fetch(EMAIL_API_URL, {
-                                method: 'POST',
-                                mode: 'no-cors', // Wichtig für Google Apps Script
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    type: 'email', // Unterscheidung für das Script
-                                    to: uData.email,
-                                    subject: isGroupChat ? "Neue Gruppen Nachricht (JohnChat)" : "Neue Nachricht (JohnChat)",
-                                    body: `Hallo ${targetUser},\n\nDu hast eine neue Nachricht von ${currentUser} erhalten, während der Chat stummgeschaltet war:\n\n"${msgText}"\n\n- John Chat Bot`
-                                })
-                            }).catch(err => console.log("API Error", err));
-                        }
+                        emailSentForChat[trackKey] = true;
+
+                        const chatLabel = isGroupChat
+                            ? `der Gruppe <b>${chatId}</b>`
+                            : `dem Chat mit <b>${currentUser}</b>`;
+
+                        sendEmailViaScript({
+                            to: uData.email,
+                            subject: isGroupChat
+                                ? `💬 Neue Gruppen-Nachricht – John Chat`
+                                : `💬 Neue Nachricht – John Chat`,
+                            htmlBody: buildEmailHtml(
+                                isGroupChat ? "Neue Nachricht in deiner Gruppe" : "Du hast eine neue Nachricht!",
+                                `Hallo <b>${targetUser}</b>,<br><br>
+                                <b>${currentUser}</b> hat dir eine Nachricht in ${chatLabel} geschrieben:<br>
+                                <div class="box">„${msgText}"</div>
+                                Öffne John Chat, um zu antworten!`,
+                                "Du erhältst nur eine E-Mail pro Chat-Session · John Chat"
+                            )
+                        });
                     }
                 });
             };
@@ -2692,6 +2761,27 @@
                 const partner = parts[0] === currentUser ? parts[1] : parts[0];
                 checkAndSend(partner);
             }
+        }
+
+        // Email-Benachrichtigung für Posteingang (Inbox)
+        function sendInboxEmailNotification(targetUser, title, body) {
+            if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
+            db.ref('users/' + targetUser + '/email').once('value', snap => {
+                const mail = snap.val();
+                if(!mail) return;
+                sendEmailViaScript({
+                    to: mail,
+                    subject: `📬 ${title} – John Chat Posteingang`,
+                    htmlBody: buildEmailHtml(
+                        title,
+                        `Hallo <b>${targetUser}</b>,<br><br>
+                        du hast eine neue Nachricht in deinem <b>John Chat Posteingang</b>:<br>
+                        <div class="box">${body}</div>
+                        Öffne John Chat und prüfe dein Postfach!`,
+                        "Automatische Posteingang-Benachrichtigung · John Chat"
+                    )
+                });
+            });
         }
 
         function logToApi(type, details) {
@@ -3179,4 +3269,8 @@
 
     </script>
 </body>
+</html>
+    
+  </body>
+  
 </html>
