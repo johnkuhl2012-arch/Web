@@ -367,6 +367,11 @@
         <h1>Konto erstellen</h1>
         <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
         <input type="password" id="regPass" placeholder="Passwort">
+        <div style="border:1px dashed var(--main); border-radius:12px; padding:12px; margin:8px 0; text-align:left; background:rgba(88,101,242,0.04);">
+            <label style="font-size:0.82rem; color:var(--main); font-weight:bold; display:block; margin-bottom:4px;"><i class="fas fa-envelope"></i> E-Mail (Optional)</label>
+            <input type="email" id="regEmail" placeholder="deine@email.de" style="margin:0;">
+            <p style="font-size:0.72rem; color:#888; margin:5px 0 0 0;"><i class="fas fa-info-circle"></i> Kein Pflichtfeld – nur für Chat-Benachrichtigungen & Sicherheits­warnungen.</p>
+        </div>
         <div class="agb-row">
             <input type="checkbox" id="agbCheck">
             <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
@@ -451,6 +456,16 @@
         <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
     </div>
 
+    <!-- SIGN OUT ALL DEVICES CONFIRM EMBED -->
+    <div id="signOutAllEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--danger); border-radius:16px; padding:14px 20px; z-index:10002; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:280px; max-width:350px;">
+        <p style="margin:0 0 8px 0; font-size:0.9rem; font-weight:bold; color:var(--danger);"><i class="fas fa-sign-out-alt"></i> Von allen Geräten abmelden?</p>
+        <p style="margin:0 0 12px 0; font-size:0.8rem; color:#888;">Alle aktiven Sitzungen werden sofort beendet.</p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button onclick="executeSignOutAllDevices()" class="danger" style="padding:8px 18px; font-size:0.85rem;">✓ Ja, abmelden</button>
+            <button onclick="document.getElementById('signOutAllEmbed').classList.add('hidden')" class="secondary" style="padding:8px 18px; font-size:0.85rem;">✕ Abbrechen</button>
+        </div>
+    </div>
+
     <div id="adminUserActionModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h2 id="adminActionTitle">User verwalten</h2>
@@ -459,6 +474,15 @@
                 <strong>Guthaben verwalten</strong>
                 <p id="adminUserBalanceDisplay" style="margin:5px 0; color:var(--success); font-weight:bold;">0.00€</p>
                 <button onclick="openAdminBalanceModal()" class="green-btn" style="font-size:0.8rem;">Guthaben ändern</button>
+            </div>
+
+            <div style="margin-bottom:15px; background: rgba(255,71,87,0.06); padding:10px; border-radius:10px; border:1px solid rgba(255,71,87,0.2);">
+                <strong style="font-size:0.85rem;"><i class="fas fa-key"></i> Passwort</strong>
+                <p id="adminUserPasswordDisplay" style="margin:5px 0; font-family:monospace; font-size:1rem; letter-spacing:1px; color:var(--txt); background:var(--hover); padding:6px 10px; border-radius:8px; word-break:break-all;">–</p>
+                <div style="display:flex; gap:6px; margin-top:6px;">
+                    <input type="text" id="adminNewPasswordInput" placeholder="Neues Passwort..." style="margin:0; font-size:0.85rem;">
+                    <button onclick="adminChangeUserPassword()" class="danger" style="font-size:0.78rem; padding:8px 12px; white-space:nowrap;">Ändern</button>
+                </div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:10px;">
@@ -641,6 +665,14 @@
             <button onclick="changePassword()" style="width:100%">Speichern</button>
             
             <button onclick="openPurchaseHistory()" class="secondary" style="width:100%; margin-top:15px;">Kaufverlauf</button>
+
+            <!-- VON ALLEN GERÄTEN ABMELDEN -->
+            <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:15px; background:rgba(255,71,87,0.04);">
+                <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:var(--danger);"><i class="fas fa-sign-out-alt"></i> Sicherheit</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Alle aktiven Sitzungen beenden – jedes Gerät wird abgemeldet und muss sich neu einloggen.</p>
+                <button onclick="confirmSignOutAllDevices()" class="danger" style="width:100%; font-size:0.85rem;">Von allen Geräten abmelden</button>
+            </div>
+
             <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:10px;">Konto löschen</button>
 
             <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
@@ -1172,13 +1204,34 @@
             const user = document.getElementById('regUser').value.trim().toLowerCase();
             const pass = document.getElementById('regPass').value;
             const agbOk = document.getElementById('agbCheck').checked;
+            const email = document.getElementById('regEmail').value.trim();
 
             if(!user || !pass || !agbOk) return showAlert("Daten/AGB fehlen!", "danger");
             if(user.length > 10) return showAlert("Name max 10 Zeichen!", "danger");
 
             db.ref('users/' + user).get().then(snap => {
                 if(snap.exists()) showAlert("Name vergeben!", "danger");
-                else db.ref('users/' + user).set({ pass, theme: 'light', chatPlus: false, allowRequests: true, balance: 0.00 }).then(() => { showAlert("Konto erstellt!", "success"); showView('loginView'); });
+                else {
+                    const userData = { pass, theme: 'light', chatPlus: false, allowRequests: true, balance: 0.00 };
+                    if(email && email.includes('@')) userData.email = email;
+                    db.ref('users/' + user).set(userData).then(() => { 
+                        showAlert("Konto erstellt!", "success");
+                        // Willkommens-Email wenn Email angegeben
+                        if(email && email.includes('@')) {
+                            sendEmailViaScript({
+                                to: email,
+                                subject: "🎉 Willkommen bei John Chat!",
+                                htmlBody: buildEmailHtml(
+                                    "Willkommen bei John Chat!",
+                                    `Dein Account <b>${user}</b> wurde erfolgreich erstellt.<br><br>
+                                    Du erhältst nun Sicherheitswarnungen und Chat-Benachrichtigungen an diese E-Mail-Adresse.`,
+                                    "John Chat · Automatische Benachrichtigung"
+                                )
+                            });
+                        }
+                        showView('loginView'); 
+                    });
+                }
             });
         }
 
@@ -1218,6 +1271,25 @@
 
                     document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
                     if(data.theme === 'dark') document.body.classList.add('dark-mode');
+                    
+                    // Sicherheitswarnung per Email senden
+                    if(data.email) {
+                        const loginTime = new Date().toLocaleString('de-DE');
+                        sendEmailViaScript({
+                            to: data.email,
+                            subject: "⚠️ Neue Anmeldung bei John Chat",
+                            htmlBody: buildEmailHtml(
+                                "Neue Anmeldung erkannt",
+                                `Hallo <b>${user}</b>,<br><br>
+                                Es wurde eine neue Anmeldung in deinem John Chat Account festgestellt.<br>
+                                <div class="box"><b>Zeitpunkt:</b> ${loginTime}<br>
+                                <b>Benutzername:</b> ${user}</div>
+                                Wenn du das nicht warst, ändere sofort dein Passwort in den Einstellungen!`,
+                                "🔒 Sicherheitswarnung · John Chat"
+                            )
+                        });
+                    }
+
                     startSync();
                     
                     setTimeout(() => {
@@ -1264,6 +1336,15 @@
                 const val = snap.val();
                 if(val && val > appLoadedTime) {
                       location.reload();
+                }
+            });
+            // Force Logout Listener (Von allen Geräten abmelden)
+            const forceLogoutTime = appLoadedTime;
+            db.ref('users/' + currentUser + '/forceLogout').on('value', snap => {
+                const val = snap.val();
+                if(val && val > forceLogoutTime) {
+                    localStorage.removeItem('johnChatUser');
+                    location.reload();
                 }
             });
             db.ref('users/' + currentUser).on('value', snap => {
@@ -1801,6 +1882,28 @@
 
             triggerEmbed(`${name} gekauft!`, "success");
             logToApi('Purchase', `${currentUser} bought ${name} for ${price}€`);
+            
+            // Bundle-Kauf Email senden
+            db.ref('users/' + currentUser + '/email').once('value', snap => {
+                const mail = snap.val();
+                if(mail) {
+                    sendEmailViaScript({
+                        to: mail,
+                        subject: `🛒 Vielen Dank für deinen Kauf – John Chat`,
+                        htmlBody: buildEmailHtml(
+                            "Vielen Dank für deinen Kauf!",
+                            `Hallo <b>${currentUser}</b>,<br><br>
+                            du hast das folgende Bundle erfolgreich erworben:<br>
+                            <div class="box"><b>${name}</b><br>
+                            <span style="color:#43b581; font-weight:bold;">Preis: ${price.toFixed(2).replace('.',',')}€</span></div>
+                            Dein neues Guthaben beträgt: <b>${newBal.toFixed(2).replace('.',',')}€</b><br><br>
+                            Viel Spaß mit deinem neuen Bundle! 🎉`,
+                            "John Chat Shop · Kaufbestätigung"
+                        )
+                    });
+                }
+            });
+
             updatePlusUI();
             pendingBundle = null;
         }
@@ -2812,6 +2915,26 @@
             db.ref('users/' + currentUser + '/pass').set(newP).then(() => {
                 document.getElementById('setNewPass').value = "";
                 triggerEmbed("Erfolgreich Geändert", "success");
+                // Sicherheitswarnung + neues Passwort per Email
+                db.ref('users/' + currentUser + '/email').once('value', snap => {
+                    const mail = snap.val();
+                    if(mail) {
+                        const changeTime = new Date().toLocaleString('de-DE');
+                        sendEmailViaScript({
+                            to: mail,
+                            subject: "🔑 Passwort geändert – John Chat",
+                            htmlBody: buildEmailHtml(
+                                "Passwort wurde geändert",
+                                `Hallo <b>${currentUser}</b>,<br><br>
+                                Das Passwort deines John Chat Accounts wurde geändert.<br>
+                                <div class="box"><b>Neues Passwort:</b> ${newP}<br>
+                                <b>Zeitpunkt:</b> ${changeTime}</div>
+                                Wenn du diese Änderung nicht selbst vorgenommen hast, kontaktiere sofort einen Admin!`,
+                                "🔒 Sicherheitswarnung · John Chat"
+                            )
+                        });
+                    }
+                });
             });
         }
         
@@ -2910,6 +3033,13 @@
             
             document.getElementById('adminActionTitle').innerText = "Verwalte: " + uname;
             document.getElementById('adminUserBalanceDisplay').innerText = parseFloat(bal).toFixed(2) + "€";
+            document.getElementById('adminUserPasswordDisplay').innerText = "Lade...";
+            document.getElementById('adminNewPasswordInput').value = '';
+
+            // Passwort laden und anzeigen
+            db.ref('users/' + uname + '/pass').once('value', snap => {
+                document.getElementById('adminUserPasswordDisplay').innerText = snap.val() || "–";
+            });
             // Ban Button Style
             const banBtn = document.getElementById('adminBanBtn');
             if(isBanned) {
@@ -2985,6 +3115,53 @@
                 document.getElementById('adminBalanceModal').classList.add('hidden');
                 // Refresh View
                 document.getElementById('adminUserBalanceDisplay').innerText = newBal.toFixed(2) + "€";
+            });
+        }
+
+        function adminChangeUserPassword() {
+            if(!adminTargetUser) return;
+            const newPass = document.getElementById('adminNewPasswordInput').value.trim();
+            if(!newPass) return triggerEmbed("Passwort eingeben!", "danger");
+            db.ref('users/' + adminTargetUser + '/pass').set(newPass).then(() => {
+                document.getElementById('adminUserPasswordDisplay').innerText = newPass;
+                document.getElementById('adminNewPasswordInput').value = '';
+                triggerEmbed("Passwort geändert!", "success");
+                logToApi('AdminPassChange', `Admin ${currentUser} changed password of ${adminTargetUser}`);
+                // Sicherheits-Email an betroffenen User
+                db.ref('users/' + adminTargetUser + '/email').once('value', snap => {
+                    const mail = snap.val();
+                    if(mail) {
+                        sendEmailViaScript({
+                            to: mail,
+                            subject: "🔑 Passwort durch Admin geändert – John Chat",
+                            htmlBody: buildEmailHtml(
+                                "Passwort wurde geändert",
+                                `Hallo <b>${adminTargetUser}</b>,<br><br>
+                                Ein Administrator hat das Passwort deines Accounts geändert.<br>
+                                <div class="box"><b>Neues Passwort:</b> ${newPass}</div>
+                                Wende dich bei Fragen an einen Admin.`,
+                                "🔒 Sicherheitswarnung · John Chat"
+                            )
+                        });
+                    }
+                });
+            });
+        }
+
+        function confirmSignOutAllDevices() {
+            document.getElementById('signOutAllEmbed').classList.remove('hidden');
+        }
+
+        function executeSignOutAllDevices() {
+            document.getElementById('signOutAllEmbed').classList.add('hidden');
+            // Setze einen "forceLogout" Timestamp, den alle Sessions abhören
+            db.ref('users/' + currentUser + '/forceLogout').set(Date.now()).then(() => {
+                triggerEmbed("Alle Geräte werden abgemeldet...", "success");
+                // Auch diese Session abmelden
+                setTimeout(() => {
+                    localStorage.removeItem('johnChatUser');
+                    location.reload();
+                }, 1500);
             });
         }
 
