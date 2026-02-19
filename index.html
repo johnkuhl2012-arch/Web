@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>John Chat v3.2</title>
+    <title>John Chat v3.1</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,15 +18,17 @@
         .bg-blue { --bg: #bbdefb !important; --cont: #e3f2fd !important; }
         .bg-purple { --bg: #ede7f6 !important; --cont: #f3e5f5 !important; }
         .bg-orange { --bg: #fff3e0 !important; --cont: #fff8e1 !important; }
+        .bg-darkred { --bg: #1a0000 !important; --cont: #2a0505 !important; --txt: #f1f1f1 !important; }
 
         .dark-mode.bg-yellow { --bg: #4a4100 !important; --cont: #332d00 !important; }
         .dark-mode.bg-red { --bg: #4a0000 !important; --cont: #330000 !important; }
         .dark-mode.bg-blue { --bg: #001b4a !important; --cont: #001233 !important; }
         .dark-mode.bg-purple { --bg: #240046 !important; --cont: #1a0033 !important; }
         .dark-mode.bg-orange { --bg: #4e2c00 !important; --cont: #331d00 !important; }
+        .dark-mode.bg-darkred { --bg: #0d0000 !important; --cont: #1a0000 !important; }
 
         /* Nametag Colors */
-        .name-blue { color: #2196F3 !important; } .name-yellow { color: #FBC02D !important; } .name-green { color: #4CAF50 !important; } .name-pink { color: #e91e63 !important; } .name-teal { color: #009688 !important; } .name-red { color: #ff4757 !important; } .name-lime { color: #badc58 !important; } .name-cyan { color: #00d2d3 !important; } .name-indigo { color: #5f27cd !important; } .name-brown { color: #795548 !important; }
+        .name-blue { color: #2196F3 !important; } .name-yellow { color: #FBC02D !important; } .name-green { color: #4CAF50 !important; } .name-pink { color: #e91e63 !important; } .name-teal { color: #009688 !important; } .name-red { color: #ff4757 !important; } .name-lime { color: #badc58 !important; } .name-cyan { color: #00d2d3 !important; } .name-indigo { color: #5f27cd !important; } .name-brown { color: #795548 !important; } .name-darkgold { color: #b8860b !important; text-shadow: 0 0 6px #ffd700; } .name-neongreen { color: #39ff14 !important; text-shadow: 0 0 6px #39ff14; }
 
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
@@ -151,7 +153,7 @@
         
         /* HEADER ICONS */
         .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; color: var(--txt); padding: 5px; }
-        .shop-icon { position: absolute; top: 20px; right: 50px; cursor: pointer; font-size: 1.3rem; color: var(--gold); padding: 5px; }
+        .shop-icon { position: absolute; top: 20px; right: 80px; cursor: pointer; font-size: 1.3rem; color: var(--gold); padding: 5px; }
         .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); padding: 5px; }
 
         /* SHOP STYLES */
@@ -233,6 +235,12 @@
         .tag-admin { background: var(--main); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-owner { background: linear-gradient(45deg, #FFD700, #ff4757); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .tag-global-admin { background: #ff4757; color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .tag-mega { background: linear-gradient(45deg, #ffd700, #ff4757, #5865F2); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 8px rgba(255,215,0,0.5); animation: megaGlow 2s infinite alternate; }
+        @keyframes megaGlow { from { box-shadow: 0 2px 8px rgba(255,215,0,0.4); } to { box-shadow: 0 2px 16px rgba(255,71,87,0.8); } }
+        .bg-darkred { --bg: #1a0000 !important; --cont: #2a0505 !important; --txt: #f1f1f1 !important; }
+        .dark-mode.bg-darkred { --bg: #0d0000 !important; --cont: #1a0000 !important; }
+        .name-darkgold { color: #b8860b !important; text-shadow: 0 0 6px #ffd700; }
+        .name-neongreen { color: #39ff14 !important; text-shadow: 0 0 6px #39ff14; }
 
         .kick-btn { background: var(--danger); color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-left: auto; }
         .info-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--brd); text-align: left; }
@@ -259,6 +267,53 @@
 
         /* HISTORY */
         .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--brd); font-size: 0.9rem; }
+
+        /* POSTFACH / INBOX */
+        .inbox-icon { position: absolute; top: 20px; right: 50px; cursor: pointer; font-size: 1.3rem; color: var(--success); padding: 5px; }
+        .inbox-badge { position: absolute; top: 14px; right: 44px; background: var(--danger); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 0.6rem; font-weight: bold; display: none; align-items: center; justify-content: center; z-index: 10; }
+        .inbox-msg-card { background: var(--hover); border: 1px solid var(--brd); border-radius: 12px; padding: 12px; margin-bottom: 10px; text-align: left; position: relative; }
+        .inbox-msg-title { font-weight: bold; font-size: 0.95rem; color: var(--main); margin-bottom: 4px; }
+        .inbox-msg-body { font-size: 0.85rem; color: var(--txt); line-height: 1.4; }
+        .inbox-msg-time { font-size: 0.7rem; color: #888; margin-top: 6px; display: block; }
+        .inbox-msg-from { font-size: 0.7rem; color: #888; margin-bottom: 4px; }
+        .inbox-delete-btn { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 0.85rem; padding: 2px 5px; }
+        .inbox-delete-btn:hover { color: var(--danger); }
+
+        /* VOICE MESSAGE */
+        .voice-btn { background: transparent; color: var(--txt); opacity: 0.7; cursor: pointer; font-size: 1.2rem; padding: 8px; transition: 0.2s; border: none; }
+        .voice-btn:hover { opacity: 1; color: var(--danger); }
+        .voice-btn.recording { color: var(--danger); opacity: 1; animation: recPulse 1s infinite; }
+        @keyframes recPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+        .voice-msg-player {
+            display: flex; align-items: center; gap: 8px; padding: 4px 0; min-width: 160px;
+        }
+        .voice-play-btn {
+            width: 32px; height: 32px; border-radius: 50%; background: var(--main);
+            color: white; border: none; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 0.85rem; flex-shrink: 0; padding: 0;
+            box-shadow: 0 2px 6px rgba(88,101,242,0.3); transition: 0.2s;
+        }
+        .voice-play-btn:hover { transform: scale(1.1); opacity: 0.9; }
+        .msg-self .voice-play-btn { background: rgba(255,255,255,0.25); box-shadow: none; }
+        .voice-waveform { flex: 1; height: 28px; position: relative; display: flex; align-items: center; gap: 2px; overflow: hidden; }
+        .voice-bar { width: 3px; border-radius: 2px; background: var(--main); opacity: 0.5; transition: opacity 0.1s; flex-shrink: 0; }
+        .msg-self .voice-bar { background: rgba(255,255,255,0.7); }
+        .voice-bar.active { opacity: 1; }
+        .voice-duration { font-size: 0.7rem; opacity: 0.75; white-space: nowrap; min-width: 28px; }
+
+        .recording-bar {
+            display: none; align-items: center; gap: 8px; padding: 0 4px;
+            color: var(--danger); font-size: 0.85rem; font-weight: bold; width: 100%;
+        }
+        .recording-bar.active { display: flex; }
+        .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: recPulse 1s infinite; flex-shrink: 0; }
+        .rec-timer { flex: 1; }
+        .rec-cancel { background: transparent; border: none; color: var(--txt); opacity: 0.6; cursor: pointer; font-size: 1rem; padding: 4px; }
+        .rec-cancel:hover { opacity: 1; color: var(--danger); }
+        .rec-send { width: 32px; height: 32px; border-radius: 50%; background: var(--success); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; padding: 0; }
+        .rec-send:hover { opacity: 0.9; transform: scale(1.05); }
+        .rec-send:disabled { background: #999; cursor: not-allowed; transform: none; }
     </style>
 </head>
 <body>
@@ -339,6 +394,8 @@
     <div id="mainView" class="view view-large hidden">
         <span id="adminBtn" class="admin-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
         <span class="shop-icon" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
+        <span class="inbox-icon" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-envelope"></i></span>
+        <span class="inbox-badge" id="inboxBadge"></span>
         <span class="settings-icon" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
         
         <h2 id="userGreeting">Hi</h2>
@@ -398,7 +455,21 @@
                 <button onclick="openBanModal()" id="adminBanBtn" class="danger">BAN OPTIONEN</button>
                 <button id="makeAdminBtn" onclick="initiateMakeAdmin()" class="gold-btn">Zum Admin machen</button>
                 <button id="removeAdminBtn" onclick="initiateRemoveAdmin()" class="danger hidden">Admin entfernen</button>
+                <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-envelope"></i> Nachricht senden</button>
                 <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminMsgModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3><i class="fas fa-envelope" style="color:var(--main);"></i> Nachricht senden</h3>
+            <p style="font-size:0.85rem; color:#888; margin:0 0 10px 0;">An: <b id="adminMsgTarget">-</b></p>
+            <input type="text" id="adminMsgTitle" placeholder="Betreff / Titel..." maxlength="60">
+            <textarea id="adminMsgBody" placeholder="Nachrichtentext..." rows="4" style="resize:none;"></textarea>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                <button onclick="sendAdminMsg()" style="background:var(--main); color:white;"><i class="fas fa-paper-plane"></i> Senden</button>
+                <button onclick="document.getElementById('adminMsgModal').classList.add('hidden')" class="secondary">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -487,8 +558,15 @@
 
         <div class="chat-input-area" id="chatInputArea">
             <label class="file-label"><i class="fas fa-camera"></i><input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
-            <div class="chat-input-wrapper">
+            <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()" title="Sprachnachricht"><i class="fas fa-microphone"></i></button>
+            <div class="chat-input-wrapper" id="chatInputWrapper">
                 <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()">
+                <div class="recording-bar" id="recordingBar">
+                    <span class="rec-dot"></span>
+                    <span class="rec-timer" id="recTimer">0:00 / 0:14</span>
+                    <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-times"></i></button>
+                    <button class="rec-send" id="recSendBtn" onclick="sendVoiceMessage()" title="Senden" disabled><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
             <button onclick="sendMessage()" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
@@ -541,6 +619,13 @@
             </div>
 
             <button onclick="toggleTheme()" style="width:100%; margin-bottom:10px;">Dunkel / Hell Modus</button>
+
+            <!-- TAGS AUSWÄHLEN -->
+            <div id="tagSettingsSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px;">
+                <h3 style="margin:0 0 6px 0; font-size:1rem;"><i class="fas fa-tags"></i> Tags Auswählen</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wähle welche Nametags neben deinem Namen angezeigt werden.</p>
+                <div id="tagSettingsList"></div>
+            </div>
             <input type="password" id="setNewPass" placeholder="Neues Passwort">
             <button onclick="changePassword()" style="width:100%">Speichern</button>
             
@@ -551,6 +636,18 @@
         </div>
     </div>
     
+    <!-- INBOX VIEW -->
+    <div id="inboxView" class="view view-large hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; flex-shrink:0;">
+            <h2 style="margin:0;"><i class="fas fa-envelope" style="color:var(--success);"></i> Postfach</h2>
+            <button onclick="clearInbox()" class="danger" style="font-size:0.75rem; padding:6px 12px;">Alle löschen</button>
+        </div>
+        <div class="scroll-area" id="inboxList" style="padding-right:5px;">
+            <p style="color:#888; font-size:0.9rem; text-align:center; margin-top:20px;" id="inboxEmpty">Keine Nachrichten.</p>
+        </div>
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
+    </div>
+
     <!-- SHOP VIEW -->
     <div id="shopView" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -867,6 +964,8 @@
         let userIsGlobalAdmin = false; 
         let myBalance = 0.00;
         let myBundles = {}; // z.B. { chatplus: true, starter: true, mega: true }
+        let myActiveTags = {}; // z.B. { owner: true, admin: true, mega: true }
+        let inboxListener = null;
 
         let currentChatPath = null;
         let friendToRemove = null;
@@ -964,9 +1063,97 @@
         }
 
         function toggleAgb(s) { document.getElementById('agbEmbed').classList.toggle('hidden', !s); }
-        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id === 'inboxView') loadInboxView(); }
         
         function formatName(n) { return n; }
+
+        // === POSTFACH / INBOX ===
+        function startInboxListener() {
+            if(inboxListener) { db.ref('users/' + currentUser + '/inbox').off('value', inboxListener); inboxListener = null; }
+            inboxListener = db.ref('users/' + currentUser + '/inbox').on('value', snap => {
+                const badge = document.getElementById('inboxBadge');
+                const data = snap.val();
+                const count = data ? Object.keys(data).length : 0;
+                if(count > 0) {
+                    badge.innerText = count > 9 ? '9+' : count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+                // Immer rendern — egal ob Postfach offen oder nicht
+                renderInbox(data);
+            });
+        }
+
+        function renderInbox(data) {
+            const list = document.getElementById('inboxList');
+            const empty = document.getElementById('inboxEmpty');
+            if(!list) return;
+            if(!data || Object.keys(data).length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            const msgs = Object.entries(data).sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0));
+            list.innerHTML = msgs.map(([id, m]) => `
+                <div class="inbox-msg-card">
+                    <button class="inbox-delete-btn" onclick="deleteInboxMsg('${id}')"><i class="fas fa-times"></i></button>
+                    <div class="inbox-msg-from"><i class="fas fa-user-shield" style="color:var(--main);"></i> ${m.from || 'System'}</div>
+                    <div class="inbox-msg-title">${m.title || '(Kein Betreff)'}</div>
+                    <div class="inbox-msg-body">${m.body || ''}</div>
+                    <span class="inbox-msg-time">${m.timestamp ? new Date(m.timestamp).toLocaleString('de-DE') : ''}</span>
+                </div>`).join('');
+        }
+
+        function loadInboxView() {
+            // Daten kommen bereits live über startInboxListener — nichts zu tun
+        }
+
+        function deleteInboxMsg(id) {
+            db.ref('users/' + currentUser + '/inbox/' + id).remove();
+        }
+
+        function clearInbox() {
+            db.ref('users/' + currentUser + '/inbox').remove().then(() => {
+                triggerEmbed("Postfach geleert", "success");
+                renderInbox(null);
+            });
+        }
+
+        // Send system message to user's inbox
+        function systemInboxMsg(targetUser, title, body) {
+            db.ref('users/' + targetUser + '/inbox').push({
+                from: '📬 System',
+                title: title,
+                body: body,
+                timestamp: Date.now()
+            });
+        }
+
+        // Admin: open send message modal
+        function openAdminMsgModal() {
+            document.getElementById('adminMsgTarget').innerText = adminTargetUser || '-';
+            document.getElementById('adminMsgTitle').value = '';
+            document.getElementById('adminMsgBody').value = '';
+            document.getElementById('adminMsgModal').classList.remove('hidden');
+        }
+
+        function sendAdminMsg() {
+            const title = document.getElementById('adminMsgTitle').value.trim();
+            const body = document.getElementById('adminMsgBody').value.trim();
+            const target = adminTargetUser;
+            if(!title || !body || !target) { triggerEmbed("Titel und Text erforderlich!", "danger"); return; }
+            db.ref('users/' + target + '/inbox').push({
+                from: '🛡️ Admin (' + currentUser + ')',
+                title: title,
+                body: body,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('adminMsgModal').classList.add('hidden');
+                triggerEmbed("Nachricht gesendet!", "success");
+            });
+        }
 
         function register() {
             const user = document.getElementById('regUser').value.trim().toLowerCase();
@@ -1047,6 +1234,7 @@
             if(typingListener) db.ref(typingListener).off();
             if(reportsListener) db.ref('reports').off();
             if(globalRefreshListener) db.ref('system/forceRefresh').off();
+            if(inboxListener) { db.ref('users/' + currentUser + '/inbox').off(); inboxListener = null; }
             
             pfpListeners = {};
             pfpCache = {};
@@ -1086,6 +1274,7 @@
                 userIsGlobalAdmin = data.isAdmin === true || currentUser.toLowerCase() === OWNER_NAME; 
                 myBalance = parseFloat(data.balance || 0);
                 myBundles = data.bundles || {};
+                myActiveTags = data.activeTags || {};
                 document.getElementById('myBalanceDisplay').innerText = myBalance.toFixed(2) + "€";
                 // ADMIN BUTTON VISIBILITY
                 if(userIsGlobalAdmin) {
@@ -1115,6 +1304,9 @@
 
                 updatePlusUI();
                 applyTheme(data.theme, myBg);
+
+                // INBOX BADGE
+                startInboxListener();
 
                 const rList = document.getElementById('pendingRequests');
                 rList.innerHTML = "";
@@ -1360,9 +1552,9 @@
             },
             mega: {
                 name: "🔥 MEGA BUNDLE",
-                emojis: ["🤖","👾","🔥","💀","🎯"],
-                bgs:    ["red"],
-                colors: ["lime","cyan"]
+                emojis: ["🤖","👾","🔥","💀","🎯","⚡","🏆"],
+                bgs:    ["darkred"],
+                colors: ["darkgold","neongreen"]
             }
         };
 
@@ -1398,6 +1590,46 @@
                 }
             });
             renderBundleSettings(emojis, bgs, colors);
+            renderTagSettings();
+        }
+
+        function renderTagSettings() {
+            const container = document.getElementById('tagSettingsList');
+            if(!container) return;
+            container.innerHTML = "";
+
+            const availableTags = [];
+            if(currentUser && currentUser.toLowerCase() === OWNER_NAME) {
+                availableTags.push({ key: 'owner', label: 'Owner', style: 'background:linear-gradient(45deg,#FFD700,#ff4757)' });
+            }
+            if(userIsGlobalAdmin) {
+                availableTags.push({ key: 'admin', label: 'Admin', style: 'background:#ff4757' });
+            }
+            if(myBundles['mega']) {
+                availableTags.push({ key: 'mega', label: '🔥 MEGA', style: 'background:linear-gradient(45deg,#ffd700,#ff4757,#5865F2)' });
+            }
+
+            if(availableTags.length === 0) {
+                container.innerHTML = '<p style="font-size:0.82rem; color:#888; margin:0;">Keine Tags vorhanden. Tags erhältst du durch Bundles oder Admin-Status.</p>';
+                return;
+            }
+
+            availableTags.forEach(tag => {
+                const isActive = myActiveTags[tag.key] !== false;
+                container.innerHTML += `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--brd);">
+                    <span style="${tag.style}; color:white; border-radius:4px; padding:2px 8px; font-size:0.75rem; font-weight:bold;">${tag.label}</span>
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem;">
+                        <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleTag('${tag.key}', this.checked)" style="width:18px; height:18px; margin:0; cursor:pointer;">
+                        Anzeigen
+                    </label>
+                </div>`;
+            });
+        }
+
+        function toggleTag(tagKey, enabled) {
+            myActiveTags[tagKey] = enabled;
+            db.ref('users/' + currentUser + '/activeTags/' + tagKey).set(enabled);
         }
 
         function renderBundleSettings(emojis, bgs, colors) {
@@ -1445,7 +1677,7 @@
 
             // Hintergründe
             if(bgs.size > 1) {
-                const bgMap = { yellow:'#fff9c4', red:'#ffcdd2', blue:'#bbdefb', purple:'#ede7f6', orange:'#fff3e0' };
+                const bgMap = { yellow:'#fff9c4', red:'#ffcdd2', blue:'#bbdefb', purple:'#ede7f6', orange:'#fff3e0', darkred:'#1a0000' };
                 let bgHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Hintergrund Farbe:</p><div class="plus-options" id="bgSelector">';
                 bgHTML += `<div class="plus-option-item ${myBg==='default'?'active-selection':''}" data-val="default" onclick="setBg('default')" style="background:var(--bg); border:1px solid #ccc;"></div>`;
                 Object.keys(bgMap).forEach(bg => {
@@ -1459,7 +1691,7 @@
 
             // Nametag Farben
             if(colors.size > 1) {
-                const colorMap = { blue:'#2196F3', yellow:'#FBC02D', green:'#4CAF50', pink:'#e91e63', teal:'#009688', red:'#ff4757', lime:'#badc58', cyan:'#00d2d3', indigo:'#5f27cd', brown:'#795548' };
+                const colorMap = { blue:'#2196F3', yellow:'#FBC02D', green:'#4CAF50', pink:'#e91e63', teal:'#009688', red:'#ff4757', lime:'#badc58', cyan:'#00d2d3', indigo:'#5f27cd', brown:'#795548', darkgold:'#b8860b', neongreen:'#39ff14' };
                 let colorHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Nametag Farbe:</p><div class="plus-options" id="nameColorSelector">';
                 colorHTML += `<div class="plus-option-item ${myNameColor===''?'active-selection':''}" data-val="" onclick="setNameColor('')" style="color:var(--txt)">A</div>`;
                 Object.keys(colorMap).forEach(c => {
@@ -1619,10 +1851,17 @@
             });
         }
 
-        function accept(n) { db.ref('users/'+currentUser+'/friends/'+n).set(true);
-            db.ref('users/'+n+'/friends/'+currentUser).set(true); db.ref('users/'+currentUser+'/requests/'+n).remove();
+        function accept(n) { 
+            db.ref('users/'+currentUser+'/friends/'+n).set(true);
+            db.ref('users/'+n+'/friends/'+currentUser).set(true); 
+            db.ref('users/'+currentUser+'/requests/'+n).remove();
+            // Inbox-Benachrichtigung an beide
+            systemInboxMsg(n, '✅ Freundschaftsanfrage angenommen', currentUser + ' hat deine Freundschaftsanfrage angenommen. Ihr seid jetzt befreundet!');
+            systemInboxMsg(currentUser, '✅ Freund hinzugefügt', 'Du hast die Anfrage von ' + n + ' angenommen. Ihr seid jetzt befreundet!');
         }
-        function deny(n) { db.ref('users/'+currentUser+'/requests/'+n).remove(); triggerEmbed("Anfrage abgelehnt", "success");
+        function deny(n) { 
+            db.ref('users/'+currentUser+'/requests/'+n).remove(); 
+            triggerEmbed("Anfrage abgelehnt", "success");
         }
         
         function askUnfriend(n) {
@@ -1641,6 +1880,9 @@
             
             const chatKey = [currentUser, n].sort().join("_");
             db.ref('chats/' + chatKey).remove();
+
+            // Inbox-Benachrichtigung
+            systemInboxMsg(n, '👋 Freund entfernt', currentUser + ' hat dich aus seiner Freundesliste entfernt.');
 
             closeUnfriendModal();
             triggerEmbed("Freund entfernt", "success");
@@ -1682,7 +1924,12 @@
                 admin: currentUser,
                 created: Date.now()
             });
-            members.forEach(m => db.ref('users/'+m+'/groups/'+gid).set(true));
+            members.forEach(m => {
+                db.ref('users/'+m+'/groups/'+gid).set(true);
+                if(m !== currentUser) {
+                    systemInboxMsg(m, '👥 Neue Gruppe: ' + name, currentUser + ' hat dich zur Gruppe "' + name + '" hinzugefügt.');
+                }
+            });
             closeGroupCreator();
             showAlert("Gruppe erstellt!", "success");
         }
@@ -1934,27 +2181,37 @@
 
             document.getElementById('chatLoading').style.display = 'block';
             document.getElementById('messageBox').innerHTML = "";
-            seenMessages = new Set(); // Reset seen messages
-            
+            seenMessages = new Set();
+
+            // Alle bestehenden Nachrichten sofort auf einmal laden (kein Flackern)
             db.ref(path).limitToLast(50).once('value', snap => {
-                if(!snap.exists()) document.getElementById('chatLoading').style.display = 'none';
-            });
-            db.ref(path).limitToLast(50).on('child_added', snap => {
                 document.getElementById('chatLoading').style.display = 'none';
-                renderSingleMessage(snap);
-            });
-            db.ref(path).limitToLast(50).on('child_removed', snap => {
-                 const key = snap.key;
-                 const el = document.getElementById('msg-' + key);
-                 if(el) el.remove();
-            });
-            db.ref(path).limitToLast(50).on('child_changed', snap => {
-                const key = snap.key;
-                const el = document.getElementById('msg-' + key);
-                if(el) {
-                    const newHtml = buildMessageHTML(snap.val(), key);
-                    el.outerHTML = newHtml;
+                const box = document.getElementById('messageBox');
+                snap.forEach(child => {
+                    const key = child.key;
+                    if(seenMessages.has(key)) return;
+                    seenMessages.add(key);
+                    box.insertAdjacentHTML('beforeend', buildMessageHTML(child.val(), key));
+                });
+                box.scrollTop = box.scrollHeight;
+                if(activeChatID && !isSpectatorMode) {
+                    db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
                 }
+
+                // Danach nur neue Nachrichten per Listener
+                db.ref(path).limitToLast(50).on('child_added', snap => {
+                    renderSingleMessage(snap);
+                });
+                db.ref(path).limitToLast(50).on('child_removed', snap => {
+                    const key = snap.key;
+                    const el = document.getElementById('msg-' + key);
+                    if(el) el.remove();
+                });
+                db.ref(path).limitToLast(50).on('child_changed', snap => {
+                    const key = snap.key;
+                    const el = document.getElementById('msg-' + key);
+                    if(el) el.outerHTML = buildMessageHTML(snap.val(), key);
+                });
             });
         }
 
@@ -1984,13 +2241,23 @@
             // DELETED MESSAGE LOGIC
             if(d.isDeleted) {
                 if(userIsGlobalAdmin) {
-                     let originalContent = d.type === 'img' ? `<img src="${d.txt}" style="max-width:50px;"> (Bild)` : d.txt;
+                     let originalContent = d.type === 'img' ? `<img src="${d.txt}" style="max-width:50px;"> (Bild)` : d.type === 'voice' ? `🎙️ Sprachnachricht (${d.duration || 0}s)` : d.txt;
                      content = `<div style="opacity:0.6; text-decoration:line-through; font-size:0.8rem;">${originalContent}</div><b style="color:red; font-size:0.7rem;">(GELÖSCHT)</b>`;
                 } else {
                      content = `<i style="color:#aaa; font-size:0.8rem;">🚫 Nachricht wurde gelöscht.</i>`;
                 }
             } else {
-                content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+                if(d.type === 'voice') {
+                    const dur = d.duration || 0;
+                    const barCount = 24;
+                    content = `<div class="voice-msg-player">
+                        <button class="voice-play-btn" id="vpbtn-${key}" onclick="playVoiceMsg('${key}', '${d.txt.replace(/'/g,"\\'")}', ${dur})"><i class="fas fa-play"></i></button>
+                        <div class="voice-waveform">${generateWaveBars(key, barCount)}</div>
+                        <span class="voice-duration" id="vpdur-${key}" data-total="${dur}">${formatDur(dur)}</span>
+                    </div>`;
+                } else {
+                    content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+                }
             }
 
             let canDelete = (!isSystem && !d.isDeleted && (d.from === currentUser || userIsGlobalAdmin));
@@ -2001,9 +2268,11 @@
             let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i></span>` : "";
             
             let tags = "";
-            if(d.from && d.from.toLowerCase() === OWNER_NAME) tags += `<span class="tag-owner">Owner</span>`;
+            const senderActiveTags = (d.plusData && d.plusData.activeTags) ? d.plusData.activeTags : {};
+            if(d.from && d.from.toLowerCase() === OWNER_NAME && senderActiveTags.owner !== false) tags += `<span class="tag-owner">Owner</span>`;
             else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
-            if(d.isAdminSender) tags += `<span class="tag-global-admin">Admin</span>`;
+            if(d.isAdminSender && senderActiveTags.admin !== false) tags += `<span class="tag-global-admin">Admin</span>`;
+            if(d.plusData && d.plusData.megaTag) tags += `<span class="tag-mega">🔥 MEGA</span>`;
 
             let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
@@ -2152,6 +2421,193 @@
             });
         }
 
+        // === VOICE RECORDING ===
+        let mediaRecorder = null;
+        let voiceChunks = [];
+        let voiceRecording = false;
+        let recInterval = null;
+        let recSeconds = 0;
+        let voiceBlob = null;
+
+        function toggleVoiceRecording() {
+            if(voiceRecording) {
+                stopVoiceRecording();
+            } else {
+                startVoiceRecording();
+            }
+        }
+
+        function startVoiceRecording() {
+            if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                triggerEmbed("Mikrofon nicht unterstützt!", "danger"); return;
+            }
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                voiceChunks = [];
+                voiceBlob = null;
+                recSeconds = 0;
+                voiceRecording = true;
+
+                const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+                mediaRecorder = new MediaRecorder(stream, { mimeType });
+                mediaRecorder.ondataavailable = e => { if(e.data.size > 0) voiceChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    voiceBlob = new Blob(voiceChunks, { type: mimeType });
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+
+                // UI
+                document.getElementById('chatInput').style.display = 'none';
+                document.getElementById('recordingBar').classList.add('active');
+                document.getElementById('voiceBtn').classList.add('recording');
+                document.getElementById('recSendBtn').disabled = true;
+
+                recInterval = setInterval(() => {
+                    recSeconds++;
+                    const remaining = 14 - recSeconds;
+                    document.getElementById('recTimer').innerText = `0:${String(recSeconds).padStart(2,'0')} / 0:14`;
+                    // Enable send after 1s
+                    if(recSeconds >= 1) document.getElementById('recSendBtn').disabled = false;
+                    // Auto-stop at 14s
+                    if(recSeconds >= 14) stopVoiceRecording();
+                }, 1000);
+
+            }).catch(() => triggerEmbed("Mikrofon-Zugriff verweigert!", "danger"));
+        }
+
+        function stopVoiceRecording() {
+            if(!voiceRecording) return;
+            voiceRecording = false;
+            clearInterval(recInterval);
+            if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+            document.getElementById('voiceBtn').classList.remove('recording');
+            // Keep UI in "recorded" state — user now sees send/cancel
+        }
+
+        function cancelVoiceRecording() {
+            if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+            voiceRecording = false;
+            voiceBlob = null;
+            voiceChunks = [];
+            clearInterval(recInterval);
+            recSeconds = 0;
+            resetVoiceUI();
+        }
+
+        function resetVoiceUI() {
+            document.getElementById('chatInput').style.display = '';
+            document.getElementById('recordingBar').classList.remove('active');
+            document.getElementById('voiceBtn').classList.remove('recording');
+            document.getElementById('recTimer').innerText = '0:00 / 0:14';
+            document.getElementById('recSendBtn').disabled = true;
+        }
+
+        function sendVoiceMessage() {
+            if(!voiceBlob) {
+                // Still recording — stop first then send
+                stopVoiceRecording();
+                setTimeout(() => sendVoiceMessage(), 200);
+                return;
+            }
+            const duration = recSeconds;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Audio = e.target.result;
+                const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+                const msgData = {
+                    from: currentUser,
+                    txt: base64Audio,
+                    type: 'voice',
+                    duration: duration,
+                    timestamp: Date.now(),
+                    isAdminSender: userIsGlobalAdmin,
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), activeTags: myActiveTags }
+                };
+                db.ref(path).push(msgData);
+                resetVoiceUI();
+                voiceBlob = null;
+                voiceChunks = [];
+                recSeconds = 0;
+            };
+            reader.readAsDataURL(voiceBlob);
+        }
+
+        // Generate simple fake waveform bars (deterministic from key)
+        function generateWaveBars(key, count) {
+            let hash = 0;
+            for(let i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i);
+            let bars = '';
+            for(let i = 0; i < count; i++) {
+                const h = 6 + Math.abs(Math.sin((hash + i * 7) * 0.4) * 18);
+                bars += `<div class="voice-bar" style="height:${h.toFixed(1)}px;" id="bar-${key}-${i}"></div>`;
+            }
+            return bars;
+        }
+
+        // Active audio players tracking
+        const activePlayers = {};
+        function playVoiceMsg(key, src, duration) {
+            // Stop all currently playing audio
+            Object.keys(activePlayers).forEach(k => {
+                if(k.endsWith('_interval')) return;
+                if(activePlayers[k] && activePlayers[k].pause) { activePlayers[k].pause(); activePlayers[k].currentTime = 0; }
+                if(activePlayers[k + '_interval']) { clearInterval(activePlayers[k + '_interval']); delete activePlayers[k + '_interval']; }
+                resetBars(k);
+                const b = document.getElementById('vpbtn-' + k);
+                if(b) b.innerHTML = '<i class="fas fa-play"></i>';
+                const d = document.getElementById('vpdur-' + k);
+                if(d) d.innerText = formatDur(parseInt(d.dataset.total || 0));
+                delete activePlayers[k];
+            });
+
+            const btn = document.getElementById('vpbtn-' + key);
+            const durEl = document.getElementById('vpdur-' + key);
+
+            const audio = new Audio(src);
+            activePlayers[key] = audio;
+            if(btn) btn.innerHTML = '<i class="fas fa-pause"></i>';
+
+            const barCount = 24;
+            let elapsed = 0;
+            const totalDur = duration || 1;
+
+            const interval = setInterval(() => {
+                elapsed++;
+                const prog = Math.min(elapsed / totalDur, 1);
+                const activeBarsCount = Math.floor(prog * barCount);
+                for(let i = 0; i < barCount; i++) {
+                    const bar = document.getElementById(`bar-${key}-${i}`);
+                    if(bar) bar.classList.toggle('active', i < activeBarsCount);
+                }
+                if(durEl) durEl.innerText = formatDur(Math.max(totalDur - elapsed, 0));
+                if(elapsed >= totalDur) clearInterval(interval);
+            }, 1000);
+            activePlayers[key + '_interval'] = interval;
+
+            audio.onended = () => {
+                clearInterval(interval);
+                delete activePlayers[key + '_interval'];
+                delete activePlayers[key];
+                resetBars(key);
+                if(btn) btn.innerHTML = '<i class="fas fa-play"></i>';
+                if(durEl) durEl.innerText = formatDur(duration);
+            };
+            audio.play().catch(() => triggerEmbed("Audio-Fehler", "danger"));
+        }
+
+        function resetBars(key) {
+            const barCount = 24;
+            for(let i = 0; i < barCount; i++) {
+                const bar = document.getElementById(`bar-${key}-${i}`);
+                if(bar) bar.classList.remove('active');
+            }
+        }
+
+        function formatDur(s) {
+            const sec = Math.max(0, Math.round(s));
+            return `0:${String(sec).padStart(2,'0')}`;
+        }
+
         function sendMessage() {
             if(isSpectatorMode) return;
             const t = document.getElementById('chatInput').value;
@@ -2163,7 +2619,7 @@
                 type: 'text',
                 timestamp: Date.now(), 
                 isAdminSender: userIsGlobalAdmin, 
-                plusData: { emoji: myEmoji, color: myNameColor }
+                plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), activeTags: myActiveTags }
             };
             db.ref(path).push(msgData);
             document.getElementById('chatInput').value = "";
@@ -2189,7 +2645,7 @@
                     type: 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 triggerEmailNotification("Hat ein Bild gesendet", isGroup, activeChatID);
