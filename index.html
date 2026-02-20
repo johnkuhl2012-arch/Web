@@ -695,6 +695,57 @@
                 </div>
               </div>
 
+            <!-- 2FA SECTION -->
+            <div id="twoFactorSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px; display:none;">
+                <h3 style="margin:0 0 6px 0; font-size:1rem;"><i class="fas fa-shield-alt" style="color:var(--main);"></i> Zwei-Faktor-Authentifizierung</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Schütze deinen Account mit einem 6-stelligen Code per Email bei jeder Anmeldung.</p>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span id="twoFactorStatusText" style="font-size:0.9rem; color:#888;">Status: Deaktiviert</span>
+                    <button id="twoFactorToggleBtn" onclick="toggle2FA()" style="padding:8px 14px; font-size:0.85rem;">Aktivieren</button>
+                </div>
+            </div>
+
+            <!-- 2FA EMBED (Aktivieren) -->
+            <div id="twoFactorEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5000;">
+                <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+                    <div id="twoFactorStep1" class="">
+                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-shield-alt"></i> 2FA Aktivieren</h3>
+                        <p style="font-size:0.9rem;">Ein 6-stelliger Code wird an deine hinterlegte Email-Adresse gesendet. Bitte überprüfe dein Postfach.</p>
+                        <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Der Code ist <b>5 Minuten</b> gültig.</p>
+                        <button onclick="send2FACode('enable')" style="width:100%; margin-bottom:8px;"><i class="fas fa-envelope"></i> Code senden</button>
+                        <button onclick="close2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
+                    </div>
+                    <div id="twoFactorStep2" class="hidden">
+                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                        <p style="font-size:0.9rem;">Bitte gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
+                        <input type="number" id="twoFactorCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
+                        <div id="twoFactorCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
+                        <button onclick="verify2FACode('enable')" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-check"></i> Bestätigen</button>
+                        <button onclick="close2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2FA EMBED (Deaktivieren) -->
+            <div id="twoFactorDisableEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5000;">
+                <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+                    <div id="twoFactorDisableStep1" class="">
+                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-shield-alt"></i> 2FA Deaktivieren</h3>
+                        <p style="font-size:0.9rem;">Um 2FA zu deaktivieren, musst du deinen Code per Email bestätigen.</p>
+                        <button onclick="send2FACode('disable')" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-envelope"></i> Code senden</button>
+                        <button onclick="close2FADisableEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
+                    </div>
+                    <div id="twoFactorDisableStep2" class="hidden">
+                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                        <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
+                        <input type="number" id="twoFactorDisableCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
+                        <div id="twoFactorDisableCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
+                        <button onclick="verify2FACode('disable')" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-check"></i> Bestätigen & Deaktivieren</button>
+                        <button onclick="close2FADisableEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--brd); padding:10px; border-radius:10px;">
                 <span style="font-size:0.9rem;">Kann Freundschaftsanfragen erhalten</span>
                 <input type="checkbox" id="requestToggle" style="width:20px; height:20px; margin:0;" onchange="toggleRequestSetting()">
@@ -1325,8 +1376,22 @@
                         }
                     }
 
+                    const stayLoggedIn = document.getElementById('keepLogin').checked;
+
+                    // 2FA CHECK
+                    if(data.twoFA === true && data.email) {
+                        // 2FA ist aktiviert → Code senden und Login pausieren
+                        hideGlobalLoading();
+                        twoFAPendingUser = user;
+                        twoFAPendingPass = pass;
+                        twoFAPendingStayLoggedIn = stayLoggedIn;
+                        initiate2FALogin(user, data.email);
+                        return;
+                    }
+
+                    // Normaler Login (kein 2FA)
                     currentUser = user;
-                    if(document.getElementById('keepLogin').checked) {
+                    if(stayLoggedIn) {
                         localStorage.setItem('johnChatUser', user);
                         if("Notification" in window) {
                              Notification.requestPermission().then(perm => {
@@ -1338,8 +1403,8 @@
                     document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
                     if(data.theme === 'dark') document.body.classList.add('dark-mode');
                     
-                    // Sicherheitswarnung per Email senden
-                    if(data.email) {
+                    // Sicherheitswarnung per Email senden (nur wenn kein 2FA aktiv, sonst redundant)
+                    if(data.email && !data.twoFA) {
                         const loginTime = new Date().toLocaleString('de-DE');
                         sendEmailViaScript({
                             to: data.email,
@@ -1348,7 +1413,7 @@
                                 "Neue Anmeldung erkannt",
                                 `Hallo <b>${user}</b>,<br><br>
                                 Es wurde eine neue Anmeldung in deinem John Chat Account festgestellt.<br>
-                                <div class="box"><b>Zeitpunkt:</b> ${loginTime}<br>
+                                <div class="box"><b>Zeitpunkt:</b> ${new Date().toLocaleString('de-DE')}<br>
                                 <b>Benutzername:</b> ${user}</div>
                                 Wenn du das nicht warst, ändere sofort dein Passwort in den Einstellungen!`,
                                 "🔒 Sicherheitswarnung · John Chat"
@@ -1474,9 +1539,12 @@
                     document.getElementById('savedEmailTxt').innerText = data.email;
                     document.getElementById('emailDisplayBox').classList.remove('hidden');
                     document.getElementById('emailInputBox').classList.add('hidden');
+                    // Zeige 2FA Section wenn Email vorhanden
+                    update2FASection(data.email, data.twoFA === true);
                 } else {
                     document.getElementById('emailDisplayBox').classList.add('hidden');
                     document.getElementById('emailInputBox').classList.remove('hidden');
+                    update2FASection(null, false);
                 }
 
                 if(data.pfp) document.getElementById('mySettingsPfp').src = data.pfp;
@@ -1592,7 +1660,10 @@
             const mail = document.getElementById('emailSettingsInput').value.trim();
             if(!mail || !mail.includes('@')) return triggerEmbed("Ungültige Email", "danger");
             db.ref('users/' + currentUser + '/email').set(mail).then(() => {
-                triggerEmbed("Email gespeichert!", "success");
+                // Bestätigungs-Embed anzeigen
+                document.getElementById('emailLinkedAddress').innerText = mail;
+                document.getElementById('emailLinkedEmbed').classList.remove('hidden');
+
                 // Bestätigungs-Email senden
                 sendEmailViaScript({
                     to: mail,
@@ -1609,28 +1680,91 @@
         }
 
         function deleteEmail() {
-            // E-Mail zuerst lesen, dann senden und löschen
+            // Prüfen ob 2FA aktiv ist – wenn ja, erst Code verlangen
+            db.ref('users/' + currentUser).once('value', snap => {
+                const data = snap.val() || {};
+                if(data.twoFA === true && data.email) {
+                    // 2FA ist aktiv → Code-Bestätigung nötig bevor Email entfernt wird
+                    document.getElementById('deleteEmailWith2FAEmbed').classList.remove('hidden');
+                    document.getElementById('deleteEmail2FAStep1').classList.remove('hidden');
+                    document.getElementById('deleteEmail2FAStep2').classList.add('hidden');
+                    document.getElementById('deleteEmail2FACodeInput').value = '';
+                } else {
+                    // Kein 2FA → direkt löschen
+                    executeDeleteEmail(data.email);
+                }
+            });
+        }
+
+        function sendDeleteEmail2FACode() {
             db.ref('users/' + currentUser + '/email').once('value', snap => {
-                const oldMail = snap.val();
-                db.ref('users/' + currentUser + '/email').remove().then(() => {
-                    triggerEmbed("Email gelöscht", "success");
-                    document.getElementById('emailSettingsInput').value = "";
-                    // E-Mail-Benachrichtigung an die alte Adresse
-                    if(oldMail) {
-                        sendEmailViaScript({
-                            to: oldMail,
-                            subject: "📧 E-Mail von John Chat Account getrennt",
-                            htmlBody: buildEmailHtml(
-                                "E-Mail Adresse entfernt",
-                                `Hallo,<br><br>
-                                deine E-Mail-Adresse wurde soeben vom John Chat Account <b>${currentUser}</b> getrennt.<br><br>
-                                Du erhältst ab sofort keine Benachrichtigungen mehr an diese Adresse.<br><br>
-                                Falls du dies nicht selbst gemacht hast, melde dich bitte umgehend bei einem Administrator.`,
-                                "🔒 Sicherheitswarnung · John Chat"
-                            )
-                        });
-                    }
+                const email = snap.val();
+                if(!email) return;
+                const code = generate2FACode();
+                twoFACode = code;
+                twoFACodeExpiry = Date.now() + 5 * 60 * 1000;
+                sendEmailViaScript({
+                    to: email,
+                    subject: "🔐 John Chat – Email-Adresse entfernen",
+                    htmlBody: buildEmailHtml(
+                        "Bestätigungscode",
+                        `Hallo <b>${currentUser}</b>,<br><br>
+                        Du möchtest deine E-Mail-Adresse von deinem John Chat Account entfernen.<br>
+                        <div class="box" style="font-size:2rem; font-weight:bold; letter-spacing:10px; text-align:center;">${code}</div>
+                        <b>Dieser Code ist 5 Minuten gültig.</b><br><br>
+                        Hinweis: Da 2FA aktiviert ist, wird es beim Entfernen der Email <b>automatisch deaktiviert</b>.<br><br>
+                        Falls du das nicht warst, ignoriere diese Email.`,
+                        "🔒 Sicherheitscode · John Chat"
+                    )
                 });
+                triggerEmbed("Code gesendet! Prüfe deine Email.", "success");
+                document.getElementById('deleteEmail2FAStep1').classList.add('hidden');
+                document.getElementById('deleteEmail2FAStep2').classList.remove('hidden');
+                startCodeTimer('deleteEmail2FATimer');
+            });
+        }
+
+        function verifyDeleteEmail2FACode() {
+            const inputCode = document.getElementById('deleteEmail2FACodeInput').value.trim();
+            if(!twoFACode) { triggerEmbed("Code abgelaufen! Bitte neuen anfordern.", "danger"); return; }
+            if(Date.now() > twoFACodeExpiry) { triggerEmbed("Code abgelaufen!", "danger"); twoFACode = null; return; }
+            if(inputCode !== twoFACode) { triggerEmbed("Falscher Code!", "danger"); return; }
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+            twoFACode = null;
+            document.getElementById('deleteEmailWith2FAEmbed').classList.add('hidden');
+            db.ref('users/' + currentUser + '/email').once('value', snap => {
+                executeDeleteEmail(snap.val());
+            });
+        }
+
+        function closeDeleteEmail2FAEmbed() {
+            document.getElementById('deleteEmailWith2FAEmbed').classList.add('hidden');
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+            twoFACode = null;
+        }
+
+        function executeDeleteEmail(oldMail) {
+            // Email UND 2FA gleichzeitig entfernen
+            const updates = { email: null, twoFA: null };
+            db.ref('users/' + currentUser).update(updates).then(() => {
+                triggerEmbed("Email & 2FA deaktiviert", "success");
+                document.getElementById('emailSettingsInput').value = "";
+                update2FASection(null, false);
+                if(oldMail) {
+                    sendEmailViaScript({
+                        to: oldMail,
+                        subject: "📧 E-Mail & 2FA von John Chat Account entfernt",
+                        htmlBody: buildEmailHtml(
+                            "E-Mail Adresse entfernt",
+                            `Hallo,<br><br>
+                            deine E-Mail-Adresse wurde soeben vom John Chat Account <b>${currentUser}</b> getrennt.<br><br>
+                            Da die E-Mail-Adresse entfernt wurde, wurde auch die <b>Zwei-Faktor-Authentifizierung automatisch deaktiviert</b>.<br><br>
+                            Du erhältst ab sofort keine Benachrichtigungen mehr an diese Adresse.<br><br>
+                            Falls du dies nicht selbst gemacht hast, melde dich bitte umgehend bei einem Administrator.`,
+                            "🔒 Sicherheitswarnung · John Chat"
+                        )
+                    });
+                }
             });
         }
 
@@ -2962,34 +3096,39 @@
             if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
             
             const checkAndSend = (targetUser) => {
-                // Pro Chat nur EINE Email senden (bis App neu geladen wird)
-                const trackKey = targetUser + '_' + chatId;
-                if(emailSentForChat[trackKey]) return;
+                // Kein Email wenn Chat gemutet ist
+                db.ref('users/' + targetUser + '/muted/' + chatId).once('value', muteSnap => {
+                    if(muteSnap.val() === true) return; // Chat ist gemutet → keine Email
 
-                db.ref('users/' + targetUser).once('value', snap => {
-                    const uData = snap.val();
-                    if(uData && uData.email) {
-                        emailSentForChat[trackKey] = true;
+                    // Pro Chat nur EINE Email senden (bis App neu geladen wird)
+                    const trackKey = targetUser + '_' + chatId;
+                    if(emailSentForChat[trackKey]) return;
 
-                        const chatLabel = isGroupChat
-                            ? `der Gruppe <b>${chatId}</b>`
-                            : `dem Chat mit <b>${currentUser}</b>`;
+                    db.ref('users/' + targetUser).once('value', snap => {
+                        const uData = snap.val();
+                        if(uData && uData.email) {
+                            emailSentForChat[trackKey] = true;
 
-                        sendEmailViaScript({
-                            to: uData.email,
-                            subject: isGroupChat
-                                ? `💬 Neue Gruppen-Nachricht – John Chat`
-                                : `💬 Neue Nachricht – John Chat`,
-                            htmlBody: buildEmailHtml(
-                                isGroupChat ? "Neue Nachricht in deiner Gruppe" : "Du hast eine neue Nachricht!",
-                                `Hallo <b>${targetUser}</b>,<br><br>
-                                <b>${currentUser}</b> hat dir eine Nachricht in ${chatLabel} geschrieben:<br>
-                                <div class="box">„${msgText}"</div>
-                                Öffne John Chat, um zu antworten!`,
-                                "Du erhältst nur eine E-Mail pro Chat-Session · John Chat"
-                            )
-                        });
-                    }
+                            const chatLabel = isGroupChat
+                                ? `der Gruppe <b>${chatId}</b>`
+                                : `dem Chat mit <b>${currentUser}</b>`;
+
+                            sendEmailViaScript({
+                                to: uData.email,
+                                subject: isGroupChat
+                                    ? `💬 Neue Gruppen-Nachricht – John Chat`
+                                    : `💬 Neue Nachricht – John Chat`,
+                                htmlBody: buildEmailHtml(
+                                    isGroupChat ? "Neue Nachricht in deiner Gruppe" : "Du hast eine neue Nachricht!",
+                                    `Hallo <b>${targetUser}</b>,<br><br>
+                                    <b>${currentUser}</b> hat dir eine Nachricht in ${chatLabel} geschrieben:<br>
+                                    <div class="box">„${msgText}"</div>
+                                    Öffne John Chat, um zu antworten!`,
+                                    "Du erhältst nur eine E-Mail pro Chat-Session · John Chat"
+                                )
+                            });
+                        }
+                    });
                 });
             };
 
@@ -3024,6 +3163,262 @@
                         "Automatische Posteingang-Benachrichtigung · John Chat"
                     )
                 });
+            });
+        }
+
+        // ==========================================
+        // 2FA (ZWEI-FAKTOR-AUTHENTIFIZIERUNG)
+        // ==========================================
+        let twoFACode = null;
+        let twoFACodeExpiry = null;
+        let twoFACodeTimerInterval = null;
+        let twoFALoginPending = false;
+        let twoFAPendingUser = null;
+        let twoFAPendingPass = null;
+        let twoFAPendingStayLoggedIn = false;
+
+        function generate2FACode() {
+            // Always generate a new 6-digit code
+            return String(Math.floor(100000 + Math.random() * 900000));
+        }
+
+        function update2FASection(email, is2FAEnabled) {
+            const section = document.getElementById('twoFactorSection');
+            const statusText = document.getElementById('twoFactorStatusText');
+            const toggleBtn = document.getElementById('twoFactorToggleBtn');
+            if(email) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+                return;
+            }
+            if(is2FAEnabled) {
+                statusText.innerHTML = '<span style="color:var(--success);"><i class="fas fa-check-circle"></i> Aktiviert</span>';
+                toggleBtn.innerText = 'Deaktivieren';
+                toggleBtn.classList.add('danger');
+                toggleBtn.classList.remove('green-btn');
+            } else {
+                statusText.innerHTML = '<span style="color:#888;"><i class="fas fa-times-circle"></i> Deaktiviert</span>';
+                toggleBtn.innerText = 'Aktivieren';
+                toggleBtn.classList.remove('danger');
+                toggleBtn.classList.add('green-btn');
+            }
+        }
+
+        function toggle2FA() {
+            db.ref('users/' + currentUser + '/twoFA').once('value', snap => {
+                const is2FAEnabled = snap.val() === true;
+                if(is2FAEnabled) {
+                    // Open disable embed
+                    document.getElementById('twoFactorDisableEmbed').classList.remove('hidden');
+                    document.getElementById('twoFactorDisableStep1').classList.remove('hidden');
+                    document.getElementById('twoFactorDisableStep2').classList.add('hidden');
+                } else {
+                    // Open enable embed
+                    document.getElementById('twoFactorEmbed').classList.remove('hidden');
+                    document.getElementById('twoFactorStep1').classList.remove('hidden');
+                    document.getElementById('twoFactorStep2').classList.add('hidden');
+                }
+            });
+        }
+
+        function send2FACode(action) {
+            db.ref('users/' + currentUser + '/email').once('value', snap => {
+                const email = snap.val();
+                if(!email) { triggerEmbed("Keine Email hinterlegt!", "danger"); return; }
+                
+                const code = generate2FACode();
+                twoFACode = code;
+                twoFACodeExpiry = Date.now() + 5 * 60 * 1000; // 5 Minuten
+
+                // Code per Email senden
+                sendEmailViaScript({
+                    to: email,
+                    subject: "🔐 Dein John Chat 2FA Code",
+                    htmlBody: buildEmailHtml(
+                        "Dein Sicherheits-Code",
+                        `Hallo <b>${currentUser}</b>,<br><br>
+                        Du hast eine Zwei-Faktor-Authentifizierung ${action === 'enable' ? 'aktiviert' : 'deaktiviert'}.<br>
+                        <div class="box" style="font-size:2rem; font-weight:bold; letter-spacing:10px; text-align:center;">${code}</div>
+                        <b>Dieser Code ist 5 Minuten gültig.</b><br><br>
+                        Falls du das nicht warst, ignoriere diese Email.`,
+                        "🔒 Sicherheitscode · John Chat"
+                    )
+                });
+
+                triggerEmbed("Code gesendet! Prüfe deine Email.", "success");
+
+                if(action === 'enable') {
+                    document.getElementById('twoFactorStep1').classList.add('hidden');
+                    document.getElementById('twoFactorStep2').classList.remove('hidden');
+                    startCodeTimer('twoFactorCodeTimer');
+                } else {
+                    document.getElementById('twoFactorDisableStep1').classList.add('hidden');
+                    document.getElementById('twoFactorDisableStep2').classList.remove('hidden');
+                    startCodeTimer('twoFactorDisableCodeTimer');
+                }
+            });
+        }
+
+        function startCodeTimer(elementId) {
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+            const el = document.getElementById(elementId);
+            twoFACodeTimerInterval = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((twoFACodeExpiry - Date.now()) / 1000));
+                if(el) el.innerText = `Code läuft ab in: ${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}`;
+                if(remaining <= 0) {
+                    clearInterval(twoFACodeTimerInterval);
+                    if(el) el.innerText = "Code abgelaufen! Bitte neuen Code anfordern.";
+                    twoFACode = null;
+                }
+            }, 1000);
+        }
+
+        function verify2FACode(action) {
+            const inputEl = action === 'enable' ? document.getElementById('twoFactorCodeInput') : document.getElementById('twoFactorDisableCodeInput');
+            const inputCode = inputEl.value.trim();
+            
+            if(!twoFACode) { triggerEmbed("Code abgelaufen! Bitte neuen Code anfordern.", "danger"); return; }
+            if(Date.now() > twoFACodeExpiry) { triggerEmbed("Code abgelaufen!", "danger"); twoFACode = null; return; }
+            if(inputCode !== twoFACode) { triggerEmbed("Falscher Code!", "danger"); return; }
+
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+            twoFACode = null;
+
+            if(action === 'enable') {
+                db.ref('users/' + currentUser + '/twoFA').set(true).then(() => {
+                    close2FAEmbed();
+                    triggerEmbed("2FA erfolgreich aktiviert! ✅", "success");
+                    update2FASection(true, true);
+                    logToApi('2FA_Enable', `User ${currentUser} enabled 2FA`);
+                    // Sicherheits-Email
+                    db.ref('users/' + currentUser + '/email').once('value', snap => {
+                        const mail = snap.val();
+                        if(mail) sendEmailViaScript({
+                            to: mail,
+                            subject: "🛡️ Zwei-Faktor-Authentifizierung aktiviert – John Chat",
+                            htmlBody: buildEmailHtml("2FA aktiviert",
+                                `Hallo <b>${currentUser}</b>,<br><br>
+                                Die <b>Zwei-Faktor-Authentifizierung</b> wurde für deinen Account aktiviert.<br><br>
+                                Ab sofort wird bei jeder Anmeldung ein Code an diese E-Mail-Adresse gesendet.<br><br>
+                                Falls du das nicht warst, ändere sofort dein Passwort!`,
+                                "🔒 Sicherheitswarnung · John Chat")
+                        });
+                    });
+                });
+            } else {
+                db.ref('users/' + currentUser + '/twoFA').set(false).then(() => {
+                    close2FADisableEmbed();
+                    triggerEmbed("2FA deaktiviert.", "success");
+                    update2FASection(true, false);
+                    logToApi('2FA_Disable', `User ${currentUser} disabled 2FA`);
+                    // Sicherheits-Email
+                    db.ref('users/' + currentUser + '/email').once('value', snap => {
+                        const mail = snap.val();
+                        if(mail) sendEmailViaScript({
+                            to: mail,
+                            subject: "⚠️ Zwei-Faktor-Authentifizierung deaktiviert – John Chat",
+                            htmlBody: buildEmailHtml("2FA deaktiviert",
+                                `Hallo <b>${currentUser}</b>,<br><br>
+                                Die <b>Zwei-Faktor-Authentifizierung</b> wurde für deinen Account <b>deaktiviert</b>.<br><br>
+                                Dein Account ist ab sofort weniger geschützt. Du kannst 2FA jederzeit in den Einstellungen wieder aktivieren.<br><br>
+                                Falls du das nicht warst, ändere sofort dein Passwort und aktiviere 2FA erneut!`,
+                                "🔒 Sicherheitswarnung · John Chat")
+                        });
+                    });
+                });
+            }
+        }
+
+        function close2FAEmbed() {
+            document.getElementById('twoFactorEmbed').classList.add('hidden');
+            document.getElementById('twoFactorCodeInput').value = '';
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+        }
+
+        function close2FADisableEmbed() {
+            document.getElementById('twoFactorDisableEmbed').classList.add('hidden');
+            document.getElementById('twoFactorDisableCodeInput').value = '';
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+        }
+
+        // 2FA Login Flow
+        function initiate2FALogin(username, email) {
+            const code = generate2FACode();
+            twoFACode = code;
+            twoFACodeExpiry = Date.now() + 5 * 60 * 1000;
+
+            sendEmailViaScript({
+                to: email,
+                subject: "🔐 John Chat Login Code",
+                htmlBody: buildEmailHtml(
+                    "Dein Login-Code",
+                    `Hallo <b>${username}</b>,<br><br>
+                    Jemand versucht sich in deinen John Chat Account einzuloggen.<br>
+                    <div class="box" style="font-size:2rem; font-weight:bold; letter-spacing:10px; text-align:center;">${code}</div>
+                    <b>Dieser Code ist 5 Minuten gültig.</b><br><br>
+                    Falls du das nicht warst, ändere sofort dein Passwort!`,
+                    "🔒 Login-Sicherheitscode · John Chat"
+                )
+            });
+
+            document.getElementById('twoFactorLoginEmbed').classList.remove('hidden');
+            document.getElementById('twoFactorLoginCodeInput').value = '';
+            startCodeTimer('twoFactorLoginTimer');
+        }
+
+        function verifyLoginCode() {
+            const inputCode = document.getElementById('twoFactorLoginCodeInput').value.trim();
+            if(!twoFACode) { triggerEmbed("Code abgelaufen! Bitte erneut senden.", "danger"); return; }
+            if(Date.now() > twoFACodeExpiry) { triggerEmbed("Code abgelaufen!", "danger"); twoFACode = null; return; }
+            if(inputCode !== twoFACode) { triggerEmbed("Falscher Code!", "danger"); return; }
+
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+            twoFACode = null;
+            document.getElementById('twoFactorLoginEmbed').classList.add('hidden');
+            
+            // Login fortsetzen
+            completeLogin(twoFAPendingUser, twoFAPendingStayLoggedIn);
+        }
+
+        function resendLoginCode() {
+            if(!twoFAPendingUser) return;
+            db.ref('users/' + twoFAPendingUser + '/email').once('value', snap => {
+                const email = snap.val();
+                if(email) {
+                    initiate2FALogin(twoFAPendingUser, email);
+                    triggerEmbed("Neuer Code gesendet!", "success");
+                }
+            });
+        }
+
+        function cancelLogin2FA() {
+            twoFAPendingUser = null;
+            twoFAPendingPass = null;
+            twoFAPendingStayLoggedIn = false;
+            twoFACode = null;
+            if(twoFACodeTimerInterval) clearInterval(twoFACodeTimerInterval);
+            document.getElementById('twoFactorLoginEmbed').classList.add('hidden');
+        }
+
+        function completeLogin(username, stayLoggedIn) {
+            currentUser = username;
+            if(stayLoggedIn) localStorage.setItem('johnChatUser', username);
+            twoFAPendingUser = null;
+            twoFAPendingPass = null;
+            twoFAPendingStayLoggedIn = false;
+            
+            // Get user data to set theme and greeting
+            db.ref('users/' + username).once('value', snap => {
+                const data = snap.val() || {};
+                document.getElementById('userGreeting').innerText = "Hi " + formatName(username);
+                if(data.theme === 'dark') document.body.classList.add('dark-mode');
+                if(stayLoggedIn && ("Notification" in window)) {
+                    Notification.requestPermission();
+                }
+                startSync();
+                hideGlobalLoading();
+                showView('mainView');
             });
         }
 
@@ -3719,9 +4114,54 @@
         }
 
     </script>
+
+    <!-- EMAIL LÖSCHEN MIT 2FA BESTÄTIGUNG -->
+    <div id="deleteEmailWith2FAEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99998;">
+        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--danger);">
+            <div id="deleteEmail2FAStep1">
+                <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-exclamation-triangle"></i> Email entfernen</h3>
+                <p style="font-size:0.9rem;">Da <b>2FA aktiviert</b> ist, musst du das Entfernen der Email per Code bestätigen.</p>
+                <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">⚠️ 2FA wird dabei automatisch deaktiviert.</p>
+                <button onclick="sendDeleteEmail2FACode()" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-envelope"></i> Bestätigungscode senden</button>
+                <button onclick="closeDeleteEmail2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
+            </div>
+            <div id="deleteEmail2FAStep2" class="hidden">
+                <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
+                <input type="number" id="deleteEmail2FACodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
+                <div id="deleteEmail2FATimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
+                <button onclick="verifyDeleteEmail2FACode()" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-trash"></i> Email & 2FA entfernen</button>
+                <button onclick="closeDeleteEmail2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2FA LOGIN EMBED - Außerhalb aller Views, immer sichtbar wenn aktiv -->
+    <div id="twoFactorLoginEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99999;">
+        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
+            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-shield-alt"></i> Zwei-Faktor-Authentifizierung</h2>
+            <p style="font-size:0.9rem;">Wir haben einen 6-stelligen Code an deine Email-Adresse gesendet.</p>
+            <p style="font-size:0.8rem; color:#888;">Der Code ist <b>5 Minuten</b> gültig.</p>
+            <input type="number" id="twoFactorLoginCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:15px 0;">
+            <div id="twoFactorLoginTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
+            <button onclick="verifyLoginCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-sign-in-alt"></i> Anmelden</button>
+            <button onclick="resendLoginCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-redo"></i> Code erneut senden</button>
+            <button onclick="cancelLogin2FA()" class="danger" style="width:100%; font-size:0.85rem;">Abmelden</button>
+        </div>
+    </div>
+
+    <!-- EMAIL VERKNÜPFT BESTÄTIGUNGS-EMBED -->
+    <div id="emailLinkedEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99998;">
+        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--success);">
+            <div style="font-size:3rem; margin-bottom:10px;">✅</div>
+            <h2 style="color:var(--success); margin-top:0;">Email verknüpft!</h2>
+            <p style="font-size:0.9rem;">Wir haben eine Bestätigungsmail an</p>
+            <p style="font-size:1rem; font-weight:bold; color:var(--main);" id="emailLinkedAddress"></p>
+            <p style="font-size:0.9rem;">gesendet, damit du siehst, dass dein Account erfolgreich verknüpft wurde.</p>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Wenn du keine Email erhalten hast, überprüfe bitte die angegebene Email-Adresse.</p>
+            <button onclick="document.getElementById('emailLinkedEmbed').classList.add('hidden')" style="width:100%; margin-top:15px;" class="green-btn">Alles klar!</button>
+        </div>
+    </div>
+
 </body>
-</html>
-    
-  </body>
-  
 </html>
