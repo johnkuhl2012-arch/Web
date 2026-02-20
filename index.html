@@ -693,6 +693,25 @@
                     <input type="email" id="emailSettingsInput" placeholder="Deine Email Adresse...">
                     <button onclick="saveEmail()" style="width:100%;">Speichern</button>
                 </div>
+
+                <!-- EMAIL COOLDOWN EINSTELLUNG -->
+                <div id="emailCooldownSection" style="margin-top:12px; border:1px solid var(--brd); border-radius:12px; padding:12px; display:none;">
+                    <h4 style="margin:0 0 6px 0; font-size:0.9rem;"><i class="fas fa-clock"></i> Chat-Email Cooldown</h4>
+                    <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wie oft kannst du maximal eine Email-Benachrichtigung für neue Chat-Nachrichten erhalten?</p>
+                    
+                    <div id="cooldownNoneWarning" class="hidden" style="background:rgba(255,71,87,0.1); border:1px solid var(--danger); border-radius:8px; padding:8px; font-size:0.78rem; color:var(--danger); margin-bottom:8px;">
+                        ⚠️ <b>Warnung:</b> Ohne Cooldown kannst du bei Spam eine sehr große Anzahl an Emails erhalten, wodurch dein Postfach volllaufen kann!
+                    </div>
+
+                    <select id="emailCooldownSelect" onchange="saveEmailCooldown()" style="width:100%;">
+                        <option value="none">Kein Cooldown ⚠️</option>
+                        <option value="5">Alle 5 Minuten</option>
+                        <option value="15" selected>Alle 15 Minuten (empfohlen)</option>
+                        <option value="30">Alle 30 Minuten</option>
+                        <option value="45">Alle 45 Minuten</option>
+                        <option value="60">Alle 60 Minuten</option>
+                    </select>
+                </div>
               </div>
 
             <!-- 2FA SECTION -->
@@ -1313,6 +1332,24 @@
             }).then(() => {
                 document.getElementById('adminMsgModal').classList.add('hidden');
                 triggerEmbed("Nachricht gesendet!", "success");
+                // Email an User senden mit Titel und Inhalt
+                db.ref('users/' + target + '/email').once('value', snap => {
+                    const mail = snap.val();
+                    if(mail) {
+                        sendEmailViaScript({
+                            to: mail,
+                            subject: `📬 Neue Admin-Nachricht: ${title} – John Chat`,
+                            htmlBody: buildEmailHtml(
+                                `📬 Neue Nachricht vom Admin`,
+                                `Hallo <b>${target}</b>,<br><br>
+                                Du hast eine Nachricht von einem Administrator erhalten.<br>
+                                <div class="box"><b>Betreff:</b> ${title}<br><br>${body}</div>
+                                Öffne John Chat und prüfe dein Postfach!`,
+                                "John Chat · Admin-Nachricht"
+                            )
+                        });
+                    }
+                });
             });
         }
 
@@ -1462,6 +1499,8 @@
         }
 
         function startSync() {
+            // Inbox Listener einmalig starten (Echtzeit-Updates)
+            startInboxListener();
             // Global Refresh Listener
             globalRefreshListener = db.ref('system/forceRefresh').on('value', snap => {
                 const val = snap.val();
@@ -1539,11 +1578,14 @@
                     document.getElementById('savedEmailTxt').innerText = data.email;
                     document.getElementById('emailDisplayBox').classList.remove('hidden');
                     document.getElementById('emailInputBox').classList.add('hidden');
+                    document.getElementById('emailCooldownSection').style.display = 'block';
+                    loadEmailCooldownSetting(data.emailCooldown);
                     // Zeige 2FA Section wenn Email vorhanden
                     update2FASection(data.email, data.twoFA === true);
                 } else {
                     document.getElementById('emailDisplayBox').classList.add('hidden');
                     document.getElementById('emailInputBox').classList.remove('hidden');
+                    document.getElementById('emailCooldownSection').style.display = 'none';
                     update2FASection(null, false);
                 }
 
@@ -1552,9 +1594,6 @@
 
                 updatePlusUI();
                 applyTheme(data.theme, myBg);
-
-                // INBOX BADGE
-                startInboxListener();
 
                 const rList = document.getElementById('pendingRequests');
                 rList.innerHTML = "";
@@ -2587,6 +2626,8 @@
                 const box = document.getElementById('messageBox');
                 snap.forEach(child => {
                     const key = child.key;
+                    const val = child.val();
+                    if(key === 'typing' || !val || val.from === undefined) return;
                     if(seenMessages.has(key)) return;
                     seenMessages.add(key);
                     box.insertAdjacentHTML('beforeend', buildMessageHTML(child.val(), key));
@@ -2617,6 +2658,8 @@
             const d = snap.val();
             const key = snap.key;
             
+            // Typing-Node und ungültige Einträge ignorieren
+            if(key === 'typing' || !d || d.from === undefined) return;
             if(seenMessages.has(key) || document.getElementById('msg-' + key)) return;
             seenMessages.add(key);
 
@@ -3055,8 +3098,27 @@
             if(file) reader.readAsDataURL(file);
         }
         
-        // Tracking: Welche Chats haben bereits eine Email gesendet (wird bei App-Load zurückgesetzt)
-        const emailSentForChat = {};
+        // Tracking: Wann zuletzt Email pro Chat gesendet (Timestamp-basiert mit Cooldown)
+        const emailLastSentForChat = {};
+        let myEmailCooldown = 15; // Default: 15 Minuten
+
+        function saveEmailCooldown() {
+            const val = document.getElementById('emailCooldownSelect').value;
+            myEmailCooldown = val === 'none' ? 0 : parseInt(val);
+            db.ref('users/' + currentUser + '/emailCooldown').set(val);
+            // Warnung anzeigen/verbergen
+            document.getElementById('cooldownNoneWarning').classList.toggle('hidden', val !== 'none');
+            triggerEmbed("Cooldown gespeichert!", "success");
+        }
+
+        function loadEmailCooldownSetting(val) {
+            const sel = document.getElementById('emailCooldownSelect');
+            if(!sel) return;
+            const saved = val || '15';
+            myEmailCooldown = saved === 'none' ? 0 : parseInt(saved);
+            sel.value = saved;
+            document.getElementById('cooldownNoneWarning').classList.toggle('hidden', saved !== 'none');
+        }
 
         function buildEmailHtml(title, content, footer) {
             return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
@@ -3100,14 +3162,24 @@
                 db.ref('users/' + targetUser + '/muted/' + chatId).once('value', muteSnap => {
                     if(muteSnap.val() === true) return; // Chat ist gemutet → keine Email
 
-                    // Pro Chat nur EINE Email senden (bis App neu geladen wird)
+                    // Cooldown-Prüfung (pro Empfänger + Chat)
                     const trackKey = targetUser + '_' + chatId;
-                    if(emailSentForChat[trackKey]) return;
+                    const lastSent = emailLastSentForChat[trackKey] || 0;
+                    const cooldownMs = myEmailCooldown * 60 * 1000;
+
+                    if(myEmailCooldown > 0 && (Date.now() - lastSent) < cooldownMs) return; // Cooldown aktiv
 
                     db.ref('users/' + targetUser).once('value', snap => {
                         const uData = snap.val();
                         if(uData && uData.email) {
-                            emailSentForChat[trackKey] = true;
+                            emailLastSentForChat[trackKey] = Date.now();
+
+                            // Empfänger-Cooldown aus dessen Einstellungen lesen
+                            const recipientCooldown = uData.emailCooldown || '15';
+                            const recipientCooldownMs = recipientCooldown === 'none' ? 0 : parseInt(recipientCooldown) * 60 * 1000;
+                            if(recipientCooldownMs > 0 && (Date.now() - lastSent) < recipientCooldownMs) return;
+
+                            emailLastSentForChat[trackKey] = Date.now();
 
                             const chatLabel = isGroupChat
                                 ? `der Gruppe <b>${chatId}</b>`
@@ -3124,7 +3196,7 @@
                                     <b>${currentUser}</b> hat dir eine Nachricht in ${chatLabel} geschrieben:<br>
                                     <div class="box">„${msgText}"</div>
                                     Öffne John Chat, um zu antworten!`,
-                                    "Du erhältst nur eine E-Mail pro Chat-Session · John Chat"
+                                    "John Chat · Chat-Benachrichtigung"
                                 )
                             });
                         }
@@ -3827,6 +3899,28 @@
                 broadcastBan(`🚫 ${adminTargetUser} wurde gesperrt. Grund: ${reason}`);
                 triggerEmbed("User gesperrt!", "success");
                 logToApi('AdminAction', `Banned ${adminTargetUser} for ${duration} days. Reason: ${reason}`);
+                // Email an User senden
+                db.ref('users/' + adminTargetUser + '/email').once('value', snap => {
+                    const mail = snap.val();
+                    if(mail) {
+                        const durationText = duration === 'perm' ? 'permanent' :
+                            duration === '1' ? '1 Tag' : duration === '3' ? '3 Tage' :
+                            duration === '7' ? '1 Woche' : '1 Monat';
+                        sendEmailViaScript({
+                            to: mail,
+                            subject: `🚫 Dein John Chat Account wurde gesperrt`,
+                            htmlBody: buildEmailHtml(
+                                "Account gesperrt",
+                                `Hallo <b>${adminTargetUser}</b>,<br><br>
+                                dein John Chat Account wurde von einem Administrator <b>gesperrt</b>.<br>
+                                <div class="box"><b>Dauer:</b> ${durationText}<br>
+                                <b>Grund:</b> ${reason}</div>
+                                Bei Fragen wende dich an einen Administrator.`,
+                                "🚫 John Chat · Kontosperrung"
+                            )
+                        });
+                    }
+                });
                 closeBanModal();
                 closeAdminAction();
              });
@@ -3839,6 +3933,23 @@
                 broadcastBan(`✅ ${adminTargetUser} wurde entsperrt.`);
                 triggerEmbed("User entsperrt", "success");
                 logToApi('AdminAction', `Unbanned ${adminTargetUser}`);
+                // Email an User senden
+                db.ref('users/' + adminTargetUser + '/email').once('value', snap => {
+                    const mail = snap.val();
+                    if(mail) {
+                        sendEmailViaScript({
+                            to: mail,
+                            subject: `✅ Dein John Chat Account wurde entsperrt`,
+                            htmlBody: buildEmailHtml(
+                                "Account entsperrt",
+                                `Hallo <b>${adminTargetUser}</b>,<br><br>
+                                Gute Nachrichten! Dein John Chat Account wurde von einem Administrator <b>entsperrt</b>.<br><br>
+                                Du kannst dich ab sofort wieder normal anmelden und den Chat nutzen.`,
+                                "✅ John Chat · Account entsperrt"
+                            )
+                        });
+                    }
+                });
                 closeAdminAction();
             });
         }
