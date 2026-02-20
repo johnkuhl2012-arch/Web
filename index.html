@@ -182,6 +182,7 @@
         .bundle-pro { border-color: #43b581; background: linear-gradient(to bottom, rgba(67,181,129,0.08), transparent); }
         .bundle-mega { border-color: #ffd700; background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,71,87,0.08), rgba(88,101,242,0.08)); }
         .bundle-basic { border-color: #888; background: linear-gradient(to bottom, rgba(136,136,136,0.06), transparent); }
+        .bundle-speed { border-color: #00b894; background: linear-gradient(to bottom, rgba(0,184,148,0.08), transparent); }
         .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 50px; background: rgba(67, 181, 129, 0.1); }
 
         /* CHAT UI STYLES */
@@ -892,6 +893,19 @@
                     <li>⚡ Emoji: 🎓 🗣️</li>
                 </ul>
                 <button style="width:100%; font-size:0.85rem; background:#43b581; color:#fff;" id="shopBtn-pro" onclick="confirmBuyBundle('pro', 4.99, 'Pro Bundle')">Kaufen</button>
+            </div>
+
+            <!-- SPEED BUNDLE 5,99€ -->
+            <div class="shop-bundle" style="border-color:#00b894; background:linear-gradient(to bottom,rgba(0,184,148,0.08),transparent);">
+                <div class="shop-bundle-price" style="color:#00b894;">5,99€</div>
+                <div class="shop-bundle-header">⚡ Speed Bundle</div>
+                <ul>
+                    <li>🟢 Nametag-Farbe: Lime & Cyan</li>
+                    <li>🌅 Hintergrund: Blau & Gelb</li>
+                    <li>🚀 Exklusive Emojis: 🚀 ⭐ 🎪</li>
+                    <li>🎯 3 einzigartige Emojis + 2 Farben + 2 Hintergründe</li>
+                </ul>
+                <button style="width:100%; font-size:0.85rem; background:linear-gradient(45deg,#00b894,#00cec9); color:#fff;" id="shopBtn-speed" onclick="confirmBuyBundle('speed', 5.99, 'Speed Bundle')">Kaufen</button>
             </div>
 
             <!-- BASIC BUNDLE 4,99€ -->
@@ -1946,6 +1960,12 @@
                 emojis: ["🎓","🗣️"],
                 bgs:    ["yellow","blue"],
                 colors: ["green","cyan"]
+            },
+            speed: {
+                name: "⚡ Speed Bundle",
+                emojis: ["🚀","⭐","🎪"],
+                bgs:    ["blue","yellow"],
+                colors: ["lime","cyan"]
             },
             basic: {
                 name: "📦 Basic Bundle",
@@ -3098,9 +3118,9 @@
             if(file) reader.readAsDataURL(file);
         }
         
-        // Tracking: Wann zuletzt Email pro Chat gesendet (Timestamp-basiert mit Cooldown)
-        const emailLastSentForChat = {};
-        let myEmailCooldown = 15; // Default: 15 Minuten
+        // Tracking: Cooldown wird jetzt in Firebase gespeichert (persistent, bug-free)
+        // emailLastSentForChat wurde entfernt (war nur in-memory → resettet bei Reload)
+        let myEmailCooldown = 15; // Nur noch für UI-Anzeige genutzt
 
         function saveEmailCooldown() {
             const val = document.getElementById('emailCooldownSelect').value;
@@ -3146,10 +3166,12 @@
 
         function sendEmailViaScript(payload) {
             if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
+            // BUGFIX: Content-Type: application/json löst CORS-Preflight aus, was mit no-cors
+            // von Browsern blockiert wird. text/plain ist ein "simple request" und wird immer gesendet.
             fetch(EMAIL_API_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({ type: 'email', ...payload })
             }).catch(err => console.log("API Error", err));
         }
@@ -3162,24 +3184,25 @@
                 db.ref('users/' + targetUser + '/muted/' + chatId).once('value', muteSnap => {
                     if(muteSnap.val() === true) return; // Chat ist gemutet → keine Email
 
-                    // Cooldown-Prüfung (pro Empfänger + Chat)
-                    const trackKey = targetUser + '_' + chatId;
-                    const lastSent = emailLastSentForChat[trackKey] || 0;
-                    const cooldownMs = myEmailCooldown * 60 * 1000;
-
-                    if(myEmailCooldown > 0 && (Date.now() - lastSent) < cooldownMs) return; // Cooldown aktiv
-
                     db.ref('users/' + targetUser).once('value', snap => {
                         const uData = snap.val();
-                        if(uData && uData.email) {
-                            emailLastSentForChat[trackKey] = Date.now();
+                        if(!uData || !uData.email) return; // Keine Email hinterlegt
 
-                            // Empfänger-Cooldown aus dessen Einstellungen lesen
-                            const recipientCooldown = uData.emailCooldown || '15';
-                            const recipientCooldownMs = recipientCooldown === 'none' ? 0 : parseInt(recipientCooldown) * 60 * 1000;
-                            if(recipientCooldownMs > 0 && (Date.now() - lastSent) < recipientCooldownMs) return;
+                        // BUGFIX: Cooldown aus Firebase lesen (persistent über Page-Reloads)
+                        // Empfänger-Cooldown (dessen eigene Einstellung)
+                        const recipientCooldown = uData.emailCooldown || '15';
+                        const recipientCooldownMs = recipientCooldown === 'none' ? 0 : parseInt(recipientCooldown) * 60 * 1000;
 
-                            emailLastSentForChat[trackKey] = Date.now();
+                        // Letzten Sendezeitpunkt aus Firebase lesen (nie mehr resettet bei Reload)
+                        const cooldownPath = 'users/' + targetUser + '/emailCooldowns/' + chatId.replace(/[^a-zA-Z0-9_]/g, '_');
+                        db.ref(cooldownPath).once('value', coolSnap => {
+                            const lastSentDB = coolSnap.val() || 0;
+
+                            // Cooldown-Check gegen Firebase-Wert
+                            if(recipientCooldownMs > 0 && (Date.now() - lastSentDB) < recipientCooldownMs) return;
+
+                            // Cooldown-Zeitstempel in Firebase speichern (persistent)
+                            db.ref(cooldownPath).set(Date.now());
 
                             const chatLabel = isGroupChat
                                 ? `der Gruppe <b>${chatId}</b>`
@@ -3199,7 +3222,7 @@
                                     "John Chat · Chat-Benachrichtigung"
                                 )
                             });
-                        }
+                        });
                     });
                 });
             };
