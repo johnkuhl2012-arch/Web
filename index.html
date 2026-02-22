@@ -249,8 +249,14 @@
         .tag-global-admin { background: #ff4757; color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .tag-mega { background: linear-gradient(45deg, #ffd700, #ff4757, #5865F2); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 8px rgba(255,215,0,0.5); animation: megaGlow 2s infinite alternate; }
         @keyframes megaGlow { from { box-shadow: 0 2px 8px rgba(255,215,0,0.4); } to { box-shadow: 0 2px 16px rgba(255,71,87,0.8); } }
+        .tag-super { background: linear-gradient(45deg, #43b581, #00b894); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+        .tag-krass { background: linear-gradient(45deg, #5865F2, #7289DA); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+        .tag-crazy { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; animation: crazyGlow 1.5s infinite alternate; }
+        @keyframes crazyGlow { from { box-shadow: 0 1px 5px rgba(255,107,107,0.4); } to { box-shadow: 0 2px 10px rgba(238,90,36,0.7); } }
         .bg-darkred { --bg: #1a0000 !important; --cont: #2a0505 !important; --txt: #f1f1f1 !important; }
+        .bg-brown { --bg: #efebe9 !important; --cont: #d7ccc8 !important; }
         .dark-mode.bg-darkred { --bg: #0d0000 !important; --cont: #1a0000 !important; }
+        .dark-mode.bg-brown { --bg: #3e2723 !important; --cont: #4e342e !important; --txt: #f1f1f1 !important; }
         .name-darkgold { color: #b8860b !important; text-shadow: 0 0 6px #ffd700; }
         .name-neongreen { color: #39ff14 !important; text-shadow: 0 0 6px #39ff14; }
 
@@ -326,6 +332,59 @@
         .rec-send { width: 32px; height: 32px; border-radius: 50%; background: var(--success); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; padding: 0; }
         .rec-send:hover { opacity: 0.9; transform: scale(1.05); }
         .rec-send:disabled { background: #999; cursor: not-allowed; transform: none; }
+
+        /* === BEAUTIFUL DELETE CONFIRM MODAL === */
+        #deleteConfirmModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center; z-index: 19999;
+            animation: fadeIn 0.2s;
+        }
+        .delete-confirm-card {
+            background: var(--cont); width: 85%; max-width: 310px;
+            padding: 26px 22px; border-radius: 22px; text-align: center;
+            border: 2px solid var(--danger); box-shadow: 0 15px 45px rgba(255,71,87,0.25);
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .delete-confirm-icon { font-size: 2.8rem; margin-bottom: 10px; display: block; }
+        .delete-confirm-card h3 { color: var(--danger); margin: 0 0 6px 0; font-size: 1.1rem; }
+        .delete-confirm-card p { color: #888; font-size: 0.85rem; margin: 0 0 18px 0; line-height: 1.4; }
+        .delete-confirm-btns { display: flex; gap: 10px; }
+        .delete-confirm-btns button { flex: 1; }
+
+        /* === REPLY FEATURE === */
+        #replyPreviewBar {
+            display: none; align-items: center; gap: 10px; padding: 6px 12px;
+            background: var(--hover); border-left: 3px solid var(--main);
+            border-radius: 8px; flex-shrink: 0; animation: fadeIn 0.15s;
+        }
+        #replyPreviewBar .reply-info { flex: 1; overflow: hidden; }
+        #replyPreviewBar .reply-from { font-size: 0.75rem; font-weight: bold; color: var(--main); }
+        #replyPreviewBar .reply-text { font-size: 0.8rem; color: var(--txt); opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #replyPreviewBar .reply-cancel-btn { cursor: pointer; color: #aaa; font-size: 1.1rem; padding: 2px 6px; flex-shrink: 0; background: none; border: none; }
+        #replyPreviewBar .reply-cancel-btn:hover { color: var(--danger); }
+
+        .reply-quote {
+            border-radius: 8px; padding: 5px 10px; margin-bottom: 6px; font-size: 0.78rem;
+            border-left: 3px solid rgba(255,255,255,0.5); background: rgba(0,0,0,0.12);
+            line-height: 1.3;
+        }
+        .msg-other .reply-quote { border-left-color: var(--main); background: rgba(88,101,242,0.08); }
+        .reply-quote-from { font-weight: bold; color: var(--main); display: block; margin-bottom: 2px; }
+        .msg-self .reply-quote-from { color: rgba(255,255,255,0.8); }
+        .reply-quote-content { opacity: 0.8; }
+
+        .reply-btn {
+            display: none; position: absolute; right: -32px; top: 50%; transform: translateY(-50%);
+            background: var(--hover); border-radius: 50%; width: 26px; height: 26px;
+            align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.75rem; color: var(--main); box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: 0.2s; border: 1px solid var(--brd);
+        }
+        .msg-other:hover .reply-btn, .msg-self:hover .reply-btn { display: flex; }
+        .msg-self .reply-btn { right: auto; left: -32px; }
+        .reply-btn:hover { background: var(--main); color: white; transform: translateY(-50%) scale(1.1); }
     </style>
 </head>
 <body>
@@ -642,13 +701,24 @@
         <div class="chat-input-area" id="chatInputArea">
             <label class="file-label"><i class="fas fa-camera"></i><input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
             <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()" title="Sprachnachricht"><i class="fas fa-microphone"></i></button>
-            <div class="chat-input-wrapper" id="chatInputWrapper">
-                <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()">
-                <div class="recording-bar" id="recordingBar">
-                    <span class="rec-dot"></span>
-                    <span class="rec-timer" id="recTimer">0:00 / 0:14</span>
-                    <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-times"></i></button>
-                    <button class="rec-send" id="recSendBtn" onclick="sendVoiceMessage()" title="Senden" disabled><i class="fas fa-paper-plane"></i></button>
+            <div style="flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;">
+                <!-- Reply Preview Bar -->
+                <div id="replyPreviewBar">
+                    <i class="fas fa-reply" style="color:var(--main); font-size:0.9rem; flex-shrink:0;"></i>
+                    <div class="reply-info">
+                        <span class="reply-from" id="replyFromName"></span>
+                        <span class="reply-text" id="replyPreviewText"></span>
+                    </div>
+                    <button class="reply-cancel-btn" onclick="clearReply()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="chat-input-wrapper" id="chatInputWrapper">
+                    <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()">
+                    <div class="recording-bar" id="recordingBar">
+                        <span class="rec-dot"></span>
+                        <span class="rec-timer" id="recTimer">0:00 / 0:14</span>
+                        <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-times"></i></button>
+                        <button class="rec-send" id="recSendBtn" onclick="sendVoiceMessage()" title="Senden" disabled><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </div>
             <button onclick="sendMessage()" class="send-btn"><i class="fas fa-paper-plane"></i></button>
@@ -792,6 +862,16 @@
             </div>
 
             <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:10px;">Konto löschen</button>
+
+            <!-- BLOCKIERTE USER SECTION -->
+            <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:15px; background:rgba(255,71,87,0.04);">
+                <h3 style="margin:0 0 8px 0; font-size:0.95rem; color:var(--danger);"><i class="fas fa-ban"></i> Blockierte User</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 10px 0;">User die du blockiert hast können dir keine Nachrichten schicken.</p>
+                <div id="blockedUsersList" style="max-height:180px; overflow-y:auto;">
+                    <p style="color:#888; font-size:0.85rem;">Lade...</p>
+                </div>
+                <button onclick="loadBlockedUsers()" class="secondary" style="width:100%; font-size:0.8rem; margin-top:8px;"><i class="fas fa-sync-alt"></i> Aktualisieren</button>
+            </div>
 
             <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
         </div>
@@ -962,6 +1042,22 @@
                 <button style="width:100%; font-size:0.9rem; background:linear-gradient(45deg,#ffd700,#ff4757,#5865F2); color:#fff; font-weight:bold; box-shadow:0 4px 15px rgba(255,215,0,0.4);" id="shopBtn-mega" onclick="confirmBuyBundle('mega', 14.99, 'MEGA BUNDLE')">🔥 Jetzt kaufen!</button>
             </div>
 
+            <!-- TAG BUNDLE 19,99€ -->
+            <div class="shop-bundle" style="border-color:#795548; background:linear-gradient(135deg,rgba(121,85,72,0.12),rgba(88,101,242,0.06),rgba(255,107,107,0.06));">
+                <div class="shop-bundle-price" style="color:#795548;">19,99€</div>
+                <div class="shop-bundle-header">🏷️ Tag Bundle</div>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;"><i>Exklusives Bundle mit einzigartigen Chat-Tags!</i></p>
+                <ul>
+                    <li>🏷️ Exklusives Emoji: 🏷️</li>
+                    <li>🟫 Hintergrundfarbe: Braun</li>
+                    <li>✅ Tag: <span style="background:linear-gradient(45deg,#43b581,#00b894); color:white; border-radius:4px; padding:1px 5px; font-size:0.7rem; font-weight:bold;">Super</span></li>
+                    <li>💙 Tag: <span style="background:linear-gradient(45deg,#5865F2,#7289DA); color:white; border-radius:4px; padding:1px 5px; font-size:0.7rem; font-weight:bold;">Krass</span></li>
+                    <li>🔥 Tag: <span style="background:linear-gradient(45deg,#ff6b6b,#ee5a24); color:white; border-radius:4px; padding:1px 5px; font-size:0.7rem; font-weight:bold;">CRAZY</span></li>
+                    <li>🎖️ 3 einzigartige animierte Nametags</li>
+                </ul>
+                <button style="width:100%; font-size:0.9rem; background:linear-gradient(45deg,#795548,#5865F2,#ff6b6b); color:#fff; font-weight:bold; box-shadow:0 4px 15px rgba(121,85,72,0.4);" id="shopBtn-tagbundle" onclick="confirmBuyBundle('tagbundle', 19.99, 'Tag Bundle')">🏷️ Jetzt kaufen!</button>
+            </div>
+
         </div>
         <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
     </div>
@@ -1087,6 +1183,32 @@
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
                 <button class="danger" onclick="executeUnfriend()">Entfernen</button>
                 <button onclick="closeUnfriendModal()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCK CONFIRM MODAL -->
+    <div id="blockConfirmModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div style="font-size:2.5rem; margin-bottom:8px;">🚫</div>
+            <h2 style="margin-top:0; color:var(--danger);">Benutzer blockieren?</h2>
+            <p><b id="blockTargetName"></b> wird aus deiner Freundesliste entfernt und kann dir keine Nachrichten mehr schicken.</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
+                <button class="danger" onclick="executeBlock()"><i class="fas fa-ban"></i> Blockieren</button>
+                <button onclick="document.getElementById('blockConfirmModal').classList.add('hidden')" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEAUTIFUL DELETE CONFIRM MODAL -->
+    <div id="deleteConfirmModal" class="hidden" onclick="hideDeleteConfirm(event)">
+        <div class="delete-confirm-card" onclick="event.stopPropagation()">
+            <span class="delete-confirm-icon">🗑️</span>
+            <h3>Nachricht löschen?</h3>
+            <p>Diese Nachricht wird für alle gelöscht und kann nicht wiederhergestellt werden.</p>
+            <div class="delete-confirm-btns">
+                <button class="danger" onclick="confirmDeleteMessage()"><i class="fas fa-trash"></i> Löschen</button>
+                <button class="secondary" onclick="hideDeleteConfirm()">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -1255,7 +1377,15 @@
         }
 
         function toggleAgb(s) { document.getElementById('agbEmbed').classList.toggle('hidden', !s); }
-        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id === 'inboxView') loadInboxView(); }
+        function showView(id) { 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById(id).classList.remove('hidden'); 
+            if(id === 'inboxView') loadInboxView(); 
+            if(id === 'settingsView') loadBlockedUsers(); 
+            // Immer Block-Modal schließen beim View-Wechsel
+            const bModal = document.getElementById('blockConfirmModal');
+            if(bModal) bModal.classList.add('hidden');
+        }
         
         function formatName(n) { return n; }
 
@@ -1638,6 +1768,7 @@
                             <button class="report-btn" onclick="openReportModal('${cid}', 'user', '${f}')"><i class="fas fa-exclamation-triangle"></i></button>
                             <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
                             <button onclick="openChat('${f}', false)">Chat</button>
+                            <button class="danger" title="Blockieren" onclick="askBlock('${f}')" style="background:rgba(255,71,87,0.15); color:var(--danger);"><i class="fas fa-ban"></i></button>
                             <button class="danger" onclick="askUnfriend('${f}')"><i class="fas fa-times"></i></button>
                         </div>
                       </div>`;
@@ -1990,6 +2121,13 @@
                 emojis: ["🤖","👾","🔥","💀","🎯","⚡","🏆"],
                 bgs:    ["darkred"],
                 colors: ["darkgold","neongreen"]
+            },
+            tagbundle: {
+                name: "🏷️ Tag Bundle",
+                emojis: ["🏷️"],
+                bgs:    ["brown"],
+                colors: [],
+                tags:   ["super","krass","crazy"]
             }
         };
 
@@ -2042,6 +2180,11 @@
             }
             if(myBundles['mega']) {
                 availableTags.push({ key: 'mega', label: '🔥 MEGA', style: 'background:linear-gradient(45deg,#ffd700,#ff4757,#5865F2)' });
+            }
+            if(myBundles['tagbundle']) {
+                availableTags.push({ key: 'super', label: 'Super', style: 'background:linear-gradient(45deg,#43b581,#00b894)' });
+                availableTags.push({ key: 'krass', label: 'Krass', style: 'background:linear-gradient(45deg,#5865F2,#7289DA)' });
+                availableTags.push({ key: 'crazy', label: 'CRAZY', style: 'background:linear-gradient(45deg,#ff6b6b,#ee5a24)' });
             }
 
             if(availableTags.length === 0) {
@@ -2345,6 +2488,78 @@
             triggerEmbed("Freund entfernt", "success");
         }
 
+        // === BLOCK SYSTEM ===
+        let userToBlock = null;
+
+        function askBlock(friendName) {
+            userToBlock = friendName;
+            document.getElementById('blockTargetName').innerText = formatName(friendName);
+            document.getElementById('blockConfirmModal').classList.remove('hidden');
+        }
+
+        function executeBlock() {
+            const n = userToBlock;
+            if(!n) return;
+            document.getElementById('blockConfirmModal').classList.add('hidden');
+
+            // Freundschaft entfernen
+            db.ref('users/'+currentUser+'/friends/'+n).remove();
+            db.ref('users/'+n+'/friends/'+currentUser).remove();
+
+            // Blockieren speichern
+            db.ref('users/'+currentUser+'/blocked/'+n).set(true);
+            db.ref('users/'+n+'/blockedBy/'+currentUser).set(true);
+
+            userToBlock = null;
+            triggerEmbed(formatName(n) + " blockiert", "success");
+        }
+
+        function unblockUser(n) {
+            db.ref('users/'+currentUser+'/blocked/'+n).remove();
+            db.ref('users/'+n+'/blockedBy/'+currentUser).remove();
+            triggerEmbed(formatName(n) + " entsperrt", "success");
+            loadBlockedUsers();
+        }
+
+        function loadBlockedUsers() {
+            const list = document.getElementById('blockedUsersList');
+            if(!list) return;
+            list.innerHTML = '<p style="color:#888; font-size:0.85rem;">Lade...</p>';
+            db.ref('users/'+currentUser+'/blocked').once('value', snap => {
+                list.innerHTML = '';
+                if(!snap.exists()) {
+                    list.innerHTML = '<p style="color:#888; font-size:0.85rem; text-align:center; margin:10px 0;">Keine blockierten User 🎉</p>';
+                    return;
+                }
+                snap.forEach(b => {
+                    const name = b.key;
+                    list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px solid var(--brd);">
+                        <span style="font-size:0.9rem;"><i class="fas fa-ban" style="color:var(--danger); margin-right:6px;"></i>${formatName(name)}</span>
+                        <button onclick="unblockUser('${name}')" class="secondary" style="font-size:0.78rem; padding:5px 10px; border-radius:20px;">Entsperren</button>
+                    </div>`;
+                });
+            });
+        }
+
+        // === REPLY SYSTEM ===
+        let replyTo = null;
+
+        function setReply(key, fromUser, txt, type) {
+            replyTo = { from: fromUser, txt: txt, type: type };
+            const bar = document.getElementById('replyPreviewBar');
+            bar.style.display = 'flex';
+            document.getElementById('replyFromName').innerText = fromUser;
+            const preview = type === 'img' ? '📷 Bild' : type === 'voice' ? '🎙️ Sprachnachricht' : txt.substring(0, 55);
+            document.getElementById('replyPreviewText').innerText = preview;
+            document.getElementById('chatInput').focus();
+        }
+
+        function clearReply() {
+            replyTo = null;
+            document.getElementById('replyPreviewBar').style.display = 'none';
+        }
+
         function openGroupCreator() {
             const list = document.getElementById('groupMembersList');
             list.innerHTML = "";
@@ -2624,7 +2839,7 @@
             if(activeChatID) db.ref('users/' + currentUser + '/lastRead/' + activeChatID).set(Date.now());
             if(currentChatPath) db.ref(currentChatPath).off();
             if(typingListener) db.ref(typingListener).off();
-            
+            clearReply();
             currentChatPath = null;
             activeChatID = null;
             isSpectatorMode = false;
@@ -2728,12 +2943,26 @@
 
             let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i></span>` : "";
             
+            // REPLY BUTTON (nur für echte Nachrichten, nicht gelöscht, nicht Spectator)
+            let replyBtn = (!isSystem && !d.isDeleted && !isSpectatorMode) ?
+                `<span class="reply-btn" onclick="setReply('${key}', '${d.from}', '${(d.type !== 'img' && d.type !== 'voice' ? (d.txt||'').replace(/'/g,"\\'").replace(/\n/g,' ') : '')}', '${d.type}')"><i class="fas fa-reply"></i></span>` : '';
+
+            // REPLY QUOTE anzeigen (wenn Nachricht auf eine andere antwortet)
+            let replyQuote = '';
+            if(d.replyTo && !d.isDeleted) {
+                const rPreview = d.replyTo.type === 'img' ? '📷 Bild' : d.replyTo.type === 'voice' ? '🎙️ Sprachnachricht' : (d.replyTo.txt || '').substring(0, 60);
+                replyQuote = `<div class="reply-quote"><span class="reply-quote-from">${formatName(d.replyTo.from)}</span><span class="reply-quote-content">${rPreview}</span></div>`;
+            }
+            
             let tags = "";
             const senderActiveTags = (d.plusData && d.plusData.activeTags) ? d.plusData.activeTags : {};
             if(d.from && d.from.toLowerCase() === OWNER_NAME && senderActiveTags.owner !== false) tags += `<span class="tag-owner">Owner</span>`;
             else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
             if(d.isAdminSender && senderActiveTags.admin !== false) tags += `<span class="tag-global-admin">Admin</span>`;
             if(d.plusData && d.plusData.megaTag) tags += `<span class="tag-mega">🔥 MEGA</span>`;
+            if(d.plusData && d.plusData.superTag) tags += `<span class="tag-super">Super</span>`;
+            if(d.plusData && d.plusData.krassTag) tags += `<span class="tag-krass">Krass</span>`;
+            if(d.plusData && d.plusData.crazyTag) tags += `<span class="tag-crazy">CRAZY</span>`;
 
             let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
@@ -2745,18 +2974,13 @@
             let timeStr = d.timestamp ? new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
 
             return `
-                <div class="msg ${isSystem ? 'system-msg' : ''} ${msgClass}" id="msg-${key}">
+                <div class="msg ${isSystem ? 'system-msg' : ''} ${msgClass}" id="msg-${key}" style="position:relative;">
                     ${displayNameHTML}
+                    ${replyQuote}
                     <div style="display:inline-block;">${content}</div>
                     ${delBtn}
+                    ${replyBtn}
                     ${!isSystem ? `<span class="msg-time">${timeStr}</span>` : ''}
-                    <div id="confirm-${key}" class="del-confirm hidden">
-                        <span>Löschen?</span>
-                        <div>
-                             <button class="danger" onclick="deleteMessage('${key}', '${d.from}')">Ja</button>
-                            <button onclick="hideInlineConfirm('${key}')">X</button>
-                        </div>
-                    </div>
                 </div>`;
         }
 
@@ -2984,7 +3208,7 @@
                     duration: duration,
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 resetVoiceUI();
@@ -3077,16 +3301,43 @@
             const t = document.getElementById('chatInput').value;
             if(!t) return;
             const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
+
+            // Blockiert-Check für private Chats
+            if(!isGroup) {
+                const parts = activeChatID.split('_');
+                const partner = parts[0] === currentUser ? parts[1] : parts[0];
+                db.ref('users/'+currentUser+'/blockedBy/'+partner).once('value', snap => {
+                    if(snap.val() === true) {
+                        triggerEmbed("Du kannst dieser Person keine Nachrichten schicken.", "danger");
+                        return;
+                    }
+                    _doSendMessage(path, t);
+                });
+                return;
+            }
+            _doSendMessage(path, t);
+        }
+
+        function _doSendMessage(path, t) {
             const msgData = { 
                 from: currentUser, 
                 txt: t, 
                 type: 'text',
                 timestamp: Date.now(), 
                 isAdminSender: userIsGlobalAdmin, 
-                plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), activeTags: myActiveTags }
+                plusData: { 
+                    emoji: myEmoji, color: myNameColor, 
+                    megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false),
+                    superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false),
+                    krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false),
+                    crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false),
+                    activeTags: myActiveTags 
+                }
             };
+            if(replyTo) { msgData.replyTo = replyTo; }
             db.ref(path).push(msgData);
             document.getElementById('chatInput').value = "";
+            clearReply();
             
             const box = document.getElementById('messageBox');
             box.scrollTop = box.scrollHeight;
@@ -3110,7 +3361,7 @@
                     type: 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 triggerEmailNotification("Hat ein Bild gesendet", isGroup, activeChatID);
@@ -3638,8 +3889,32 @@
             location.reload();
         }
 
-        function showInlineConfirm(key, sender) { document.getElementById('confirm-' + key).classList.remove('hidden'); }
-        function hideInlineConfirm(key) { document.getElementById('confirm-' + key).classList.add('hidden'); }
+        let deleteConfirmKey = null;
+        let deleteConfirmSender = null;
+
+        function showInlineConfirm(key, sender) {
+            deleteConfirmKey = key;
+            deleteConfirmSender = sender;
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+        function hideInlineConfirm(key) {
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            deleteConfirmKey = null;
+            deleteConfirmSender = null;
+        }
+        function hideDeleteConfirm(e) {
+            if(!e || e.target === document.getElementById('deleteConfirmModal')) {
+                document.getElementById('deleteConfirmModal').classList.add('hidden');
+                deleteConfirmKey = null;
+                deleteConfirmSender = null;
+            }
+        }
+        function confirmDeleteMessage() {
+            if(deleteConfirmKey) deleteMessage(deleteConfirmKey, deleteConfirmSender);
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            deleteConfirmKey = null;
+            deleteConfirmSender = null;
+        }
 
         function deleteMessage(key, sender) {
             const path = isGroup ? 'groups/'+activeChatID+'/messages/'+key : 'chats/'+activeChatID+'/'+key;
