@@ -226,6 +226,41 @@
         .icon-btn:hover { background: var(--hover); }
         .muted-state { color: var(--danger); opacity: 0.7; }
 
+        /* 3-DOT MENU STYLES */
+        .three-dot-btn {
+            background: transparent; border: none; color: var(--txt); 
+            width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; cursor: pointer; transition: 0.2s; padding: 0;
+        }
+        .three-dot-btn:hover { background: var(--hover); transform: none; }
+
+        /* CONTEXT MENU SHEET */
+        #userContextSheet {
+            position: fixed; bottom: -100%; left: 0; width: 100%; z-index: 5000;
+            transition: bottom 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #userContextSheet.open { bottom: 0; }
+        #userContextSheetBg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+            z-index: 4999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #userContextSheetBg.open { opacity: 1; pointer-events: all; }
+        .context-sheet-inner {
+            background: var(--cont); border-radius: 24px 24px 0 0; padding: 10px 0 30px 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2); border-top: 1px solid var(--brd);
+        }
+        .context-sheet-handle { width: 40px; height: 4px; background: var(--brd); border-radius: 2px; margin: 8px auto 12px auto; }
+        .context-sheet-title { text-align: center; font-weight: bold; font-size: 1rem; padding: 4px 20px 14px 20px; border-bottom: 1px solid var(--brd); margin-bottom: 8px; color: var(--main); }
+        .context-sheet-item {
+            display: flex; align-items: center; gap: 16px; padding: 14px 24px;
+            cursor: pointer; transition: background 0.15s; font-size: 0.98rem;
+        }
+        .context-sheet-item:hover { background: var(--hover); }
+        .context-sheet-item i { width: 22px; text-align: center; font-size: 1.1rem; }
+        .context-sheet-item.danger-item { color: var(--danger); }
+        .context-sheet-item.warn-item { color: #ff9f43; }
+
         .pfp { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; border: 2px solid var(--brd); flex-shrink: 0; margin-right: 10px; display: none; }
         .pfp-large { width: 80px; height: 80px; margin-bottom: 10px; cursor: pointer; display: inline-block; background: #eee; }
         .friend-info { display: flex; align-items: center; }
@@ -507,7 +542,8 @@
             <div id="friendsList"></div>
             <div id="groupsList"></div>
         </div>
-        <button onclick="confirmLogout()" class="secondary" style="width:100%; margin-top:10px;">Abmelden</button>
+        <button id="downloadApkBtn" onclick="downloadApk()" style="width:100%; margin-top:10px; background:linear-gradient(135deg,#43b581,#2ecc71); color:white; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fas fa-android"></i> Android App Herunterladen</button>
+        <button onclick="confirmLogout()" class="secondary" style="width:100%; margin-top:8px;">Abmelden</button>
     </div>
 
     <div id="adminPanelView" class="view view-large hidden">
@@ -519,6 +555,7 @@
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <button onclick="toggleAdminTab('users')" id="tabBtnUser" style="flex:1;">User</button>
             <button onclick="toggleAdminTab('reports')" id="tabBtnReport" class="secondary" style="flex:1;">Reports</button>
+            <button onclick="toggleAdminTab('downloads')" id="tabBtnDownload" class="secondary" style="flex:1;">Downloads</button>
         </div>
 
         <div id="adminTabUsers">
@@ -535,6 +572,26 @@
 
         <div id="adminTabReports" class="hidden scroll-area">
             <div id="reportsListContainer"></div>
+        </div>
+
+        <div id="adminTabDownloads" class="hidden scroll-area">
+            <div style="background:rgba(67,181,129,0.08); border:1px solid var(--success); border-radius:14px; padding:16px;">
+                <h3 style="margin:0 0 8px 0; color:var(--success); font-size:1rem;"><i class="fas fa-android"></i> Android APK verwalten</h3>
+                <p style="font-size:0.82rem; color:#888; margin:0 0 14px 0;">Lade die APK-Datei hoch. Alle User können sie dann über den "Android App Herunterladen" Button abrufen.</p>
+                <div style="border:2px dashed var(--brd); border-radius:12px; padding:20px; text-align:center; margin-bottom:12px; cursor:pointer; transition:0.2s;" id="apkDropZone" onclick="document.getElementById('apkFileInput').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--success)'" ondragleave="this.style.borderColor='var(--brd)'" ondrop="handleApkDrop(event)">
+                    <i class="fas fa-cloud-upload-alt" style="font-size:2rem; color:var(--success); margin-bottom:8px; display:block;"></i>
+                    <p style="margin:0; font-size:0.9rem; color:#888;">APK hier ablegen oder <span style="color:var(--success); font-weight:bold;">durchsuchen</span></p>
+                    <input type="file" id="apkFileInput" accept=".apk" hidden onchange="handleApkFile(this.files[0])">
+                </div>
+                <div id="apkUploadStatus" style="font-size:0.85rem; color:#888; text-align:center; margin-bottom:10px;"></div>
+                <div id="currentApkInfo" style="background:var(--hover); border-radius:10px; padding:12px; margin-bottom:10px; display:none;">
+                    <p style="margin:0 0 4px 0; font-size:0.8rem; color:#888;">Aktuelle APK:</p>
+                    <p id="currentApkName" style="margin:0; font-weight:bold; font-size:0.9rem; color:var(--txt);"></p>
+                    <p id="currentApkDate" style="margin:0; font-size:0.75rem; color:#888;"></p>
+                </div>
+                <button onclick="uploadApkToFirebase()" class="green-btn" style="width:100%;" id="apkUploadBtn" disabled><i class="fas fa-upload"></i> APK Hochladen & Aktivieren</button>
+                <button onclick="removeApk()" class="danger" style="width:100%; margin-top:8px; font-size:0.82rem;"><i class="fas fa-trash"></i> APK entfernen</button>
+            </div>
         </div>
 
         <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
@@ -1760,17 +1817,11 @@
                     
                     fList.innerHTML += `
                     <div class="friend-item" id="row-${cid}">
-                        <div class="friend-info">
+                        <div class="friend-info" onclick="openChat('${f}', false)" style="cursor:pointer; flex:1;">
                             <img class="pfp" id="pfp-view-${f}" src="${pfpSrc}" style="${pfpStyle}">
                             <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
-                         <div class="action-btn-group">
-                            <button class="report-btn" onclick="openReportModal('${cid}', 'user', '${f}')"><i class="fas fa-exclamation-triangle"></i></button>
-                            <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${cid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
-                            <button onclick="openChat('${f}', false)">Chat</button>
-                            <button class="danger" title="Blockieren" onclick="askBlock('${f}')" style="background:rgba(255,71,87,0.15); color:var(--danger);"><i class="fas fa-ban"></i></button>
-                            <button class="danger" onclick="askUnfriend('${f}')"><i class="fas fa-times"></i></button>
-                        </div>
+                        <button class="three-dot-btn" onclick="openContextSheet('friend','${f}','${f}')"><i class="fas fa-ellipsis-v"></i></button>
                       </div>`;
                     watchChat(cid, 'private', f); 
                     loadPfp(f);
@@ -1790,15 +1841,11 @@
                             let iconHTML = gPfp ? `<img src="${gPfp}" style="width:40px; height:40px; border-radius:50%; margin-right:10px; object-fit:cover;">` : `<span style="font-size:1.5rem; margin-right:10px;"><i class="fas fa-users"></i></span>`;
                             gList.innerHTML += `
                             <div class="friend-item" id="row-${gid}">
-                                <div class="friend-info">
+                                <div class="friend-info" onclick="openChat('${gid}', true, '${gName}')" style="cursor:pointer; flex:1;">
                                     ${iconHTML}
                                     <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
                                 </div>
-                                <div class="action-btn-group">
-                                    <button class="report-btn" onclick="openReportModal('${gid}', 'group', '${gName}')"><i class="fas fa-exclamation-triangle"></i></button>
-                                    <button class="icon-btn ${isMuted ? 'muted-state' : ''}" onclick="toggleMute('${gid}')">${isMuted ? '<i class="fas fa-bell-slash"></i>' : '<i class="fas fa-bell"></i>'}</button>
-                                    <button onclick="openChat('${gid}', true, '${gName}')">Chat</button>
-                                </div>
+                                <button class="three-dot-btn" onclick="openContextSheet('group','${gid}','${gName}')"><i class="fas fa-ellipsis-v"></i></button>
                             </div>`;
                             
                             watchChat(gid, 'group', gName);
@@ -4457,19 +4504,126 @@
 
         // --- ADMIN REPORT VIEW ---
         function toggleAdminTab(tab) {
+            document.getElementById('adminTabUsers').classList.add('hidden');
+            document.getElementById('adminTabReports').classList.add('hidden');
+            document.getElementById('adminTabDownloads').classList.add('hidden');
+            document.getElementById('tabBtnUser').classList.add('secondary');
+            document.getElementById('tabBtnReport').classList.add('secondary');
+            document.getElementById('tabBtnDownload').classList.add('secondary');
+
             if(tab === 'users') {
                 document.getElementById('adminTabUsers').classList.remove('hidden');
-                document.getElementById('adminTabReports').classList.add('hidden');
                 document.getElementById('tabBtnUser').classList.remove('secondary');
-                document.getElementById('tabBtnReport').classList.add('secondary');
-                if(reportsListener) db.ref('reports').off(); 
-            } else {
-                document.getElementById('adminTabUsers').classList.add('hidden');
+                if(reportsListener) db.ref('reports').off();
+            } else if(tab === 'reports') {
                 document.getElementById('adminTabReports').classList.remove('hidden');
-                document.getElementById('tabBtnUser').classList.add('secondary');
                 document.getElementById('tabBtnReport').classList.remove('secondary');
                 loadReports();
+            } else if(tab === 'downloads') {
+                document.getElementById('adminTabDownloads').classList.remove('hidden');
+                document.getElementById('tabBtnDownload').classList.remove('secondary');
+                loadCurrentApkInfo();
             }
+        }
+
+        // --- APK DOWNLOAD (USER) ---
+        function downloadApk() {
+            const btn = document.getElementById('downloadApkBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wird geladen...';
+            db.ref('settings/apk').once('value', snap => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-android"></i> Android App Herunterladen';
+                const apkData = snap.val();
+                if(!apkData || !apkData.url) {
+                    triggerEmbed("Keine App verfügbar", "danger");
+                    return;
+                }
+                // Download trigger
+                const a = document.createElement('a');
+                a.href = apkData.url;
+                a.download = apkData.name || 'JohnChat.apk';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                triggerEmbed("Download gestartet!", "success");
+            });
+        }
+
+        // --- APK ADMIN FUNCTIONS ---
+        let pendingApkFile = null;
+
+        function handleApkDrop(e) {
+            e.preventDefault();
+            document.getElementById('apkDropZone').style.borderColor = 'var(--brd)';
+            const file = e.dataTransfer.files[0];
+            if(file) handleApkFile(file);
+        }
+
+        function handleApkFile(file) {
+            if(!file || !file.name.endsWith('.apk')) {
+                triggerEmbed("Nur .apk Dateien erlaubt", "danger");
+                return;
+            }
+            pendingApkFile = file;
+            document.getElementById('apkUploadStatus').innerHTML = `<i class="fas fa-file-alt" style="color:var(--success);"></i> <b>${file.name}</b> bereit (${(file.size/1024/1024).toFixed(2)} MB)`;
+            document.getElementById('apkUploadBtn').disabled = false;
+        }
+
+        function uploadApkToFirebase() {
+            if(!pendingApkFile) return;
+            const btn = document.getElementById('apkUploadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wird hochgeladen...';
+            document.getElementById('apkUploadStatus').innerHTML = 'Konvertiere Datei...';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                const apkData = {
+                    url: base64,
+                    name: pendingApkFile.name,
+                    uploadedAt: Date.now(),
+                    size: pendingApkFile.size
+                };
+                db.ref('settings/apk').set(apkData).then(() => {
+                    triggerEmbed("APK erfolgreich hochgeladen!", "success");
+                    btn.innerHTML = '<i class="fas fa-upload"></i> APK Hochladen & Aktivieren';
+                    btn.disabled = true;
+                    pendingApkFile = null;
+                    document.getElementById('apkUploadStatus').innerHTML = '';
+                    document.getElementById('apkFileInput').value = '';
+                    loadCurrentApkInfo();
+                }).catch(err => {
+                    triggerEmbed("Upload fehlgeschlagen", "danger");
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-upload"></i> APK Hochladen & Aktivieren';
+                });
+            };
+            reader.readAsDataURL(pendingApkFile);
+        }
+
+        function loadCurrentApkInfo() {
+            db.ref('settings/apk').once('value', snap => {
+                const apkData = snap.val();
+                const infoBox = document.getElementById('currentApkInfo');
+                if(apkData && apkData.name) {
+                    infoBox.style.display = 'block';
+                    document.getElementById('currentApkName').innerText = apkData.name;
+                    const d = new Date(apkData.uploadedAt);
+                    document.getElementById('currentApkDate').innerText = `Hochgeladen: ${d.toLocaleDateString('de-DE')} ${d.toLocaleTimeString('de-DE')} · ${(apkData.size/1024/1024).toFixed(2)} MB`;
+                } else {
+                    infoBox.style.display = 'none';
+                }
+            });
+        }
+
+        function removeApk() {
+            if(!confirm("APK wirklich entfernen? User können dann nicht mehr herunterladen.")) return;
+            db.ref('settings/apk').remove().then(() => {
+                triggerEmbed("APK entfernt", "success");
+                document.getElementById('currentApkInfo').style.display = 'none';
+            });
         }
 
         function loadReports() {
@@ -4522,6 +4676,47 @@
             loadChatMessages();
         }
 
+        // --- 3-DOT CONTEXT SHEET ---
+        let contextSheetTarget = null;
+
+        function openContextSheet(type, id, name) {
+            contextSheetTarget = { type, id, name };
+            document.getElementById('contextSheetTitle').textContent = name;
+
+            let items = '';
+            if(type === 'friend') {
+                const cid = [currentUser, id].sort().join("_");
+                const isMuted = mutedChats[cid] === true;
+                items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="toggleMute('${cid}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
+                items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${cid}', 'user', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
+                items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-ban"></i> Blockieren</div>`;
+                items += `<div class="context-sheet-item danger-item" onclick="askUnfriend('${id}'); closeContextSheet()"><i class="fas fa-user-times"></i> Entfreunden</div>`;
+            } else if(type === 'group') {
+                const isMuted = mutedChats[id] === true;
+                items += `<div class="context-sheet-item" onclick="openChat('${id}', true, '${name}'); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="toggleMute('${id}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
+                items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${id}', 'group', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
+                items += `<div class="context-sheet-item danger-item" onclick="confirmLeaveGroupById('${id}', '${name}'); closeContextSheet()"><i class="fas fa-sign-out-alt"></i> Gruppe verlassen</div>`;
+            }
+
+            document.getElementById('contextSheetItems').innerHTML = items;
+            document.getElementById('userContextSheet').classList.add('open');
+            document.getElementById('userContextSheetBg').classList.add('open');
+        }
+
+        function closeContextSheet() {
+            document.getElementById('userContextSheet').classList.remove('open');
+            document.getElementById('userContextSheetBg').classList.remove('open');
+        }
+
+        function confirmLeaveGroupById(gid, gName) {
+            activeChatID = gid;
+            isGroup = true;
+            document.getElementById('chatWithTitle').innerText = gName;
+            confirmLeaveGroup();
+        }
+
     </script>
 
     <!-- EMAIL LÖSCHEN MIT 2FA BESTÄTIGUNG -->
@@ -4569,6 +4764,16 @@
             <p style="font-size:0.9rem;">gesendet, damit du siehst, dass dein Account erfolgreich verknüpft wurde.</p>
             <p style="font-size:0.8rem; color:#888; margin-top:10px;">Wenn du keine Email erhalten hast, überprüfe bitte die angegebene Email-Adresse.</p>
             <button onclick="document.getElementById('emailLinkedEmbed').classList.add('hidden')" style="width:100%; margin-top:15px;" class="green-btn">Alles klar!</button>
+        </div>
+    </div>
+
+    <!-- USER / GROUP CONTEXT SHEET -->
+    <div id="userContextSheetBg" onclick="closeContextSheet()"></div>
+    <div id="userContextSheet">
+        <div class="context-sheet-inner">
+            <div class="context-sheet-handle"></div>
+            <div class="context-sheet-title" id="contextSheetTitle"></div>
+            <div id="contextSheetItems"></div>
         </div>
     </div>
 
