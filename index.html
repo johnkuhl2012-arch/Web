@@ -580,17 +580,23 @@
                 <p style="font-size:0.82rem; color:#888; margin:0 0 14px 0;">Lade die APK-Datei hoch. Alle User können sie dann über den "Android App Herunterladen" Button abrufen.</p>
                 <div style="border:2px dashed var(--brd); border-radius:12px; padding:20px; text-align:center; margin-bottom:12px; cursor:pointer; transition:0.2s;" id="apkDropZone" onclick="document.getElementById('apkFileInput').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--success)'" ondragleave="this.style.borderColor='var(--brd)'" ondrop="handleApkDrop(event)">
                     <i class="fas fa-cloud-upload-alt" style="font-size:2rem; color:var(--success); margin-bottom:8px; display:block;"></i>
-                    <p style="margin:0; font-size:0.9rem; color:#888;">APK hier ablegen oder <span style="color:var(--success); font-weight:bold;">durchsuchen</span></p>
-                    <input type="file" id="apkFileInput" accept=".apk" hidden onchange="handleApkFile(this.files[0])">
+                    <p style="margin:0; font-size:0.9rem; color:#888;">Datei hier ablegen oder <span style="color:var(--success); font-weight:bold;">durchsuchen</span></p>
+                    <input type="file" id="apkFileInput" hidden onchange="handleApkFile(this.files[0])">
                 </div>
-                <div id="apkUploadStatus" style="font-size:0.85rem; color:#888; text-align:center; margin-bottom:10px;"></div>
+                <div id="apkUploadStatus" style="font-size:0.85rem; color:#888; text-align:center; margin-bottom:10px; min-height:20px;"></div>
+                <div id="apkProgressWrap" style="display:none; margin-bottom:10px;">
+                    <div style="background:var(--brd); border-radius:50px; height:8px; overflow:hidden;">
+                        <div id="apkProgressBar" style="height:100%; width:0%; background:linear-gradient(90deg,#43b581,#2ecc71); border-radius:50px; transition:width 0.3s;"></div>
+                    </div>
+                    <p id="apkProgressTxt" style="margin:5px 0 0 0; font-size:0.78rem; color:#888; text-align:center;"></p>
+                </div>
                 <div id="currentApkInfo" style="background:var(--hover); border-radius:10px; padding:12px; margin-bottom:10px; display:none;">
-                    <p style="margin:0 0 4px 0; font-size:0.8rem; color:#888;">Aktuelle APK:</p>
+                    <p style="margin:0 0 4px 0; font-size:0.8rem; color:#888;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Aktive Datei:</p>
                     <p id="currentApkName" style="margin:0; font-weight:bold; font-size:0.9rem; color:var(--txt);"></p>
                     <p id="currentApkDate" style="margin:0; font-size:0.75rem; color:#888;"></p>
                 </div>
-                <button onclick="uploadApkToFirebase()" class="green-btn" style="width:100%;" id="apkUploadBtn" disabled><i class="fas fa-upload"></i> APK Hochladen & Aktivieren</button>
-                <button onclick="removeApk()" class="danger" style="width:100%; margin-top:8px; font-size:0.82rem;"><i class="fas fa-trash"></i> APK entfernen</button>
+                <button onclick="uploadApkToFirebase()" class="green-btn" style="width:100%;" id="apkUploadBtn" disabled><i class="fas fa-upload"></i> Hochladen & Aktivieren</button>
+                <button onclick="removeApk()" class="danger" style="width:100%; margin-top:8px; font-size:0.82rem;"><i class="fas fa-trash"></i> Datei entfernen</button>
             </div>
         </div>
 
@@ -4531,27 +4537,34 @@
             const btn = document.getElementById('downloadApkBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wird geladen...';
-            db.ref('settings/apk').once('value', snap => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-android"></i> Android App Herunterladen';
-                const apkData = snap.val();
-                if(!apkData || !apkData.url) {
+            db.ref('settings/apk/meta').once('value', snap => {
+                const meta = snap.val();
+                if(!meta || !meta.name) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-android"></i> Android App Herunterladen';
                     triggerEmbed("Keine App verfügbar", "danger");
                     return;
                 }
-                // Download trigger
-                const a = document.createElement('a');
-                a.href = apkData.url;
-                a.download = apkData.name || 'JohnChat.apk';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                triggerEmbed("Download gestartet!", "success");
+                // Reassemble chunks
+                db.ref('settings/apk/chunks').once('value', chunkSnap => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-android"></i> Android App Herunterladen';
+                    let base64 = '';
+                    chunkSnap.forEach(c => { base64 += c.val(); });
+                    const a = document.createElement('a');
+                    a.href = base64;
+                    a.download = meta.name;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    triggerEmbed("Download gestartet!", "success");
+                });
             });
         }
 
         // --- APK ADMIN FUNCTIONS ---
         let pendingApkFile = null;
+        const CHUNK_SIZE = 700000; // ~700KB per chunk, safe for Firebase
 
         function handleApkDrop(e) {
             e.preventDefault();
@@ -4561,57 +4574,91 @@
         }
 
         function handleApkFile(file) {
-            if(!file || !file.name.endsWith('.apk')) {
-                triggerEmbed("Nur .apk Dateien erlaubt", "danger");
-                return;
-            }
+            if(!file) return;
             pendingApkFile = file;
-            document.getElementById('apkUploadStatus').innerHTML = `<i class="fas fa-file-alt" style="color:var(--success);"></i> <b>${file.name}</b> bereit (${(file.size/1024/1024).toFixed(2)} MB)`;
+            const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+            document.getElementById('apkUploadStatus').innerHTML =
+                `<i class="fas fa-file-alt" style="color:var(--success);"></i> <b>${file.name}</b> (${sizeMB} MB) – bereit`;
             document.getElementById('apkUploadBtn').disabled = false;
         }
 
-        function uploadApkToFirebase() {
+        async function uploadApkToFirebase() {
             if(!pendingApkFile) return;
             const btn = document.getElementById('apkUploadBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wird hochgeladen...';
-            document.getElementById('apkUploadStatus').innerHTML = 'Konvertiere Datei...';
+            const statusEl = document.getElementById('apkUploadStatus');
+            const progressWrap = document.getElementById('apkProgressWrap');
+            const progressBar = document.getElementById('apkProgressBar');
+            const progressTxt = document.getElementById('apkProgressTxt');
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64 = e.target.result;
-                const apkData = {
-                    url: base64,
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lädt hoch...';
+            progressWrap.style.display = 'block';
+            statusEl.innerHTML = 'Datei wird gelesen...';
+
+            try {
+                // Read file as base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.onerror = () => reject(new Error("Datei konnte nicht gelesen werden"));
+                    reader.readAsDataURL(pendingApkFile);
+                });
+
+                // Split into chunks
+                const chunks = [];
+                for(let i = 0; i < base64.length; i += CHUNK_SIZE) {
+                    chunks.push(base64.slice(i, i + CHUNK_SIZE));
+                }
+
+                statusEl.innerHTML = `${chunks.length} Teil(e) werden hochgeladen...`;
+
+                // Delete old data first
+                await db.ref('settings/apk').remove();
+
+                // Upload meta
+                await db.ref('settings/apk/meta').set({
                     name: pendingApkFile.name,
                     uploadedAt: Date.now(),
-                    size: pendingApkFile.size
-                };
-                db.ref('settings/apk').set(apkData).then(() => {
-                    triggerEmbed("APK erfolgreich hochgeladen!", "success");
-                    btn.innerHTML = '<i class="fas fa-upload"></i> APK Hochladen & Aktivieren';
-                    btn.disabled = true;
-                    pendingApkFile = null;
-                    document.getElementById('apkUploadStatus').innerHTML = '';
-                    document.getElementById('apkFileInput').value = '';
-                    loadCurrentApkInfo();
-                }).catch(err => {
-                    triggerEmbed("Upload fehlgeschlagen", "danger");
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-upload"></i> APK Hochladen & Aktivieren';
+                    size: pendingApkFile.size,
+                    chunks: chunks.length
                 });
-            };
-            reader.readAsDataURL(pendingApkFile);
+
+                // Upload each chunk
+                for(let i = 0; i < chunks.length; i++) {
+                    await db.ref(`settings/apk/chunks/${i}`).set(chunks[i]);
+                    const pct = Math.round(((i + 1) / chunks.length) * 100);
+                    progressBar.style.width = pct + '%';
+                    progressTxt.textContent = `${pct}% (${i+1}/${chunks.length} Teile)`;
+                }
+
+                triggerEmbed("Erfolgreich hochgeladen! ✅", "success");
+                statusEl.innerHTML = '';
+                progressWrap.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-upload"></i> Hochladen & Aktivieren';
+                btn.disabled = true;
+                pendingApkFile = null;
+                document.getElementById('apkFileInput').value = '';
+                loadCurrentApkInfo();
+
+            } catch(err) {
+                statusEl.innerHTML = `<span style="color:var(--danger);">❌ Fehler: ${err.message}</span>`;
+                progressWrap.style.display = 'none';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Hochladen & Aktivieren';
+            }
         }
 
         function loadCurrentApkInfo() {
-            db.ref('settings/apk').once('value', snap => {
-                const apkData = snap.val();
+            db.ref('settings/apk/meta').once('value', snap => {
+                const meta = snap.val();
                 const infoBox = document.getElementById('currentApkInfo');
-                if(apkData && apkData.name) {
+                if(meta && meta.name) {
                     infoBox.style.display = 'block';
-                    document.getElementById('currentApkName').innerText = apkData.name;
-                    const d = new Date(apkData.uploadedAt);
-                    document.getElementById('currentApkDate').innerText = `Hochgeladen: ${d.toLocaleDateString('de-DE')} ${d.toLocaleTimeString('de-DE')} · ${(apkData.size/1024/1024).toFixed(2)} MB`;
+                    document.getElementById('currentApkName').innerText = meta.name;
+                    const d = new Date(meta.uploadedAt);
+                    const sizeMB = (meta.size / 1024 / 1024).toFixed(2);
+                    document.getElementById('currentApkDate').innerText =
+                        `Hochgeladen: ${d.toLocaleDateString('de-DE')} ${d.toLocaleTimeString('de-DE')} · ${sizeMB} MB · ${meta.chunks} Teil(e)`;
                 } else {
                     infoBox.style.display = 'none';
                 }
@@ -4619,9 +4666,9 @@
         }
 
         function removeApk() {
-            if(!confirm("APK wirklich entfernen? User können dann nicht mehr herunterladen.")) return;
+            if(!confirm("Datei wirklich entfernen?")) return;
             db.ref('settings/apk').remove().then(() => {
-                triggerEmbed("APK entfernt", "success");
+                triggerEmbed("Datei entfernt", "success");
                 document.getElementById('currentApkInfo').style.display = 'none';
             });
         }
