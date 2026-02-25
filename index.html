@@ -288,6 +288,9 @@
         .tag-krass { background: linear-gradient(45deg, #5865F2, #7289DA); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-crazy { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; animation: crazyGlow 1.5s infinite alternate; }
         @keyframes crazyGlow { from { box-shadow: 0 1px 5px rgba(255,107,107,0.4); } to { box-shadow: 0 2px 10px rgba(238,90,36,0.7); } }
+        .tag-og { background: linear-gradient(45deg, #1a1a1a, #444); color: #FFD700; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; border: 1px solid #FFD700; box-shadow: 0 1px 6px rgba(255,215,0,0.4); }
+        .tag-verifiziert { background: linear-gradient(45deg, #1DA1F2, #0d6efd); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+        .tag-brot { background: linear-gradient(45deg, #c8a06e, #a0522d); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .bg-darkred { --bg: #1a0000 !important; --cont: #2a0505 !important; --txt: #f1f1f1 !important; }
         .bg-brown { --bg: #efebe9 !important; --cont: #d7ccc8 !important; }
         .dark-mode.bg-darkred { --bg: #0d0000 !important; --cont: #1a0000 !important; }
@@ -464,10 +467,10 @@
         <h1>Konto erstellen</h1>
         <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
         <input type="password" id="regPass" placeholder="Passwort">
-        <div style="border:1px dashed var(--main); border-radius:12px; padding:12px; margin:8px 0; text-align:left; background:rgba(88,101,242,0.04);">
-            <label style="font-size:0.82rem; color:var(--main); font-weight:bold; display:block; margin-bottom:4px;"><i class="fas fa-envelope"></i> E-Mail (Optional)</label>
-            <input type="email" id="regEmail" placeholder="deine@email.de" style="margin:0;">
-            <p style="font-size:0.72rem; color:#888; margin:5px 0 0 0;"><i class="fas fa-info-circle"></i> Kein Pflichtfeld – nur für Chat-Benachrichtigungen & Sicherheits­warnungen.</p>
+        <div style="border:1px solid var(--main); border-radius:12px; padding:12px; margin:8px 0; text-align:left; background:rgba(88,101,242,0.04);">
+            <label style="font-size:0.82rem; color:var(--main); font-weight:bold; display:block; margin-bottom:4px;"><i class="fas fa-envelope"></i> E-Mail <span style="color:var(--danger);">*</span> (Pflichtfeld)</label>
+            <input type="email" id="regEmail" placeholder="deine@email.de" style="margin:0 0 6px 0;">
+            <p style="font-size:0.72rem; color:#888; margin:0;"><i class="fas fa-info-circle"></i> Jede Email kann nur für einen Account verwendet werden. Du musst die Email bestätigen.</p>
         </div>
         <div class="agb-row">
             <input type="checkbox" id="agbCheck">
@@ -542,7 +545,6 @@
             <div id="friendsList"></div>
             <div id="groupsList"></div>
         </div>
-        <button id="downloadApkBtn" onclick="downloadApk()" style="width:100%; margin-top:10px; background:linear-gradient(135deg,#43b581,#2ecc71); color:white; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fas fa-android"></i> <i class="fas fa-download"></i> Android App Herunterladen</button>
         <button onclick="confirmLogout()" class="secondary" style="width:100%; margin-top:8px;">Abmelden</button>
     </div>
 
@@ -612,6 +614,35 @@
                 <button onclick="adminUnlockChat()" id="adminChatUnlockBtn" class="danger hidden" style="background:var(--success);">💬 CHAT ENTSPERREN</button>
                 <button id="makeAdminBtn" onclick="initiateMakeAdmin()" class="gold-btn">Zum Admin machen</button>
                 <button id="removeAdminBtn" onclick="initiateRemoveAdmin()" class="danger hidden">Admin entfernen</button>
+                
+                <!-- SPECIAL TAGS -->
+                <div style="border:1px solid var(--brd); border-radius:10px; padding:10px; background:rgba(0,0,0,0.03);">
+                    <strong style="font-size:0.85rem;">Spezial Tags vergeben</strong>
+                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="tag-og" style="font-size:0.75rem; padding:2px 8px;">OG</span>
+                            <div style="display:flex; gap:6px;">
+                                <button onclick="adminGiveTag('ogTag')" class="green-btn" style="font-size:0.75rem; padding:5px 10px;">Geben</button>
+                                <button onclick="adminRemoveTag('ogTag')" class="danger" style="font-size:0.75rem; padding:5px 10px;">Entfernen</button>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="tag-verifiziert" style="font-size:0.75rem; padding:2px 8px;">✔ Verifiziert</span>
+                            <div style="display:flex; gap:6px;">
+                                <button onclick="adminGiveTag('verifiziert')" class="green-btn" style="font-size:0.75rem; padding:5px 10px;">Geben</button>
+                                <button onclick="adminRemoveTag('verifiziert')" class="danger" style="font-size:0.75rem; padding:5px 10px;">Entfernen</button>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="tag-brot" style="font-size:0.75rem; padding:2px 8px;">🍞 Brot</span>
+                            <div style="display:flex; gap:6px;">
+                                <button onclick="adminGiveTag('brotTag')" class="green-btn" style="font-size:0.75rem; padding:5px 10px;">Geben</button>
+                                <button onclick="adminRemoveTag('brotTag')" class="danger" style="font-size:0.75rem; padding:5px 10px;">Entfernen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-envelope"></i> Nachricht senden</button>
                 <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
             </div>
@@ -780,14 +811,14 @@
             </div>
 
             <div class="chat-plus-container" id="bundleSettingsContainer">
-                <div class="chat-plus-header"><i class="fas fa-store"></i> Meine Pakete</div>
-                <p style="font-size:0.8rem; color:#888; margin-bottom:10px;" id="bundleSettingsHint">Keine Pakete gekauft. Gehe zum <b onclick="showView('shopView')" style="color:var(--gold); cursor:pointer;"><i class="fas fa-store"></i> Shop</b>.</p>
+                <div class="chat-plus-header">Meine Pakete</div>
+                <p style="font-size:0.8rem; color:#888; margin-bottom:10px;" id="bundleSettingsHint">Keine Pakete gekauft. Gehe zum <b onclick="showView('shopView')" style="color:var(--gold); cursor:pointer;">Shop</b>.</p>
                 <!-- Dynamisch befüllt durch renderBundleSettings() -->
                 <div id="bundleSettingsContent"></div>
             </div>
             
               <div style="border-top: 1px solid var(--brd); margin-top:15px; padding-top:15px; margin-bottom: 15px;">
-                <h3><i class="fas fa-envelope"></i> Email Benachrichtigungen</h3>
+                <h3>Email Benachrichtigungen</h3>
                 <p style="font-size:0.8rem; color:#888;">Erhalte eine Email bei neuen Nachrichten (wenn der Chat gemutet ist).</p>
                 
                 <div id="emailDisplayBox" class="email-status-box hidden">
@@ -803,7 +834,7 @@
 
                 <!-- EMAIL COOLDOWN EINSTELLUNG -->
                 <div id="emailCooldownSection" style="margin-top:12px; border:1px solid var(--brd); border-radius:12px; padding:12px; display:none;">
-                    <h4 style="margin:0 0 6px 0; font-size:0.9rem;"><i class="fas fa-clock"></i> Chat-Email Cooldown</h4>
+                    <h4 style="margin:0 0 6px 0; font-size:0.9rem;">Chat-Email Cooldown</h4>
                     <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wie oft kannst du maximal eine Email-Benachrichtigung für neue Chat-Nachrichten erhalten?</p>
                     
                     <div id="cooldownNoneWarning" class="hidden" style="background:rgba(255,71,87,0.1); border:1px solid var(--danger); border-radius:8px; padding:8px; font-size:0.78rem; color:var(--danger); margin-bottom:8px;">
@@ -823,7 +854,7 @@
 
             <!-- 2FA SECTION -->
             <div id="twoFactorSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px; display:none;">
-                <h3 style="margin:0 0 6px 0; font-size:1rem;"><i class="fas fa-shield-alt" style="color:var(--main);"></i> Zwei-Faktor-Authentifizierung</h3>
+                <h3 style="margin:0 0 6px 0; font-size:1rem;">Zwei-Faktor-Authentifizierung</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Schütze deinen Account mit einem 6-stelligen Code per Email bei jeder Anmeldung.</p>
                 <div style="display:flex; align-items:center; justify-content:space-between;">
                     <span id="twoFactorStatusText" style="font-size:0.9rem; color:#888;">Status: Deaktiviert</span>
@@ -881,7 +912,7 @@
 
             <!-- TAGS AUSWÄHLEN -->
             <div id="tagSettingsSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px;">
-                <h3 style="margin:0 0 6px 0; font-size:1rem;"><i class="fas fa-tags"></i> Tags Auswählen</h3>
+                <h3 style="margin:0 0 6px 0; font-size:1rem;">Tags Auswählen</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wähle welche Nametags neben deinem Namen angezeigt werden.</p>
                 <div id="tagSettingsList"></div>
             </div>
@@ -892,7 +923,7 @@
 
             <!-- VON ALLEN GERÄTEN ABMELDEN -->
             <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:15px; background:rgba(255,71,87,0.04);">
-                <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:var(--danger);"><i class="fas fa-sign-out-alt"></i> Sicherheit</h3>
+                <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:var(--danger);">Sicherheit</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Alle aktiven Sitzungen beenden – jedes Gerät wird abgemeldet und muss sich neu einloggen.</p>
                 <button onclick="confirmSignOutAllDevices()" class="danger" style="width:100%; font-size:0.85rem;">Von allen Geräten abmelden</button>
             </div>
@@ -901,12 +932,19 @@
 
             <!-- BLOCKIERTE USER SECTION -->
             <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:15px; background:rgba(255,71,87,0.04);">
-                <h3 style="margin:0 0 8px 0; font-size:0.95rem; color:var(--danger);"><i class="fas fa-ban"></i> Blockierte User</h3>
+                <h3 style="margin:0 0 8px 0; font-size:0.95rem; color:var(--danger);">Blockierte User</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 10px 0;">User die du blockiert hast können dir keine Nachrichten schicken.</p>
                 <div id="blockedUsersList" style="max-height:180px; overflow-y:auto;">
                     <p style="color:#888; font-size:0.85rem;">Lade...</p>
                 </div>
-                <button onclick="loadBlockedUsers()" class="secondary" style="width:100%; font-size:0.8rem; margin-top:8px;"><i class="fas fa-sync-alt"></i> Aktualisieren</button>
+                <button onclick="loadBlockedUsers()" class="secondary" style="width:100%; font-size:0.8rem; margin-top:8px;">Aktualisieren</button>
+            </div>
+
+            <!-- ANDROID APP DOWNLOAD -->
+            <div style="border:1px solid #43b581; border-radius:12px; padding:12px; margin-top:15px; background:rgba(67,181,129,0.06);">
+                <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:#43b581;">Android App</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Lade die Android App herunter für ein besseres Erlebnis.</p>
+                <button id="downloadApkBtn" onclick="downloadApk()" style="width:100%; background:linear-gradient(135deg,#43b581,#2ecc71); color:white;">Android App Herunterladen</button>
             </div>
 
             <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
@@ -1297,6 +1335,9 @@
         let myBalance = 0.00;
         let myBundles = {}; // z.B. { chatplus: true, starter: true, mega: true }
         let myActiveTags = {}; // z.B. { owner: true, admin: true, mega: true }
+        let myOgTag = false;
+        let myVerifiziert = false;
+        let myBrotTag = false;
         let inboxListener = null;
         let isChatLocked = false; // Chat-Sperre Status
 
@@ -1537,21 +1578,30 @@
             const user = document.getElementById('regUser').value.trim().toLowerCase();
             const pass = document.getElementById('regPass').value;
             const agbOk = document.getElementById('agbCheck').checked;
-            const email = document.getElementById('regEmail').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
 
             if(!user || !pass || !agbOk) return showAlert("Daten/AGB fehlen!", "danger");
             if(user.length > 10) return showAlert("Name max 10 Zeichen!", "danger");
             if(pass.length < 6) return showAlert("Passwort muss mindestens 6 Zeichen haben!", "danger");
+            if(!email || !email.includes('@') || !email.includes('.')) return showAlert("Gültige E-Mail-Adresse erforderlich!", "danger");
 
-            db.ref('users/' + user).get().then(snap => {
-                if(snap.exists()) showAlert("Name vergeben!", "danger");
-                else {
-                    const userData = { pass, theme: 'light', chatPlus: false, allowRequests: true, balance: 0.00 };
-                    if(email && email.includes('@')) userData.email = email;
-                    db.ref('users/' + user).set(userData).then(() => { 
-                        showAlert("Konto erstellt!", "success");
-                        // Willkommens-Email wenn Email angegeben
-                        if(email && email.includes('@')) {
+            const emailKey = email.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+
+            // Prüfen ob Email schon verwendet wird
+            db.ref('emailIndex/' + emailKey).once('value').then(emailSnap => {
+                if(emailSnap.exists()) {
+                    return showAlert("Diese E-Mail-Adresse wird bereits verwendet!", "danger");
+                }
+                // Prüfen ob Username vergeben
+                db.ref('users/' + user).get().then(snap => {
+                    if(snap.exists()) {
+                        showAlert("Name vergeben!", "danger");
+                    } else {
+                        const userData = { pass, theme: 'light', chatPlus: false, allowRequests: true, balance: 0.00, email };
+                        db.ref('users/' + user).set(userData).then(() => {
+                            // Email-Index schreiben
+                            db.ref('emailIndex/' + emailKey).set(user);
+                            showAlert("Konto erstellt!", "success");
                             sendEmailViaScript({
                                 to: email,
                                 subject: "🎉 Willkommen bei John Chat!",
@@ -1562,10 +1612,10 @@
                                     "John Chat · Automatische Benachrichtigung"
                                 )
                             });
-                        }
-                        showView('loginView'); 
-                    });
-                }
+                            showView('loginView'); 
+                        });
+                    }
+                });
             });
         }
 
@@ -1723,6 +1773,9 @@
                 myBalance = parseFloat(data.balance || 0);
                 myBundles = data.bundles || {};
                 myActiveTags = data.activeTags || {};
+                myOgTag = data.ogTag === true;
+                myVerifiziert = data.verifiziert === true;
+                myBrotTag = data.brotTag === true;
                 document.getElementById('myBalanceDisplay').innerText = myBalance.toFixed(2) + "€";
                 // ADMIN BUTTON VISIBILITY
                 if(userIsGlobalAdmin) {
@@ -1774,6 +1827,13 @@
 
                 updatePlusUI();
                 applyTheme(data.theme, myBg);
+
+                // EMAIL PFLICHT CHECK – Popup anzeigen wenn keine Email hinterlegt
+                if(!data.email) {
+                    document.getElementById('emailRequiredEmbed').classList.remove('hidden');
+                } else {
+                    document.getElementById('emailRequiredEmbed').classList.add('hidden');
+                }
 
                 const rList = document.getElementById('pendingRequests');
                 rList.innerHTML = "";
@@ -1866,27 +1926,98 @@
         }
 
         // --- EMAIL FUNCTIONS ---
-        function saveEmail() {
-            const mail = document.getElementById('emailSettingsInput').value.trim();
-            if(!mail || !mail.includes('@')) return triggerEmbed("Ungültige Email", "danger");
-            db.ref('users/' + currentUser + '/email').set(mail).then(() => {
-                // Bestätigungs-Embed anzeigen
-                document.getElementById('emailLinkedAddress').innerText = mail;
-                document.getElementById('emailLinkedEmbed').classList.remove('hidden');
+        // Pending email change state
+        let pendingEmailChange = null;
+        let emailChangeCode = null;
+        let emailChangeCodeExpiry = null;
+        let emailChangeCodeTimerInterval = null;
 
+        function saveEmail() {
+            const mail = document.getElementById('emailSettingsInput').value.trim().toLowerCase();
+            if(!mail || !mail.includes('@') || !mail.includes('.')) return triggerEmbed("Ungültige Email-Adresse!", "danger");
+            
+            const emailKey = mail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+            // Uniqueness check
+            db.ref('emailIndex/' + emailKey).once('value').then(snap => {
+                if(snap.exists() && snap.val() !== currentUser) {
+                    return triggerEmbed("Diese Email wird bereits von einem anderen Account verwendet!", "danger");
+                }
+                // Alles OK → Verifizierung starten
+                pendingEmailChange = mail;
+                document.getElementById('emailChangePendingDisplay').innerText = mail;
+                document.getElementById('emailChangeStep1').classList.remove('hidden');
+                document.getElementById('emailChangeStep2').classList.add('hidden');
+                document.getElementById('emailChangeCodeInput').value = '';
+                document.getElementById('emailChangeVerifyEmbed').classList.remove('hidden');
+            });
+        }
+
+        function sendEmailChangeCode() {
+            if(!pendingEmailChange) return;
+            const code = generate2FACode();
+            emailChangeCode = code;
+            emailChangeCodeExpiry = Date.now() + 5 * 60 * 1000;
+            sendEmailViaScript({
+                to: pendingEmailChange,
+                subject: "📧 John Chat – Email-Adresse bestätigen",
+                htmlBody: buildEmailHtml(
+                    "E-Mail bestätigen",
+                    `Hallo <b>${currentUser}</b>,<br><br>
+                    Gib diesen Code ein, um deine neue E-Mail-Adresse zu bestätigen:<br>
+                    <div class="box" style="font-size:2rem; font-weight:bold; letter-spacing:10px; text-align:center;">${code}</div>
+                    <b>Dieser Code ist 5 Minuten gültig.</b>`,
+                    "🔒 Sicherheitscode · John Chat"
+                )
+            });
+            document.getElementById('emailChangeStep1').classList.add('hidden');
+            document.getElementById('emailChangeStep2').classList.remove('hidden');
+            startCodeTimer('emailChangeCodeTimer');
+            triggerEmbed("Code gesendet!", "success");
+        }
+
+        function verifyEmailChangeCode() {
+            const inputCode = document.getElementById('emailChangeCodeInput').value.trim();
+            if(!emailChangeCode) { triggerEmbed("Code abgelaufen! Bitte neu anfordern.", "danger"); return; }
+            if(Date.now() > emailChangeCodeExpiry) { triggerEmbed("Code abgelaufen!", "danger"); emailChangeCode = null; return; }
+            if(inputCode !== emailChangeCode) { triggerEmbed("Falscher Code!", "danger"); return; }
+            if(emailChangeCodeTimerInterval) clearInterval(emailChangeCodeTimerInterval);
+            emailChangeCode = null;
+
+            const mail = pendingEmailChange;
+            const emailKey = mail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+
+            // Alte Email aus Index entfernen
+            db.ref('users/' + currentUser + '/email').once('value').then(snap => {
+                const oldMail = snap.val();
+                if(oldMail) {
+                    const oldKey = oldMail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+                    db.ref('emailIndex/' + oldKey).remove();
+                }
+                // Neue Email speichern
+                db.ref('users/' + currentUser + '/email').set(mail);
+                db.ref('emailIndex/' + emailKey).set(currentUser);
+                pendingEmailChange = null;
+                document.getElementById('emailChangeVerifyEmbed').classList.add('hidden');
+                document.getElementById('emailSettingsInput').value = '';
+                triggerEmbed("Email erfolgreich gespeichert! ✅", "success");
                 // Bestätigungs-Email senden
                 sendEmailViaScript({
                     to: mail,
                     subject: "✅ Email mit John Chat Account verbunden",
                     htmlBody: buildEmailHtml(
                         "E-Mail verbunden!",
-                        `Deine E-Mail-Adresse wurde erfolgreich mit dem <b>John Chat Account „${currentUser}"</b> verknüpft.<br><br>
-                        Ab sofort erhältst du eine E-Mail, wenn du im Chat oder einer Gruppe eine neue Nachricht bekommst – aber immer nur <b>eine pro Chat</b>, damit du nicht überflutet wirst.<br><br>
-                        Wenn du die E-Mail-Adresse nicht mehr möchtest, kannst du sie jederzeit in den Einstellungen löschen.`,
-                        "🎉 Alles eingerichtet!"
+                        `Deine E-Mail-Adresse wurde erfolgreich mit dem <b>John Chat Account „${currentUser}"</b> verknüpft.`,
+                        "John Chat · Alles eingerichtet!"
                     )
                 });
             });
+        }
+
+        function closeEmailChangeVerify() {
+            document.getElementById('emailChangeVerifyEmbed').classList.add('hidden');
+            if(emailChangeCodeTimerInterval) clearInterval(emailChangeCodeTimerInterval);
+            emailChangeCode = null;
+            pendingEmailChange = null;
         }
 
         function deleteEmail() {
@@ -1960,7 +2091,10 @@
                 triggerEmbed("Email & 2FA deaktiviert", "success");
                 document.getElementById('emailSettingsInput').value = "";
                 update2FASection(null, false);
+                // Email aus Index entfernen
                 if(oldMail) {
+                    const oldKey = oldMail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+                    db.ref('emailIndex/' + oldKey).remove();
                     sendEmailViaScript({
                         to: oldMail,
                         subject: "📧 E-Mail & 2FA von John Chat Account entfernt",
@@ -2211,6 +2345,15 @@
                 availableTags.push({ key: 'super', label: 'Super', style: 'background:linear-gradient(45deg,#43b581,#00b894)' });
                 availableTags.push({ key: 'krass', label: 'Krass', style: 'background:linear-gradient(45deg,#5865F2,#7289DA)' });
                 availableTags.push({ key: 'crazy', label: 'CRAZY', style: 'background:linear-gradient(45deg,#ff6b6b,#ee5a24)' });
+            }
+            if(myOgTag) {
+                availableTags.push({ key: 'og', label: 'OG', style: 'background:linear-gradient(45deg,#1a1a1a,#444); border:1px solid #FFD700; color:#FFD700' });
+            }
+            if(myVerifiziert) {
+                availableTags.push({ key: 'verifiziert', label: '✔ Verifiziert', style: 'background:linear-gradient(45deg,#1DA1F2,#0d6efd)' });
+            }
+            if(myBrotTag) {
+                availableTags.push({ key: 'brot', label: '🍞 Brot', style: 'background:linear-gradient(45deg,#c8a06e,#a0522d)' });
             }
 
             if(availableTags.length === 0) {
@@ -2518,6 +2661,10 @@
         let userToBlock = null;
 
         function askBlock(friendName) {
+            if(friendName.toLowerCase() === OWNER_NAME) {
+                triggerEmbed("Du kannst den Owner nicht blockieren!", "danger");
+                return;
+            }
             userToBlock = friendName;
             document.getElementById('blockTargetName').innerText = formatName(friendName);
             document.getElementById('blockConfirmModal').classList.remove('hidden');
@@ -2989,6 +3136,9 @@
             if(d.plusData && d.plusData.superTag) tags += `<span class="tag-super">Super</span>`;
             if(d.plusData && d.plusData.krassTag) tags += `<span class="tag-krass">Krass</span>`;
             if(d.plusData && d.plusData.crazyTag) tags += `<span class="tag-crazy">CRAZY</span>`;
+            if(d.plusData && d.plusData.ogTag) tags += `<span class="tag-og">OG</span>`;
+            if(d.plusData && d.plusData.verifiziert) tags += `<span class="tag-verifiziert">✔ Verifiziert</span>`;
+            if(d.plusData && d.plusData.brotTag) tags += `<span class="tag-brot">🍞 Brot</span>`;
 
             let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
@@ -3234,7 +3384,7 @@
                     duration: duration,
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 resetVoiceUI();
@@ -3357,6 +3507,9 @@
                     superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false),
                     krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false),
                     crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false),
+                    ogTag: !!(myOgTag && myActiveTags['og'] !== false),
+                    verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false),
+                    brotTag: !!(myBrotTag && myActiveTags['brot'] !== false),
                     activeTags: myActiveTags 
                 }
             };
@@ -3387,7 +3540,7 @@
                     type: 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 triggerEmailNotification("Hat ein Bild gesendet", isGroup, activeChatID);
@@ -4192,6 +4345,23 @@
                 closeAdminAction();
             });
         }
+
+        function adminGiveTag(tagKey) {
+            if(!adminTargetUser) return;
+            db.ref('users/' + adminTargetUser + '/' + tagKey).set(true).then(() => {
+                triggerEmbed("Tag vergeben!", "success");
+                logToApi('AdminTag', `Admin ${currentUser} gave tag '${tagKey}' to ${adminTargetUser}`);
+                systemInboxMsg(adminTargetUser, '🏷️ Neuer Tag erhalten', `Du hast den Tag "${tagKey}" von einem Administrator erhalten!`);
+            });
+        }
+
+        function adminRemoveTag(tagKey) {
+            if(!adminTargetUser) return;
+            db.ref('users/' + adminTargetUser + '/' + tagKey).remove().then(() => {
+                triggerEmbed("Tag entfernt!", "success");
+                logToApi('AdminTag', `Admin ${currentUser} removed tag '${tagKey}' from ${adminTargetUser}`);
+            });
+        }
         
         // --- BAN SYSTEM ---
         function openBanModal() {
@@ -4417,6 +4587,21 @@
         let reportTargetName = null;
 
         function openReportModal(id, type, name = "") {
+            // Owner kann nicht gemeldet werden
+            if(name && name.toLowerCase() === OWNER_NAME) {
+                triggerEmbed("Du kannst den Owner nicht melden!", "danger");
+                return;
+            }
+            // Auch via Chat-ID prüfen (private Chats): ID enthält den Usernamen
+            if(type === 'user' && id) {
+                const parts = id.split('_');
+                for(const p of parts) {
+                    if(p.toLowerCase() === OWNER_NAME) {
+                        triggerEmbed("Du kannst den Owner nicht melden!", "danger");
+                        return;
+                    }
+                }
+            }
             reportTargetID = id;
             reportTargetType = type;
             reportTargetName = name || id; 
@@ -4505,8 +4690,7 @@
 
         function downloadApk() {
             const btn = document.getElementById('downloadApkBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wird geladen...';
+            if(btn) { btn.disabled = true; btn.innerHTML = 'Wird geladen...'; }
             setTimeout(() => {
                 try {
                     const a = document.createElement('a');
@@ -4519,8 +4703,7 @@
                 } catch(e) {
                     triggerEmbed("Fehler: " + e.message, "danger");
                 }
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-android"></i> <i class="fas fa-download"></i> Android App Herunterladen';
+                if(btn) { btn.disabled = false; btn.innerHTML = 'Android App Herunterladen'; }
             }, 100);
         }
 
@@ -4586,10 +4769,13 @@
             if(type === 'friend') {
                 const cid = [currentUser, id].sort().join("_");
                 const isMuted = mutedChats[cid] === true;
+                const isOwner = id.toLowerCase() === OWNER_NAME;
                 items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
                 items += `<div class="context-sheet-item" onclick="toggleMute('${cid}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
-                items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${cid}', 'user', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
-                items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-ban"></i> Blockieren</div>`;
+                if(!isOwner) {
+                    items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${cid}', 'user', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
+                    items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-ban"></i> Blockieren</div>`;
+                }
                 items += `<div class="context-sheet-item danger-item" onclick="askUnfriend('${id}'); closeContextSheet()"><i class="fas fa-user-times"></i> Entfreunden</div>`;
             } else if(type === 'group') {
                 const isMuted = mutedChats[id] === true;
@@ -4602,6 +4788,102 @@
             document.getElementById('contextSheetItems').innerHTML = items;
             document.getElementById('userContextSheet').classList.add('open');
             document.getElementById('userContextSheetBg').classList.add('open');
+        }
+
+        // ==========================================
+        // EMAIL PFLICHT POPUP (für Accounts ohne Email)
+        // ==========================================
+        let emailRequiredCode = null;
+        let emailRequiredCodeExpiry = null;
+        let emailRequiredPendingMail = null;
+        let emailRequiredTimerInterval = null;
+
+        function sendEmailRequiredCode() {
+            const mail = document.getElementById('emailRequiredInput').value.trim().toLowerCase();
+            if(!mail || !mail.includes('@') || !mail.includes('.')) {
+                triggerEmbed("Bitte gültige Email eingeben!", "danger");
+                return;
+            }
+            const emailKey = mail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+            db.ref('emailIndex/' + emailKey).once('value').then(snap => {
+                if(snap.exists() && snap.val() !== currentUser) {
+                    triggerEmbed("Diese Email wird bereits verwendet!", "danger");
+                    return;
+                }
+                emailRequiredPendingMail = mail;
+                const code = generate2FACode();
+                emailRequiredCode = code;
+                emailRequiredCodeExpiry = Date.now() + 5 * 60 * 1000;
+                sendEmailViaScript({
+                    to: mail,
+                    subject: "📧 John Chat – Email bestätigen",
+                    htmlBody: buildEmailHtml(
+                        "E-Mail bestätigen",
+                        `Hallo <b>${currentUser}</b>,<br><br>
+                        Gib diesen Code ein, um deine E-Mail-Adresse zu bestätigen:<br>
+                        <div class="box" style="font-size:2rem; font-weight:bold; letter-spacing:10px; text-align:center;">${code}</div>
+                        <b>Dieser Code ist 5 Minuten gültig.</b>`,
+                        "🔒 Sicherheitscode · John Chat"
+                    )
+                });
+                document.getElementById('emailRequiredStep1').classList.add('hidden');
+                document.getElementById('emailRequiredStep2').classList.remove('hidden');
+                document.getElementById('emailRequiredCodeInput').value = '';
+                startEmailRequiredTimer();
+                triggerEmbed("Code gesendet! Prüfe deine Email.", "success");
+            });
+        }
+
+        function startEmailRequiredTimer() {
+            if(emailRequiredTimerInterval) clearInterval(emailRequiredTimerInterval);
+            let secs = 300;
+            const el = document.getElementById('emailRequiredTimer');
+            const tick = () => {
+                if(secs <= 0) { clearInterval(emailRequiredTimerInterval); if(el) el.innerText = "Code abgelaufen"; return; }
+                const m = Math.floor(secs/60); const s = secs%60;
+                if(el) el.innerText = `Code läuft ab in ${m}:${String(s).padStart(2,'0')}`;
+                secs--;
+            };
+            tick();
+            emailRequiredTimerInterval = setInterval(tick, 1000);
+        }
+
+        function verifyEmailRequiredCode() {
+            const inputCode = document.getElementById('emailRequiredCodeInput').value.trim();
+            if(!emailRequiredCode) { triggerEmbed("Code abgelaufen!", "danger"); return; }
+            if(Date.now() > emailRequiredCodeExpiry) { triggerEmbed("Code abgelaufen!", "danger"); emailRequiredCode = null; return; }
+            if(inputCode !== emailRequiredCode) { triggerEmbed("Falscher Code!", "danger"); return; }
+            if(emailRequiredTimerInterval) clearInterval(emailRequiredTimerInterval);
+            emailRequiredCode = null;
+
+            const mail = emailRequiredPendingMail;
+            const emailKey = mail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+
+            db.ref('users/' + currentUser + '/email').set(mail);
+            db.ref('emailIndex/' + emailKey).set(currentUser);
+            emailRequiredPendingMail = null;
+
+            document.getElementById('emailRequiredEmbed').classList.add('hidden');
+            triggerEmbed("Email erfolgreich hinterlegt! ✅", "success");
+            sendEmailViaScript({
+                to: mail,
+                subject: "✅ Email mit John Chat Account verbunden",
+                htmlBody: buildEmailHtml(
+                    "E-Mail verbunden!",
+                    `Deine E-Mail-Adresse wurde erfolgreich mit dem <b>John Chat Account „${currentUser}"</b> verknüpft.`,
+                    "John Chat · Alles eingerichtet!"
+                )
+            });
+        }
+
+        function resetEmailRequiredStep() {
+            emailRequiredCode = null;
+            emailRequiredPendingMail = null;
+            if(emailRequiredTimerInterval) clearInterval(emailRequiredTimerInterval);
+            document.getElementById('emailRequiredStep1').classList.remove('hidden');
+            document.getElementById('emailRequiredStep2').classList.add('hidden');
+            document.getElementById('emailRequiredInput').value = '';
+            document.getElementById('emailRequiredCodeInput').value = '';
         }
 
         function closeContextSheet() {
@@ -4673,6 +4955,47 @@
             <div class="context-sheet-handle"></div>
             <div class="context-sheet-title" id="contextSheetTitle"></div>
             <div id="contextSheetItems"></div>
+        </div>
+    </div>
+
+    <!-- EMAIL PFLICHT POPUP (für Accounts ohne Email) -->
+    <div id="emailRequiredEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99997;">
+        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
+            <div style="font-size:2.5rem; margin-bottom:10px;">📧</div>
+            <h2 style="color:var(--main); margin-top:0;">Email erforderlich</h2>
+            <p style="font-size:0.9rem; color:#888;">Um John Chat nutzen zu können, musst du eine gültige E-Mail-Adresse hinterlegen und bestätigen.</p>
+            <div id="emailRequiredStep1">
+                <input type="email" id="emailRequiredInput" placeholder="deine@email.de" style="margin:10px 0;">
+                <button onclick="sendEmailRequiredCode()" style="width:100%;">Code senden & bestätigen</button>
+            </div>
+            <div id="emailRequiredStep2" class="hidden">
+                <p style="font-size:0.85rem; color:#888; margin-bottom:5px;">Gib den 6-stelligen Code ein, den wir an deine Email gesendet haben:</p>
+                <input type="number" id="emailRequiredCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
+                <div id="emailRequiredTimer" style="font-size:0.8rem; color:#888; margin-bottom:8px;"></div>
+                <button onclick="verifyEmailRequiredCode()" style="width:100%; margin-bottom:8px;" class="green-btn">Email bestätigen</button>
+                <button onclick="resetEmailRequiredStep()" class="secondary" style="width:100%; font-size:0.85rem;">Andere Email eingeben</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMAIL ÄNDERN VERIFIZIERUNGS-EMBED (Settings) -->
+    <div id="emailChangeVerifyEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5001;">
+        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--main);">
+            <div id="emailChangeStep1">
+                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-envelope"></i> Email bestätigen</h3>
+                <p style="font-size:0.9rem;">Wir senden einen 6-stelligen Code an <b id="emailChangePendingDisplay"></b>.</p>
+                <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Der Code ist <b>5 Minuten</b> gültig.</p>
+                <button onclick="sendEmailChangeCode()" style="width:100%; margin-bottom:8px;"><i class="fas fa-envelope"></i> Code senden</button>
+                <button onclick="closeEmailChangeVerify()" class="secondary" style="width:100%;">Abbrechen</button>
+            </div>
+            <div id="emailChangeStep2" class="hidden">
+                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
+                <input type="number" id="emailChangeCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
+                <div id="emailChangeCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
+                <button onclick="verifyEmailChangeCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-check"></i> Bestätigen & Speichern</button>
+                <button onclick="closeEmailChangeVerify()" class="secondary" style="width:100%;">Abbrechen</button>
+            </div>
         </div>
     </div>
 
