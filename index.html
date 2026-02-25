@@ -824,7 +824,7 @@
                 <div id="emailDisplayBox" class="email-status-box hidden">
                     <p style="margin:0; font-size:0.9rem;">Gespeicherte Email:</p>
                     <b id="savedEmailTxt" style="color:var(--main);"></b>
-                    <button onclick="deleteEmail()" class="danger" style="width:100%; margin-top:10px; font-size:0.8rem;">Email Löschen</button>
+                    <p style="font-size:0.75rem; color:#888; margin:6px 0 0 0;"><i class="fas fa-lock"></i> Email ist Pflicht und kann nicht entfernt werden.</p>
                 </div>
 
                 <div id="emailInputBox">
@@ -1830,7 +1830,16 @@
 
                 // EMAIL PFLICHT CHECK – Popup anzeigen wenn keine Email hinterlegt
                 if(!data.email) {
-                    document.getElementById('emailRequiredEmbed').classList.remove('hidden');
+                    const reqEmbed = document.getElementById('emailRequiredEmbed');
+                    // Nur anzeigen wenn noch nicht sichtbar (verhindert Step-Reset während Verifizierung)
+                    if(reqEmbed.classList.contains('hidden')) {
+                        // Steps zurücksetzen und frisch anzeigen
+                        document.getElementById('emailRequiredStep1').classList.remove('hidden');
+                        document.getElementById('emailRequiredStep2').classList.add('hidden');
+                        document.getElementById('emailRequiredInput').value = '';
+                        document.getElementById('emailRequiredCodeInput').value = '';
+                        reqEmbed.classList.remove('hidden');
+                    }
                 } else {
                     document.getElementById('emailRequiredEmbed').classList.add('hidden');
                 }
@@ -2021,20 +2030,8 @@
         }
 
         function deleteEmail() {
-            // Prüfen ob 2FA aktiv ist – wenn ja, erst Code verlangen
-            db.ref('users/' + currentUser).once('value', snap => {
-                const data = snap.val() || {};
-                if(data.twoFA === true && data.email) {
-                    // 2FA ist aktiv → Code-Bestätigung nötig bevor Email entfernt wird
-                    document.getElementById('deleteEmailWith2FAEmbed').classList.remove('hidden');
-                    document.getElementById('deleteEmail2FAStep1').classList.remove('hidden');
-                    document.getElementById('deleteEmail2FAStep2').classList.add('hidden');
-                    document.getElementById('deleteEmail2FACodeInput').value = '';
-                } else {
-                    // Kein 2FA → direkt löschen
-                    executeDeleteEmail(data.email);
-                }
-            });
+            // Email ist Pflicht und kann nicht entfernt werden
+            triggerEmbed("Email ist Pflicht und kann nicht entfernt werden!", "danger");
         }
 
         function sendDeleteEmail2FACode() {
@@ -4804,12 +4801,12 @@
                 triggerEmbed("Bitte gültige Email eingeben!", "danger");
                 return;
             }
-            const emailKey = mail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
-            db.ref('emailIndex/' + emailKey).once('value').then(snap => {
-                if(snap.exists() && snap.val() !== currentUser) {
-                    triggerEmbed("Diese Email wird bereits verwendet!", "danger");
-                    return;
-                }
+
+            // Button deaktivieren während Prüfung läuft
+            const btn = document.querySelector('#emailRequiredStep1 button');
+            if(btn) { btn.disabled = true; btn.innerText = 'Wird gesendet...'; }
+
+            const proceed = () => {
                 emailRequiredPendingMail = mail;
                 const code = generate2FACode();
                 emailRequiredCode = code;
@@ -4831,6 +4828,20 @@
                 document.getElementById('emailRequiredCodeInput').value = '';
                 startEmailRequiredTimer();
                 triggerEmbed("Code gesendet! Prüfe deine Email.", "success");
+                if(btn) { btn.disabled = false; btn.innerText = 'Code senden & bestätigen'; }
+            };
+
+            const emailKey = mail.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+            db.ref('emailIndex/' + emailKey).once('value').then(snap => {
+                if(snap.exists() && snap.val() !== currentUser) {
+                    triggerEmbed("Diese Email wird bereits verwendet!", "danger");
+                    if(btn) { btn.disabled = false; btn.innerText = 'Code senden & bestätigen'; }
+                    return;
+                }
+                proceed();
+            }).catch(() => {
+                // Firebase-Lese-Fehler → trotzdem fortfahren (Duplikat-Check beim Speichern)
+                proceed();
             });
         }
 
@@ -4846,6 +4857,32 @@
             };
             tick();
             emailRequiredTimerInterval = setInterval(tick, 1000);
+        }
+
+        function resendEmailRequiredCode() {
+            if(!emailRequiredPendingMail) {
+                resetEmailRequiredStep();
+                return;
+            }
+            const mail = emailRequiredPendingMail;
+            const code = generate2FACode();
+            emailRequiredCode = code;
+            emailRequiredCodeExpiry = Date.now() + 5 * 60 * 1000;
+            sendEmailViaScript({
+                to: mail,
+                subject: "📧 John Chat – Email bestätigen",
+                htmlBody: buildEmailHtml(
+                    "E-Mail bestätigen",
+                    `Hallo <b>${currentUser}</b>,<br><br>
+                    Gib diesen Code ein, um deine E-Mail-Adresse zu bestätigen:<br>
+                    <div class="box" style="font-size:2rem; font-weight:bold; letter-spacing:10px; text-align:center;">${code}</div>
+                    <b>Dieser Code ist 5 Minuten gültig.</b>`,
+                    "🔒 Sicherheitscode · John Chat"
+                )
+            });
+            document.getElementById('emailRequiredCodeInput').value = '';
+            startEmailRequiredTimer();
+            triggerEmbed("Neuer Code gesendet! Prüfe deine Email.", "success");
         }
 
         function verifyEmailRequiredCode() {
@@ -4865,6 +4902,13 @@
 
             document.getElementById('emailRequiredEmbed').classList.add('hidden');
             triggerEmbed("Email erfolgreich hinterlegt! ✅", "success");
+
+            // Settings-UI sofort aktualisieren (falls gerade in settingsView)
+            document.getElementById('savedEmailTxt').innerText = mail;
+            document.getElementById('emailDisplayBox').classList.remove('hidden');
+            document.getElementById('emailInputBox').classList.add('hidden');
+            document.getElementById('emailCooldownSection').style.display = 'block';
+            update2FASection(mail, false);
             sendEmailViaScript({
                 to: mail,
                 subject: "✅ Email mit John Chat Account verbunden",
@@ -4973,6 +5017,7 @@
                 <input type="number" id="emailRequiredCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="emailRequiredTimer" style="font-size:0.8rem; color:#888; margin-bottom:8px;"></div>
                 <button onclick="verifyEmailRequiredCode()" style="width:100%; margin-bottom:8px;" class="green-btn">Email bestätigen</button>
+                <button onclick="resendEmailRequiredCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-redo"></i> Code erneut senden</button>
                 <button onclick="resetEmailRequiredStep()" class="secondary" style="width:100%; font-size:0.85rem;">Andere Email eingeben</button>
             </div>
         </div>
