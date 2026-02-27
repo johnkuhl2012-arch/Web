@@ -551,7 +551,10 @@
     <div id="adminPanelView" class="view view-large hidden">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
             <h2 style="color: var(--danger); margin:0;"><i class="fas fa-user-shield"></i> Admin Panel</h2>
-            <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <div style="display:flex; gap:8px;">
+                <button onclick="triggerUpdateAnnouncement()" style="padding:8px 12px; font-size:0.85rem; background:var(--success); color:white;" title="Update ankündigen"><i class="fas fa-download"></i> Update</button>
+                <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
         </div>
         
         <div style="display:flex; gap:10px; margin-bottom:15px;">
@@ -618,28 +621,19 @@
                 <!-- SPECIAL TAGS -->
                 <div style="border:1px solid var(--brd); border-radius:10px; padding:10px; background:rgba(0,0,0,0.03);">
                     <strong style="font-size:0.85rem;">Spezial Tags vergeben</strong>
-                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                        <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
                             <span class="tag-og" style="font-size:0.75rem; padding:2px 8px;">OG</span>
-                            <div style="display:flex; gap:6px;">
-                                <button onclick="adminGiveTag('ogTag')" class="green-btn" style="font-size:0.75rem; padding:5px 10px;">Geben</button>
-                                <button onclick="adminRemoveTag('ogTag')" class="danger" style="font-size:0.75rem; padding:5px 10px;">Entfernen</button>
-                            </div>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="tag-verifiziert" style="font-size:0.75rem; padding:2px 8px;">✔ Verifiziert</span>
-                            <div style="display:flex; gap:6px;">
-                                <button onclick="adminGiveTag('verifiziert')" class="green-btn" style="font-size:0.75rem; padding:5px 10px;">Geben</button>
-                                <button onclick="adminRemoveTag('verifiziert')" class="danger" style="font-size:0.75rem; padding:5px 10px;">Entfernen</button>
-                            </div>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="tag-brot" style="font-size:0.75rem; padding:2px 8px;">🍞 Brot</span>
-                            <div style="display:flex; gap:6px;">
-                                <button onclick="adminGiveTag('brotTag')" class="green-btn" style="font-size:0.75rem; padding:5px 10px;">Geben</button>
-                                <button onclick="adminRemoveTag('brotTag')" class="danger" style="font-size:0.75rem; padding:5px 10px;">Entfernen</button>
-                            </div>
-                        </div>
+                            <input type="checkbox" id="adminTagOg" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('ogTag', this.checked)">
+                        </label>
+                        <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                            <span class="tag-verifiziert" style="font-size:0.75rem; padding:2px 8px;">Verifiziert</span>
+                            <input type="checkbox" id="adminTagVerifiziert" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('verifiziert', this.checked)">
+                        </label>
+                        <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                            <span class="tag-brot" style="font-size:0.75rem; padding:2px 8px;">Brot</span>
+                            <input type="checkbox" id="adminTagBrot" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('brotTag', this.checked)">
+                        </label>
                     </div>
                 </div>
 
@@ -766,7 +760,7 @@
         <div id="typingIndicator"></div>
 
         <div class="chat-input-area" id="chatInputArea">
-            <label class="file-label"><i class="fas fa-camera"></i><input type="file" id="imgInput" hidden accept="image/*" onchange="sendImage()"></label>
+            <label class="file-label"><i class="fas fa-camera"></i><input type="file" id="imgInput" hidden accept="image/*,video/*" onchange="sendMediaFile()"></label>
             <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()" title="Sprachnachricht"><i class="fas fa-microphone"></i></button>
             <div style="flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;">
                 <!-- Reply Preview Bar -->
@@ -1146,6 +1140,7 @@
                     <li>💙 Tag: <span style="background:linear-gradient(45deg,#5865F2,#7289DA); color:white; border-radius:4px; padding:1px 5px; font-size:0.7rem; font-weight:bold;">Krass</span></li>
                     <li>🔥 Tag: <span style="background:linear-gradient(45deg,#ff6b6b,#ee5a24); color:white; border-radius:4px; padding:1px 5px; font-size:0.7rem; font-weight:bold;">CRAZY</span></li>
                     <li>🎖️ 3 einzigartige animierte Nametags</li>
+                    <li>⚡ <b>2 Tags gleichzeitig ausrüsten</b></li>
                 </ul>
                 <button style="width:100%; font-size:0.9rem; background:linear-gradient(45deg,#795548,#5865F2,#ff6b6b); color:#fff; font-weight:bold; box-shadow:0 4px 15px rgba(121,85,72,0.4);" id="shopBtn-tagbundle" onclick="confirmBuyBundle('tagbundle', 19.99, 'Tag Bundle')">🏷️ Jetzt kaufen!</button>
             </div>
@@ -1777,6 +1772,13 @@
                       location.reload();
                 }
             });
+            // Update Announcement Listener
+            db.ref('system/updateAnnouncement').on('value', snap => {
+                const val = snap.val();
+                if(val && val > appLoadedTime) {
+                    document.getElementById('updateOverlay').classList.remove('hidden');
+                }
+            });
             // Force Logout Listener (Von allen Geräten abmelden)
             // Nur Geräte abmelden, die den User im localStorage haben (angemeldet bleiben)
             const forceLogoutTime = appLoadedTime;
@@ -2375,7 +2377,7 @@
                 availableTags.push({ key: 'admin', label: 'Admin', style: 'background:#ff4757' });
             }
             if(myBundles['mega']) {
-                availableTags.push({ key: 'mega', label: '🔥 MEGA', style: 'background:linear-gradient(45deg,#ffd700,#ff4757,#5865F2)' });
+                availableTags.push({ key: 'mega', label: 'MEGA', style: 'background:linear-gradient(45deg,#ffd700,#ff4757,#5865F2)' });
             }
             if(myBundles['tagbundle']) {
                 availableTags.push({ key: 'super', label: 'Super', style: 'background:linear-gradient(45deg,#43b581,#00b894)' });
@@ -2386,16 +2388,20 @@
                 availableTags.push({ key: 'og', label: 'OG', style: 'background:linear-gradient(45deg,#1a1a1a,#444); border:1px solid #FFD700; color:#FFD700' });
             }
             if(myVerifiziert) {
-                availableTags.push({ key: 'verifiziert', label: '✔ Verifiziert', style: 'background:linear-gradient(45deg,#1DA1F2,#0d6efd)' });
+                availableTags.push({ key: 'verifiziert', label: 'Verifiziert', style: 'background:linear-gradient(45deg,#1DA1F2,#0d6efd)' });
             }
             if(myBrotTag) {
-                availableTags.push({ key: 'brot', label: '🍞 Brot', style: 'background:linear-gradient(45deg,#c8a06e,#a0522d)' });
+                availableTags.push({ key: 'brot', label: 'Brot', style: 'background:linear-gradient(45deg,#c8a06e,#a0522d)' });
             }
 
             if(availableTags.length === 0) {
                 container.innerHTML = '<p style="font-size:0.82rem; color:#888; margin:0;">Keine Tags vorhanden. Tags erhältst du durch Bundles oder Admin-Status.</p>';
                 return;
             }
+
+            const maxTags = myBundles['tagbundle'] ? 2 : 1;
+            const activeCount = availableTags.filter(t => myActiveTags[t.key] !== false && myActiveTags[t.key] !== null && myActiveTags[t.key] !== undefined ? (myActiveTags[t.key] === true) : true).length;
+            container.innerHTML += `<p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Du kannst maximal <b>${maxTags}</b> Tag${maxTags > 1 ? 's' : ''} gleichzeitig tragen${myBundles['tagbundle'] ? '' : ' (2 mit Tag Bundle)'}.</p>`;
 
             availableTags.forEach(tag => {
                 const isActive = myActiveTags[tag.key] !== false;
@@ -2411,8 +2417,22 @@
         }
 
         function toggleTag(tagKey, enabled) {
+            // Max tags: 1 normally, 2 with tag bundle
+            const maxTags = myBundles['tagbundle'] ? 2 : 1;
+            if(enabled) {
+                const currentActive = Object.keys(myActiveTags).filter(k => myActiveTags[k] === true || myActiveTags[k] !== false);
+                // Count how many are currently truly active
+                const activeCount = Object.keys(myActiveTags).filter(k => myActiveTags[k] !== false && myActiveTags[k] !== null).length;
+                if(activeCount >= maxTags) {
+                    triggerEmbed(`Maximal ${maxTags} Tag${maxTags > 1 ? 's' : ''} erlaubt!`, "danger");
+                    // Revert the checkbox
+                    renderTagSettings();
+                    return;
+                }
+            }
             myActiveTags[tagKey] = enabled;
             db.ref('users/' + currentUser + '/activeTags/' + tagKey).set(enabled);
+            renderTagSettings();
         }
 
         function renderBundleSettings(emojis, bgs, colors) {
@@ -3141,7 +3161,11 @@
                         <span class="voice-duration" id="vpdur-${key}" data-total="${dur}">${formatDur(dur)}</span>
                     </div>`;
                 } else {
-                    content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+                    if(d.type === 'video') {
+                        content = `<video src="${d.txt}" controls style="max-width:100%; border-radius:12px; margin-top:5px; display:block; max-height:300px;"></video>`;
+                    } else {
+                        content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+                    }
                 }
             }
 
@@ -3168,13 +3192,13 @@
             if(d.from && d.from.toLowerCase() === OWNER_NAME && senderActiveTags.owner !== false) tags += `<span class="tag-owner">Owner</span>`;
             else if(isGroup && d.from === currentGroupAdmin) tags += `<span class="tag-admin">Gruppen Admin</span>`;
             if(d.isAdminSender && senderActiveTags.admin !== false) tags += `<span class="tag-global-admin">Admin</span>`;
-            if(d.plusData && d.plusData.megaTag) tags += `<span class="tag-mega">🔥 MEGA</span>`;
+            if(d.plusData && d.plusData.megaTag) tags += `<span class="tag-mega">MEGA</span>`;
             if(d.plusData && d.plusData.superTag) tags += `<span class="tag-super">Super</span>`;
             if(d.plusData && d.plusData.krassTag) tags += `<span class="tag-krass">Krass</span>`;
             if(d.plusData && d.plusData.crazyTag) tags += `<span class="tag-crazy">CRAZY</span>`;
             if(d.plusData && d.plusData.ogTag) tags += `<span class="tag-og">OG</span>`;
-            if(d.plusData && d.plusData.verifiziert) tags += `<span class="tag-verifiziert">✔ Verifiziert</span>`;
-            if(d.plusData && d.plusData.brotTag) tags += `<span class="tag-brot">🍞 Brot</span>`;
+            if(d.plusData && d.plusData.verifiziert) tags += `<span class="tag-verifiziert">Verifiziert</span>`;
+            if(d.plusData && d.plusData.brotTag) tags += `<span class="tag-brot">Brot</span>`;
 
             let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
@@ -3563,26 +3587,35 @@
             db.ref(typePath).remove();
         }
 
-        function sendImage() {
+        function sendMediaFile() {
             if(isSpectatorMode) return;
             if(isChatLocked) { triggerEmbed("Dein Chat-Zugang wurde gesperrt!", "danger"); return; }
             const file = document.getElementById('imgInput').files[0];
+            if(!file) return;
+            const isVideo = file.type.startsWith('video/');
+            const MAX_SIZE = isVideo ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+            if(isVideo && file.size > MAX_SIZE) { triggerEmbed("Video zu groß! Max. 10 MB.", "danger"); return; }
             const reader = new FileReader();
             reader.onload = (e) => {
                 const path = isGroup ? 'groups/'+activeChatID+'/messages' : 'chats/'+activeChatID;
-                const msgData = { 
-                    from: currentUser, 
-                    txt: e.target.result, 
-                    type: 'img',
+                const msgData = {
+                    from: currentUser,
+                    txt: e.target.result,
+                    type: isVideo ? 'video' : 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
                     plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
-                triggerEmailNotification("Hat ein Bild gesendet", isGroup, activeChatID);
+                triggerEmailNotification(isVideo ? "Hat ein Video gesendet" : "Hat ein Bild gesendet", isGroup, activeChatID);
             };
-            if(file) reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
+            document.getElementById('imgInput').value = '';
         }
+
+        function sendImage() { sendMediaFile(); }
+        function sendVideo() { sendMediaFile(); }
+        
         
         // Tracking: Cooldown wird jetzt in Firebase gespeichert (persistent, bug-free)
         // emailLastSentForChat wurde entfernt (war nur in-memory → resettet bei Reload)
@@ -4230,6 +4263,14 @@
             }
 
             document.getElementById('adminUserActionModal').classList.remove('hidden');
+            
+            // Tag Checkboxes aktuell setzen
+            db.ref('users/' + uname).once('value', snap => {
+                const d = snap.val() || {};
+                document.getElementById('adminTagOg').checked = !!d.ogTag;
+                document.getElementById('adminTagVerifiziert').checked = !!d.verifiziert;
+                document.getElementById('adminTagBrot').checked = !!d.brotTag;
+            });
         }
 
         function closeAdminAction() {
@@ -4384,22 +4425,24 @@
             });
         }
 
-        function adminGiveTag(tagKey) {
+        function adminToggleTag(tagKey, enabled) {
             if(!adminTargetUser) return;
-            db.ref('users/' + adminTargetUser + '/' + tagKey).set(true).then(() => {
-                triggerEmbed("Tag vergeben!", "success");
-                logToApi('AdminTag', `Admin ${currentUser} gave tag '${tagKey}' to ${adminTargetUser}`);
-                systemInboxMsg(adminTargetUser, '🏷️ Neuer Tag erhalten', `Du hast den Tag "${tagKey}" von einem Administrator erhalten!`);
-            });
+            if(enabled) {
+                db.ref('users/' + adminTargetUser + '/' + tagKey).set(true).then(() => {
+                    triggerEmbed("Tag vergeben!", "success");
+                    logToApi('AdminTag', `Admin ${currentUser} gave tag '${tagKey}' to ${adminTargetUser}`);
+                    systemInboxMsg(adminTargetUser, 'Neuer Tag erhalten', `Du hast den Tag "${tagKey}" von einem Administrator erhalten!`);
+                });
+            } else {
+                db.ref('users/' + adminTargetUser + '/' + tagKey).remove().then(() => {
+                    triggerEmbed("Tag entfernt!", "success");
+                    logToApi('AdminTag', `Admin ${currentUser} removed tag '${tagKey}' from ${adminTargetUser}`);
+                });
+            }
         }
 
-        function adminRemoveTag(tagKey) {
-            if(!adminTargetUser) return;
-            db.ref('users/' + adminTargetUser + '/' + tagKey).remove().then(() => {
-                triggerEmbed("Tag entfernt!", "success");
-                logToApi('AdminTag', `Admin ${currentUser} removed tag '${tagKey}' from ${adminTargetUser}`);
-            });
-        }
+        function adminGiveTag(tagKey) { adminToggleTag(tagKey, true); }
+        function adminRemoveTag(tagKey) { adminToggleTag(tagKey, false); }
         
         // --- BAN SYSTEM ---
         function openBanModal() {
@@ -4566,6 +4609,24 @@
              // Override confirm button
              const btn = document.getElementById('adminCodeConfirmBtn');
              btn.onclick = executeGlobalRefresh;
+        }
+
+        function triggerUpdateAnnouncement() {
+            document.getElementById('adminCodeModal').classList.remove('hidden');
+            document.getElementById('adminAuthCode').value = "";
+            const btn = document.getElementById('adminCodeConfirmBtn');
+            btn.onclick = executeUpdateAnnouncement;
+        }
+
+        function executeUpdateAnnouncement() {
+            const code = document.getElementById('adminAuthCode').value;
+            if(code === "1001") {
+                closeAdminCodeModal();
+                db.ref('system/updateAnnouncement').set(Date.now());
+                triggerEmbed("Update-Ankündigung gesendet!", "success");
+            } else {
+                triggerEmbed("Code falsch", "danger");
+            }
         }
         
         function executeGlobalRefresh() {
@@ -5067,6 +5128,16 @@
             <p style="font-size:0.9rem;">gesendet, damit du siehst, dass dein Account erfolgreich verknüpft wurde.</p>
             <p style="font-size:0.8rem; color:#888; margin-top:10px;">Wenn du keine Email erhalten hast, überprüfe bitte die angegebene Email-Adresse.</p>
             <button onclick="document.getElementById('emailLinkedEmbed').classList.add('hidden')" style="width:100%; margin-top:15px;" class="green-btn">Alles klar!</button>
+        </div>
+    </div>
+
+    <!-- UPDATE OVERLAY - shown to all users -->
+    <div id="updateOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); backdrop-filter:blur(10px); display:flex; justify-content:center; align-items:center; z-index:999999;">
+        <div style="background:var(--cont); padding:35px 30px; border-radius:24px; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid var(--success);">
+            <div style="font-size:3rem; margin-bottom:12px;">🔄</div>
+            <h2 style="color:var(--success); margin:0 0 8px 0;">Update verfügbar</h2>
+            <p style="font-size:0.95rem; color:var(--txt); margin:0 0 20px 0;">Aktualisiere die Seite, um die neueste Version von John Chat zu laden.</p>
+            <button onclick="location.reload()" style="width:100%; background:var(--success); color:white; font-size:1rem; padding:14px; border-radius:14px;"><i class="fas fa-redo"></i> Reload</button>
         </div>
     </div>
 
