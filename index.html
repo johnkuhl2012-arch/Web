@@ -793,33 +793,26 @@
     </div>
 
     <div id="settingsView" class="view view-large hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-             <h1>Einstellungen</h1>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+             <h1 style="margin:0 0 10px 0;">Einstellungen</h1>
              <div style="text-align:right;">
                  <span style="font-size:0.8rem; color:#888;">Guthaben:</span><br>
                  <span id="myBalanceDisplay" style="color:var(--success); font-weight:bold;">0.00€</span>
              </div>
         </div>
-       
-        <div class="scroll-area" style="padding-right: 5px;">
-            
-            <div style="text-align:center; margin-bottom:15px; border-bottom: 1px solid var(--brd); padding-bottom:15px;">
-                <img id="mySettingsPfp" src="" class="pfp pfp-large" onclick="document.getElementById('pfpInput').click()">
-                <br>
-                <span style="font-size:0.8rem; color:var(--main); cursor:pointer;" onclick="document.getElementById('pfpInput').click()">Profilbild ändern</span>
-                <input type="file" id="pfpInput" hidden accept="image/*" onchange="uploadPfp()">
-            </div>
 
-            <div class="chat-plus-container" id="bundleSettingsContainer">
-                <div class="chat-plus-header">Meine Pakete</div>
-                <p style="font-size:0.8rem; color:#888; margin-bottom:10px;" id="bundleSettingsHint">Keine Pakete gekauft. Gehe zum <b onclick="showView('shopView')" style="color:var(--gold); cursor:pointer;">Shop</b>.</p>
-                <!-- Dynamisch befüllt durch renderBundleSettings() -->
-                <div id="bundleSettingsContent"></div>
-            </div>
-            
-              <div style="border-top: 1px solid var(--brd); margin-top:15px; padding-top:15px; margin-bottom: 15px;">
-                <h3>Email Benachrichtigungen</h3>
-                <p style="font-size:0.8rem; color:#888;">Erhalte eine Email bei neuen Nachrichten (wenn der Chat gemutet ist).</p>
+        <!-- TABS -->
+        <div style="display:flex; gap:8px; margin-bottom:12px; flex-shrink:0;">
+            <button id="settingsTabSecurity" onclick="switchSettingsTab('security')" style="flex:1; padding:10px; font-size:0.9rem; background:var(--main); color:white; border-radius:12px;">🔒 Sicherheit</button>
+            <button id="settingsTabProfile" onclick="switchSettingsTab('profile')" style="flex:1; padding:10px; font-size:0.9rem; background:var(--hover); color:var(--txt); border-radius:12px;">👤 Profil</button>
+        </div>
+
+        <!-- TAB: SICHERHEIT -->
+        <div id="settingsTabContentSecurity" class="scroll-area" style="padding-right:5px;">
+
+            <div style="margin-bottom:15px;">
+                <h3 style="margin:0 0 4px 0;">Email &amp; Benachrichtigungen</h3>
+                <p style="font-size:0.8rem; color:#888; margin:0 0 10px 0;">Erhalte eine Email bei neuen Nachrichten (wenn der Chat gemutet ist).</p>
                 
                 <div id="emailDisplayBox" class="email-status-box hidden">
                     <p style="margin:0; font-size:0.9rem;">Gespeicherte Email:</p>
@@ -850,7 +843,7 @@
                         <option value="60">Alle 60 Minuten</option>
                     </select>
                 </div>
-              </div>
+            </div>
 
             <!-- 2FA SECTION -->
             <div id="twoFactorSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px; display:none;">
@@ -903,32 +896,24 @@
                 </div>
             </div>
 
+            <!-- PASSWORT ÄNDERN -->
+            <div style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px;">
+                <h3 style="margin:0 0 6px 0; font-size:1rem;">Passwort ändern</h3>
+                <input type="password" id="setNewPass" placeholder="Neues Passwort" style="margin-bottom:8px;">
+                <button onclick="changePassword()" style="width:100%">Speichern</button>
+            </div>
+
             <div style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--brd); padding:10px; border-radius:10px;">
                 <span style="font-size:0.9rem;">Kann Freundschaftsanfragen erhalten</span>
                 <input type="checkbox" id="requestToggle" style="width:20px; height:20px; margin:0;" onchange="toggleRequestSetting()">
             </div>
 
-            <button onclick="toggleTheme()" style="width:100%; margin-bottom:10px;">Dunkel / Hell Modus</button>
-
-            <!-- TAGS AUSWÄHLEN -->
-            <div id="tagSettingsSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-bottom:10px;">
-                <h3 style="margin:0 0 6px 0; font-size:1rem;">Tags Auswählen</h3>
-                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wähle welche Nametags neben deinem Namen angezeigt werden.</p>
-                <div id="tagSettingsList"></div>
-            </div>
-            <input type="password" id="setNewPass" placeholder="Neues Passwort">
-            <button onclick="changePassword()" style="width:100%">Speichern</button>
-            
-            <button onclick="openPurchaseHistory()" class="secondary" style="width:100%; margin-top:15px;">Kaufverlauf</button>
-
             <!-- VON ALLEN GERÄTEN ABMELDEN -->
-            <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:15px; background:rgba(255,71,87,0.04);">
-                <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:var(--danger);">Sicherheit</h3>
+            <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:10px; background:rgba(255,71,87,0.04);">
+                <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:var(--danger);">Sitzungen</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Alle aktiven Sitzungen beenden – jedes Gerät wird abgemeldet und muss sich neu einloggen.</p>
                 <button onclick="confirmSignOutAllDevices()" class="danger" style="width:100%; font-size:0.85rem;">Von allen Geräten abmelden</button>
             </div>
-
-            <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:10px;">Konto löschen</button>
 
             <!-- BLOCKIERTE USER SECTION -->
             <div style="border:1px solid var(--danger); border-radius:12px; padding:12px; margin-top:15px; background:rgba(255,71,87,0.04);">
@@ -940,14 +925,47 @@
                 <button onclick="loadBlockedUsers()" class="secondary" style="width:100%; font-size:0.8rem; margin-top:8px;">Aktualisieren</button>
             </div>
 
+            <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:15px;">Konto löschen</button>
+
+            <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+        </div>
+
+        <!-- TAB: PROFIL -->
+        <div id="settingsTabContentProfile" class="scroll-area hidden" style="padding-right:5px;">
+
+            <div style="text-align:center; margin-bottom:15px; border-bottom: 1px solid var(--brd); padding-bottom:15px;">
+                <img id="mySettingsPfp" src="" class="pfp pfp-large" onclick="document.getElementById('pfpInput').click()">
+                <br>
+                <span style="font-size:0.8rem; color:var(--main); cursor:pointer;" onclick="document.getElementById('pfpInput').click()">Profilbild ändern</span>
+                <input type="file" id="pfpInput" hidden accept="image/*" onchange="uploadPfp()">
+            </div>
+
+            <div class="chat-plus-container" id="bundleSettingsContainer">
+                <div class="chat-plus-header">Meine Pakete</div>
+                <p style="font-size:0.8rem; color:#888; margin-bottom:10px;" id="bundleSettingsHint">Keine Pakete gekauft. Gehe zum <b onclick="showView('shopView')" style="color:var(--gold); cursor:pointer;">Shop</b>.</p>
+                <!-- Dynamisch befüllt durch renderBundleSettings() -->
+                <div id="bundleSettingsContent"></div>
+            </div>
+
+            <!-- TAGS AUSWÄHLEN -->
+            <div id="tagSettingsSection" style="border:1px solid var(--brd); border-radius:12px; padding:12px; margin-top:10px; margin-bottom:10px;">
+                <h3 style="margin:0 0 6px 0; font-size:1rem;">Tags Auswählen</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wähle welche Nametags neben deinem Namen angezeigt werden.</p>
+                <div id="tagSettingsList"></div>
+            </div>
+
+            <button onclick="toggleTheme()" style="width:100%; margin-bottom:10px;">Dunkel / Hell Modus</button>
+
+            <button onclick="openPurchaseHistory()" class="secondary" style="width:100%; margin-bottom:10px;">Kaufverlauf</button>
+
             <!-- ANDROID APP DOWNLOAD -->
-            <div style="border:1px solid #43b581; border-radius:12px; padding:12px; margin-top:15px; background:rgba(67,181,129,0.06);">
+            <div style="border:1px solid #43b581; border-radius:12px; padding:12px; margin-bottom:15px; background:rgba(67,181,129,0.06);">
                 <h3 style="margin:0 0 6px 0; font-size:0.95rem; color:#43b581;">Android App</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Lade die Android App herunter für ein besseres Erlebnis.</p>
                 <button id="downloadApkBtn" onclick="downloadApk()" style="width:100%; background:linear-gradient(135deg,#43b581,#2ecc71); color:white;">Android App Herunterladen</button>
             </div>
 
-            <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:15px;">Zurück</button>
+            <button onclick="showView('mainView')" class="secondary" style="width:100%;">Zurück</button>
         </div>
     </div>
     
@@ -1350,6 +1368,7 @@
         let pfpCache = {};
         let seenMessages = new Set(); 
         let isSpectatorMode = false;
+        let myNicknames = {}; // { username: 'Spitzname' } - nur lokal gespeichert
         // Group & Admin
         let currentGroupAdmin = null;
         let kickTargetUser = null;
@@ -1375,6 +1394,8 @@
             
                         currentUser = savedUser;
                         const data = snap.val();
+                        // Nicknames laden
+                        myNicknames = JSON.parse(localStorage.getItem('nicknames_' + savedUser) || '{}');
                         
                         // BAN CHECK
                          if(data.banned === true) {
@@ -1458,15 +1479,33 @@
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
             document.getElementById(id).classList.remove('hidden'); 
             if(id === 'inboxView') loadInboxView(); 
-            if(id === 'settingsView') loadBlockedUsers(); 
+            if(id === 'settingsView') { loadBlockedUsers(); switchSettingsTab('security'); } 
             // Immer Block-Modal schließen beim View-Wechsel
             const bModal = document.getElementById('blockConfirmModal');
             if(bModal) bModal.classList.add('hidden');
         }
         
-        function formatName(n) { return n; }
+        function formatName(n) { return (myNicknames && myNicknames[n]) ? myNicknames[n] : n; }
 
-        // === POSTFACH / INBOX ===
+        function switchSettingsTab(tab) {
+            const secContent = document.getElementById('settingsTabContentSecurity');
+            const proContent = document.getElementById('settingsTabContentProfile');
+            const secBtn = document.getElementById('settingsTabSecurity');
+            const proBtn = document.getElementById('settingsTabProfile');
+            if(tab === 'security') {
+                secContent.classList.remove('hidden');
+                proContent.classList.add('hidden');
+                secBtn.style.background = 'var(--main)'; secBtn.style.color = 'white';
+                proBtn.style.background = 'var(--hover)'; proBtn.style.color = 'var(--txt)';
+            } else {
+                proContent.classList.remove('hidden');
+                secContent.classList.add('hidden');
+                proBtn.style.background = 'var(--main)'; proBtn.style.color = 'white';
+                secBtn.style.background = 'var(--hover)'; secBtn.style.color = 'var(--txt)';
+            }
+        }
+
+        
         function startInboxListener() {
             if(inboxListener) { db.ref('users/' + currentUser + '/inbox').off('value', inboxListener); inboxListener = null; }
             inboxListener = db.ref('users/' + currentUser + '/inbox').on('value', snap => {
@@ -1867,7 +1906,7 @@
                     <div class="friend-item" id="row-${cid}">
                         <div class="friend-info" onclick="openChat('${f}', false)" style="cursor:pointer; flex:1;">
                             <img class="pfp" id="pfp-view-${f}" src="${pfpSrc}" style="${pfpStyle}">
-                            <span>${formatName(f)} <span class="unread-badge" id="badge-${cid}">0</span></span>
+                            <span><span id="fname-${f}">${formatName(f)}</span> <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
                         <button class="three-dot-btn" onclick="openContextSheet('friend','${f}','${f}')"><i class="fas fa-ellipsis-v"></i></button>
                       </div>`;
@@ -3929,6 +3968,8 @@
             twoFAPendingUser = null;
             twoFAPendingPass = null;
             twoFAPendingStayLoggedIn = false;
+            // Nicknames laden
+            myNicknames = JSON.parse(localStorage.getItem('nicknames_' + username) || '{}');
             
             // Get user data to set theme and greeting
             db.ref('users/' + username).once('value', snap => {
@@ -4768,6 +4809,7 @@
                 const isMuted = mutedChats[cid] === true;
                 const isOwner = id.toLowerCase() === OWNER_NAME;
                 items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="openNicknameModal('${id}', '${name}'); closeContextSheet()"><i class="fas fa-tag" style="color:var(--main);"></i> Anzeigename ändern</div>`;
                 items += `<div class="context-sheet-item" onclick="toggleMute('${cid}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
                 if(!isOwner) {
                     items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${cid}', 'user', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
@@ -4930,6 +4972,42 @@
             document.getElementById('emailRequiredCodeInput').value = '';
         }
 
+        function openNicknameModal(friendId, realName) {
+            const current = myNicknames[friendId] || '';
+            document.getElementById('nicknameModalRealName').textContent = realName;
+            document.getElementById('nicknameInput').value = current;
+            document.getElementById('nicknameModalFriendId').value = friendId;
+            document.getElementById('nicknameModalOverlay').classList.remove('hidden');
+            setTimeout(() => document.getElementById('nicknameInput').focus(), 100);
+        }
+
+        function saveNickname() {
+            const friendId = document.getElementById('nicknameModalFriendId').value;
+            const val = document.getElementById('nicknameInput').value.trim();
+            if(val) {
+                myNicknames[friendId] = val;
+            } else {
+                delete myNicknames[friendId];
+            }
+            localStorage.setItem('nicknames_' + currentUser, JSON.stringify(myNicknames));
+            closeNicknameModal();
+            triggerEmbed(val ? 'Anzeigename gespeichert!' : 'Anzeigename zurückgesetzt', 'success');
+
+            // Name-Span in Freundesliste live updaten
+            const nameSpan = document.getElementById('fname-' + friendId);
+            if(nameSpan) nameSpan.textContent = formatName(friendId);
+
+            // Chat-Header live updaten falls der Chat gerade offen ist
+            if(activeChatID === friendId && !isGroup) {
+                const titleEl = document.getElementById('chatWithTitle');
+                if(titleEl) titleEl.innerText = formatName(friendId);
+            }
+        }
+
+        function closeNicknameModal() {
+            document.getElementById('nicknameModalOverlay').classList.add('hidden');
+        }
+
         function closeContextSheet() {
             document.getElementById('userContextSheet').classList.remove('open');
             document.getElementById('userContextSheetBg').classList.remove('open');
@@ -5041,6 +5119,19 @@
                 <button onclick="verifyEmailChangeCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-check"></i> Bestätigen & Speichern</button>
                 <button onclick="closeEmailChangeVerify()" class="secondary" style="width:100%;">Abbrechen</button>
             </div>
+        </div>
+    </div>
+
+    <!-- NICKNAME MODAL -->
+    <div id="nicknameModalOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99990;">
+        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:340px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <h3 style="margin-top:0; color:var(--main);"><i class="fas fa-tag"></i> Anzeigename ändern</h3>
+            <p style="font-size:0.85rem; color:#888; margin-bottom:4px;">Nur du siehst diesen Namen.</p>
+            <p style="font-size:0.9rem; margin-bottom:12px;">Freund: <b id="nicknameModalRealName"></b></p>
+            <input type="hidden" id="nicknameModalFriendId">
+            <input type="text" id="nicknameInput" placeholder="Anzeigename (leer = zurücksetzen)" maxlength="30" style="margin-bottom:10px;">
+            <button onclick="saveNickname()" style="width:100%; margin-bottom:8px;"><i class="fas fa-check"></i> Speichern</button>
+            <button onclick="closeNicknameModal()" class="secondary" style="width:100%;">Abbrechen</button>
         </div>
     </div>
 
