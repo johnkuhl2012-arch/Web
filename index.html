@@ -292,6 +292,7 @@
         .tag-verifiziert { background: linear-gradient(45deg, #1DA1F2, #0d6efd); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-brot { background: linear-gradient(45deg, #c8a06e, #a0522d); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-official { background: linear-gradient(45deg, #00b4d8, #0077b6); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 1px 6px rgba(0,119,182,0.4); }
+        .tag-sicher { background: linear-gradient(45deg, #43b581, #1e7e34); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 1px 6px rgba(67,181,129,0.4); }
         .bg-darkred { --bg: #1a0000 !important; --cont: #2a0505 !important; --txt: #f1f1f1 !important; }
         .bg-brown { --bg: #efebe9 !important; --cont: #d7ccc8 !important; }
         .dark-mode.bg-darkred { --bg: #0d0000 !important; --cont: #1a0000 !important; }
@@ -634,6 +635,10 @@
                         <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
                             <span class="tag-official" style="font-size:0.75rem; padding:2px 8px;">Official</span>
                             <input type="checkbox" id="adminTagOfficial" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('officialTag', this.checked)">
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--brd);">
+                            <span class="tag-sicher" style="font-size:0.75rem; padding:2px 8px;">Sicher</span>
+                            <input type="checkbox" id="adminTagSicher" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('sicherTag', this.checked)">
                         </label>
                     </div>
                 </div>
@@ -1353,6 +1358,7 @@
         let myVerifiziert = false;
         let myBrotTag = false;
         let myOfficialTag = false;
+        let mySicherTag = false;
         let inboxListener = null;
         let isChatLocked = false; // Chat-Sperre Status
 
@@ -1835,6 +1841,7 @@
                 myVerifiziert = data.verifiziert === true;
                 myBrotTag = data.brotTag === true;
                 myOfficialTag = data.officialTag === true;
+                mySicherTag = data.sicherTag === true;
                 document.getElementById('myBalanceDisplay').innerText = myBalance.toFixed(2) + "€";
                 // ADMIN BUTTON VISIBILITY
                 if(userIsGlobalAdmin) {
@@ -2410,6 +2417,12 @@
             }
             if(myBrotTag) {
                 availableTags.push({ key: 'brot', label: 'Brot', style: 'background:linear-gradient(45deg,#c8a06e,#a0522d)' });
+            }
+            if(myOfficialTag) {
+                availableTags.push({ key: 'official', label: 'Official', style: 'background:linear-gradient(45deg,#00b4d8,#0077b6)' });
+            }
+            if(mySicherTag) {
+                availableTags.push({ key: 'sicher', label: 'Sicher', style: 'background:linear-gradient(45deg,#43b581,#1e7e34)' });
             }
 
             if(availableTags.length === 0) {
@@ -3218,6 +3231,7 @@
             if(d.plusData && d.plusData.verifiziert) tags += `<span class="tag-verifiziert">Verifiziert</span>`;
             if(d.plusData && d.plusData.brotTag) tags += `<span class="tag-brot">Brot</span>`;
             if(d.plusData && d.plusData.officialTag) tags += `<span class="tag-official">Official</span>`;
+            if(d.plusData && d.plusData.sicherTag) tags += `<span class="tag-sicher">Sicher</span>`;
 
             let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
@@ -3462,7 +3476,7 @@
                     duration: duration,
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), sicherTag: !!(mySicherTag && myActiveTags['sicher'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 resetVoiceUI();
@@ -3589,6 +3603,7 @@
                     verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false),
                     brotTag: !!(myBrotTag && myActiveTags['brot'] !== false),
                     officialTag: !!(myOfficialTag && myActiveTags['official'] !== false),
+                    sicherTag: !!(mySicherTag && myActiveTags['sicher'] !== false),
                     activeTags: myActiveTags 
                 }
             };
@@ -3623,7 +3638,7 @@
                     type: isVideo ? 'video' : 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), sicherTag: !!(mySicherTag && myActiveTags['sicher'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 triggerEmailNotification(isVideo ? "Hat ein Video gesendet" : "Hat ein Bild gesendet", isGroup, activeChatID);
@@ -4296,6 +4311,7 @@
                 document.getElementById('adminTagVerifiziert').checked = !!d.verifiziert;
                 document.getElementById('adminTagBrot').checked = !!d.brotTag;
                 document.getElementById('adminTagOfficial').checked = !!d.officialTag;
+                document.getElementById('adminTagSicher').checked = !!d.sicherTag;
             });
         }
 
