@@ -291,6 +291,7 @@
         .tag-og { background: linear-gradient(45deg, #1a1a1a, #444); color: #FFD700; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; border: 1px solid #FFD700; box-shadow: 0 1px 6px rgba(255,215,0,0.4); }
         .tag-verifiziert { background: linear-gradient(45deg, #1DA1F2, #0d6efd); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-brot { background: linear-gradient(45deg, #c8a06e, #a0522d); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+        .tag-official { background: linear-gradient(45deg, #00b4d8, #0077b6); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 1px 6px rgba(0,119,182,0.4); }
         .bg-darkred { --bg: #1a0000 !important; --cont: #2a0505 !important; --txt: #f1f1f1 !important; }
         .bg-brown { --bg: #efebe9 !important; --cont: #d7ccc8 !important; }
         .dark-mode.bg-darkred { --bg: #0d0000 !important; --cont: #1a0000 !important; }
@@ -467,11 +468,7 @@
         <h1>Konto erstellen</h1>
         <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
         <input type="password" id="regPass" placeholder="Passwort">
-        <div style="border:1px solid var(--main); border-radius:12px; padding:12px; margin:8px 0; text-align:left; background:rgba(88,101,242,0.04);">
-            <label style="font-size:0.82rem; color:var(--main); font-weight:bold; display:block; margin-bottom:4px;"><i class="fas fa-envelope"></i> E-Mail <span style="color:var(--danger);">*</span> (Pflichtfeld)</label>
-            <input type="email" id="regEmail" placeholder="deine@email.de" style="margin:0 0 6px 0;">
-            <p style="font-size:0.72rem; color:#888; margin:0;"><i class="fas fa-info-circle"></i> Jede Email kann nur für einen Account verwendet werden. Du musst die Email bestätigen.</p>
-        </div>
+        <input type="email" id="regEmail" placeholder="E-Mail Adresse">
         <div class="agb-row">
             <input type="checkbox" id="agbCheck">
             <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
@@ -633,6 +630,10 @@
                         <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
                             <span class="tag-brot" style="font-size:0.75rem; padding:2px 8px;">Brot</span>
                             <input type="checkbox" id="adminTagBrot" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('brotTag', this.checked)">
+                        </label>
+                        <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                            <span class="tag-official" style="font-size:0.75rem; padding:2px 8px;">Official</span>
+                            <input type="checkbox" id="adminTagOfficial" style="width:20px; height:20px; cursor:pointer;" onchange="adminToggleTag('officialTag', this.checked)">
                         </label>
                     </div>
                 </div>
@@ -1351,6 +1352,7 @@
         let myOgTag = false;
         let myVerifiziert = false;
         let myBrotTag = false;
+        let myOfficialTag = false;
         let inboxListener = null;
         let isChatLocked = false; // Chat-Sperre Status
 
@@ -1363,7 +1365,7 @@
         let pfpCache = {};
         let seenMessages = new Set(); 
         let isSpectatorMode = false;
-        let myNicknames = {}; // { username: 'Spitzname' } - nur lokal gespeichert
+        let myNicknames = {}; // { username: 'Spitzname' } - wird in Firebase gespeichert (accountweit)
         // Group & Admin
         let currentGroupAdmin = null;
         let kickTargetUser = null;
@@ -1389,8 +1391,15 @@
             
                         currentUser = savedUser;
                         const data = snap.val();
-                        // Nicknames laden
-                        myNicknames = JSON.parse(localStorage.getItem('nicknames_' + savedUser) || '{}');
+                        // Nicknames aus Firebase laden (accountweit)
+                        myNicknames = data.nicknames || {};
+                        // Fallback: alte localStorage-Nicknames migrieren
+                        const oldLocal = localStorage.getItem('nicknames_' + savedUser);
+                        if(oldLocal && Object.keys(myNicknames).length === 0) {
+                            myNicknames = JSON.parse(oldLocal);
+                            db.ref('users/' + savedUser + '/nicknames').set(myNicknames);
+                            localStorage.removeItem('nicknames_' + savedUser);
+                        }
                         
                         // BAN CHECK
                          if(data.banned === true) {
@@ -1692,6 +1701,14 @@
 
                     // Normaler Login (kein 2FA)
                     currentUser = user;
+                    // Nicknames aus Firebase laden (accountweit, mit Migration aus localStorage)
+                    myNicknames = data.nicknames || {};
+                    const oldNickLocal = localStorage.getItem('nicknames_' + user);
+                    if(oldNickLocal && Object.keys(myNicknames).length === 0) {
+                        myNicknames = JSON.parse(oldNickLocal);
+                        db.ref('users/' + user + '/nicknames').set(myNicknames);
+                        localStorage.removeItem('nicknames_' + user);
+                    }
                     if(stayLoggedIn) {
                         localStorage.setItem('johnChatUser', user);
                         if("Notification" in window) {
@@ -1817,6 +1834,7 @@
                 myOgTag = data.ogTag === true;
                 myVerifiziert = data.verifiziert === true;
                 myBrotTag = data.brotTag === true;
+                myOfficialTag = data.officialTag === true;
                 document.getElementById('myBalanceDisplay').innerText = myBalance.toFixed(2) + "€";
                 // ADMIN BUTTON VISIBILITY
                 if(userIsGlobalAdmin) {
@@ -3146,7 +3164,7 @@
             // DELETED MESSAGE LOGIC
             if(d.isDeleted) {
                 if(userIsGlobalAdmin) {
-                     let originalContent = d.type === 'img' ? `<img src="${d.txt}" style="max-width:50px;"> (Bild)` : d.type === 'voice' ? `🎙️ Sprachnachricht (${d.duration || 0}s)` : d.txt;
+                     let originalContent = d.type === 'img' ? `<img src="${d.txt}" style="max-width:50px;"> (Bild)` : d.type === 'voice' ? `🎙️ Sprachnachricht (${d.duration || 0}s)` : d.type === 'video' ? `🎥 Video gelöscht` : d.txt;
                      content = `<div style="opacity:0.6; text-decoration:line-through; font-size:0.8rem;">${originalContent}</div><b style="color:red; font-size:0.7rem;">(GELÖSCHT)</b>`;
                 } else {
                      content = `<i style="color:#aaa; font-size:0.8rem;">🚫 Nachricht wurde gelöscht.</i>`;
@@ -3199,6 +3217,7 @@
             if(d.plusData && d.plusData.ogTag) tags += `<span class="tag-og">OG</span>`;
             if(d.plusData && d.plusData.verifiziert) tags += `<span class="tag-verifiziert">Verifiziert</span>`;
             if(d.plusData && d.plusData.brotTag) tags += `<span class="tag-brot">Brot</span>`;
+            if(d.plusData && d.plusData.officialTag) tags += `<span class="tag-official">Official</span>`;
 
             let displayNameHTML = isSystem ? '' : `<span class="msg-sender-name">${formatName(d.from)}${tags}</span>`;
             if(!isSystem && d.plusData) {
@@ -3386,12 +3405,11 @@
 
                 recInterval = setInterval(() => {
                     recSeconds++;
-                    const remaining = 14 - recSeconds;
-                    document.getElementById('recTimer').innerText = `0:${String(recSeconds).padStart(2,'0')} / 0:14`;
+                    const m = Math.floor(recSeconds / 60);
+                    const s = recSeconds % 60;
+                    document.getElementById('recTimer').innerText = `${m}:${String(s).padStart(2,'0')}`;
                     // Enable send after 1s
                     if(recSeconds >= 1) document.getElementById('recSendBtn').disabled = false;
-                    // Auto-stop at 14s
-                    if(recSeconds >= 14) stopVoiceRecording();
                 }, 1000);
 
             }).catch(() => triggerEmbed("Mikrofon-Zugriff verweigert!", "danger"));
@@ -3420,7 +3438,7 @@
             document.getElementById('chatInput').style.display = '';
             document.getElementById('recordingBar').classList.remove('active');
             document.getElementById('voiceBtn').classList.remove('recording');
-            document.getElementById('recTimer').innerText = '0:00 / 0:14';
+            document.getElementById('recTimer').innerText = '0:00';
             document.getElementById('recSendBtn').disabled = true;
         }
 
@@ -3444,7 +3462,7 @@
                     duration: duration,
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 resetVoiceUI();
@@ -3570,6 +3588,7 @@
                     ogTag: !!(myOgTag && myActiveTags['og'] !== false),
                     verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false),
                     brotTag: !!(myBrotTag && myActiveTags['brot'] !== false),
+                    officialTag: !!(myOfficialTag && myActiveTags['official'] !== false),
                     activeTags: myActiveTags 
                 }
             };
@@ -3604,7 +3623,7 @@
                     type: isVideo ? 'video' : 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 triggerEmailNotification(isVideo ? "Hat ein Video gesendet" : "Hat ein Bild gesendet", isGroup, activeChatID);
@@ -4001,12 +4020,18 @@
             twoFAPendingUser = null;
             twoFAPendingPass = null;
             twoFAPendingStayLoggedIn = false;
-            // Nicknames laden
-            myNicknames = JSON.parse(localStorage.getItem('nicknames_' + username) || '{}');
             
             // Get user data to set theme and greeting
             db.ref('users/' + username).once('value', snap => {
                 const data = snap.val() || {};
+                // Nicknames aus Firebase laden (accountweit, mit Migration aus localStorage)
+                myNicknames = data.nicknames || {};
+                const oldLocal = localStorage.getItem('nicknames_' + username);
+                if(oldLocal && Object.keys(myNicknames).length === 0) {
+                    myNicknames = JSON.parse(oldLocal);
+                    db.ref('users/' + username + '/nicknames').set(myNicknames);
+                    localStorage.removeItem('nicknames_' + username);
+                }
                 document.getElementById('userGreeting').innerText = "Hi " + formatName(username);
                 if(data.theme === 'dark') document.body.classList.add('dark-mode');
                 if(stayLoggedIn && ("Notification" in window)) {
@@ -4270,6 +4295,7 @@
                 document.getElementById('adminTagOg').checked = !!d.ogTag;
                 document.getElementById('adminTagVerifiziert').checked = !!d.verifiziert;
                 document.getElementById('adminTagBrot').checked = !!d.brotTag;
+                document.getElementById('adminTagOfficial').checked = !!d.officialTag;
             });
         }
 
@@ -5050,7 +5076,8 @@
             } else {
                 delete myNicknames[friendId];
             }
-            localStorage.setItem('nicknames_' + currentUser, JSON.stringify(myNicknames));
+            // In Firebase speichern (accountweit)
+            db.ref('users/' + currentUser + '/nicknames').set(myNicknames);
             closeNicknameModal();
             triggerEmbed(val ? 'Anzeigename gespeichert!' : 'Anzeigename zurückgesetzt', 'success');
 
