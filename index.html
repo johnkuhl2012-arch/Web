@@ -1634,22 +1634,30 @@
             if(pass.length < 6) return showAlert("Passwort muss mindestens 6 Zeichen haben!", "danger");
             if(!email || !email.includes('@') || !email.includes('.')) return showAlert("Gültige E-Mail-Adresse erforderlich!", "danger");
 
+            // Ungültige Firebase-Key-Zeichen im Benutzernamen prüfen
+            if(/[.#$\[\]\/]/.test(user)) return showAlert("Benutzername enthält ungültige Zeichen!", "danger");
+
             const emailKey = email.replace(/\./g, '_dot_').replace(/@/g, '_at_');
 
-            // Prüfen ob Email schon verwendet wird
-            db.ref('emailIndex/' + emailKey).once('value').then(emailSnap => {
-                if(emailSnap.exists()) {
-                    return showAlert("Diese E-Mail-Adresse wird bereits verwendet!", "danger");
-                }
-                // Prüfen ob Username vergeben
+            const registerBtn = document.querySelector('#registerView button[onclick="register()"]');
+            if(registerBtn) { registerBtn.disabled = true; registerBtn.innerText = 'Wird erstellt...'; }
+
+            const resetBtn = () => {
+                if(registerBtn) { registerBtn.disabled = false; registerBtn.innerText = 'Konto erstellen'; }
+            };
+
+            // Hilfsfunktion: Username prüfen und Account anlegen
+            const proceedWithRegistration = () => {
                 db.ref('users/' + user).get().then(snap => {
                     if(snap.exists()) {
+                        resetBtn();
                         showAlert("Name vergeben!", "danger");
                     } else {
                         const userData = { pass, theme: 'light', chatPlus: false, allowRequests: true, balance: 0.00, email };
                         db.ref('users/' + user).set(userData).then(() => {
-                            // Email-Index schreiben
-                            db.ref('emailIndex/' + emailKey).set(user);
+                            // Email-Index schreiben (best-effort, kein Fehler wenn keine Berechtigung)
+                            db.ref('emailIndex/' + emailKey).set(user).catch(() => {});
+                            resetBtn();
                             showAlert("Konto erstellt!", "success");
                             sendEmailViaScript({
                                 to: email,
@@ -1661,10 +1669,30 @@
                                     "John Chat · Automatische Benachrichtigung"
                                 )
                             });
-                            showView('loginView'); 
+                            showView('loginView');
+                        }).catch(err => {
+                            resetBtn();
+                            console.error("Register set error:", err);
+                            showAlert("Fehler beim Erstellen: " + (err.message || "Unbekannter Fehler"), "danger");
                         });
                     }
+                }).catch(err => {
+                    resetBtn();
+                    console.error("Register check error:", err);
+                    showAlert("Fehler bei der Prüfung: " + (err.message || "Verbindungsfehler"), "danger");
                 });
+            };
+
+            // Prüfen ob Email schon verwendet wird (optional – bei fehlender Berechtigung wird übersprungen)
+            db.ref('emailIndex/' + emailKey).once('value').then(emailSnap => {
+                if(emailSnap.exists()) {
+                    resetBtn();
+                    return showAlert("Diese E-Mail-Adresse wird bereits verwendet!", "danger");
+                }
+                proceedWithRegistration();
+            }).catch(() => {
+                // Keine Leseberechtigung auf emailIndex → Check überspringen, trotzdem registrieren
+                proceedWithRegistration();
             });
         }
 
