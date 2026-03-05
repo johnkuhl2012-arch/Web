@@ -425,6 +425,11 @@
         .msg-other:hover .reply-btn, .msg-self:hover .reply-btn { display: flex; }
         .msg-self .reply-btn { right: auto; left: -32px; }
         .reply-btn:hover { background: var(--main); color: white; transform: translateY(-50%) scale(1.1); }
+
+        /* Email notification tab styles */
+        .email-notif-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd); }
+        .email-notif-row span { font-size:0.85rem; flex:1; margin-right:10px; }
+        .email-notif-row.mandatory span { color:#888; }
     </style>
 </head>
 <body>
@@ -802,47 +807,33 @@
         </div>
 
         <!-- TABS -->
-        <div style="display:flex; gap:8px; margin-bottom:12px; flex-shrink:0;">
-            <button id="settingsTabSecurity" onclick="switchSettingsTab('security')" style="flex:1; padding:10px; font-size:0.9rem; background:var(--main); color:white; border-radius:12px;">🔒 Sicherheit</button>
-            <button id="settingsTabProfile" onclick="switchSettingsTab('profile')" style="flex:1; padding:10px; font-size:0.9rem; background:var(--hover); color:var(--txt); border-radius:12px;">👤 Profil</button>
+        <div style="display:flex; gap:6px; margin-bottom:12px; flex-shrink:0;">
+            <button id="settingsTabSecurity" onclick="switchSettingsTab('security')" style="flex:1; padding:8px 4px; font-size:0.82rem; background:var(--main); color:white; border-radius:12px;">🔒 Sicherheit</button>
+            <button id="settingsTabEmail" onclick="switchSettingsTab('email')" style="flex:1; padding:8px 4px; font-size:0.82rem; background:var(--hover); color:var(--txt); border-radius:12px;">📧 Email</button>
+            <button id="settingsTabProfile" onclick="switchSettingsTab('profile')" style="flex:1; padding:8px 4px; font-size:0.82rem; background:var(--hover); color:var(--txt); border-radius:12px;">👤 Profil</button>
         </div>
 
         <!-- TAB: SICHERHEIT -->
         <div id="settingsTabContentSecurity" class="scroll-area" style="padding-right:5px;">
 
-            <div style="margin-bottom:15px;">
-                <h3 style="margin:0 0 4px 0;">Email &amp; Benachrichtigungen</h3>
-                <p style="font-size:0.8rem; color:#888; margin:0 0 10px 0;">Erhalte eine Email bei neuen Nachrichten (wenn der Chat gemutet ist).</p>
-                
-                <div id="emailDisplayBox" class="email-status-box hidden">
-                    <p style="margin:0; font-size:0.9rem;">Gespeicherte Email:</p>
-                    <b id="savedEmailTxt" style="color:var(--main);"></b>
-                    <p style="font-size:0.75rem; color:#888; margin:6px 0 0 0;"><i class="fas fa-lock"></i> Email ist Pflicht und kann nicht entfernt werden.</p>
-                </div>
-
-                <div id="emailInputBox">
-                    <input type="email" id="emailSettingsInput" placeholder="Deine Email Adresse...">
-                    <button onclick="saveEmail()" style="width:100%;">Speichern</button>
-                </div>
-
-                <!-- EMAIL COOLDOWN EINSTELLUNG -->
-                <div id="emailCooldownSection" style="margin-top:12px; border:1px solid var(--brd); border-radius:12px; padding:12px; display:none;">
-                    <h4 style="margin:0 0 6px 0; font-size:0.9rem;">Chat-Email Cooldown</h4>
-                    <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Wie oft kannst du maximal eine Email-Benachrichtigung für neue Chat-Nachrichten erhalten?</p>
-                    
-                    <div id="cooldownNoneWarning" class="hidden" style="background:rgba(255,71,87,0.1); border:1px solid var(--danger); border-radius:8px; padding:8px; font-size:0.78rem; color:var(--danger); margin-bottom:8px;">
-                        ⚠️ <b>Warnung:</b> Ohne Cooldown kannst du bei Spam eine sehr große Anzahl an Emails erhalten, wodurch dein Postfach volllaufen kann!
-                    </div>
-
-                    <select id="emailCooldownSelect" onchange="saveEmailCooldown()" style="width:100%;">
-                        <option value="none">Kein Cooldown ⚠️</option>
-                        <option value="5">Alle 5 Minuten</option>
-                        <option value="15" selected>Alle 15 Minuten (empfohlen)</option>
-                        <option value="30">Alle 30 Minuten</option>
-                        <option value="45">Alle 45 Minuten</option>
-                        <option value="60">Alle 60 Minuten</option>
-                    </select>
-                </div>
+            <!-- Hidden email elements for JS compatibility -->
+            <div id="emailDisplayBox" class="email-status-box hidden" style="display:none!important;">
+                <p style="margin:0; font-size:0.9rem;">Gespeicherte Email:</p>
+                <b id="savedEmailTxt" style="color:var(--main);"></b>
+            </div>
+            <div id="emailInputBox" style="display:none!important;">
+                <input type="email" id="emailSettingsInput" placeholder="Deine Email Adresse...">
+                <button onclick="saveEmail()" style="width:100%;">Speichern</button>
+            </div>
+            <div id="emailCooldownSection" style="display:none!important;">
+                <select id="emailCooldownSelect" onchange="saveEmailCooldown()" style="display:none;">
+                    <option value="none">Kein Cooldown ⚠️</option>
+                    <option value="5">Alle 5 Minuten</option>
+                    <option value="15" selected>Alle 15 Minuten (empfohlen)</option>
+                    <option value="30">Alle 30 Minuten</option>
+                    <option value="45">Alle 45 Minuten</option>
+                    <option value="60">Alle 60 Minuten</option>
+                </select>
             </div>
 
             <!-- 2FA SECTION -->
@@ -928,6 +919,93 @@
             <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:15px;">Konto löschen</button>
 
             <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+        </div>
+
+        <!-- TAB: EMAIL -->
+        <div id="settingsTabContentEmail" class="scroll-area hidden" style="padding-right:5px;">
+
+            <!-- EMAIL ANZEIGE -->
+            <div style="border:1px solid var(--main); border-radius:12px; padding:14px; margin-bottom:12px; background:rgba(88,101,242,0.04);">
+                <h3 style="margin:0 0 8px 0; font-size:1rem;"><i class="fas fa-envelope" style="color:var(--main);"></i> Deine Email-Adresse</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 10px 0;"><i class="fas fa-lock"></i> Email ist Pflicht und kann nur geändert, nicht entfernt werden.</p>
+                <div style="display:flex; align-items:center; gap:8px; background:var(--hover); border-radius:10px; padding:10px 12px; margin-bottom:10px;">
+                    <i class="fas fa-envelope" style="color:var(--main);"></i>
+                    <span id="emailTabMasked" style="font-size:0.9rem; font-family:monospace; flex:1; word-break:break-all;">••••••••••</span>
+                    <button onclick="toggleEmailVisibility()" id="emailTabToggleBtn" class="secondary" style="padding:5px 10px; font-size:0.78rem; border-radius:8px; flex-shrink:0;">Anzeigen</button>
+                </div>
+                <input type="email" id="emailTabChangeInput" placeholder="Neue Email-Adresse eingeben..." style="margin-bottom:6px;">
+                <button onclick="saveEmailFromTab()" style="width:100%; font-size:0.85rem;"><i class="fas fa-save"></i> Email ändern / speichern</button>
+            </div>
+
+            <!-- EMAIL BENACHRICHTIGUNGS-EINSTELLUNGEN -->
+            <div style="border:1px solid var(--brd); border-radius:12px; padding:14px; margin-bottom:12px;">
+                <h3 style="margin:0 0 4px 0; font-size:1rem;"><i class="fas fa-bell" style="color:var(--main);"></i> Email-Benachrichtigungen</h3>
+                <p style="font-size:0.78rem; color:#888; margin:0 0 12px 0;">Wähle wofür du eine Email-Benachrichtigung erhalten möchtest.</p>
+
+                <!-- PFLICHT-EMAILS -->
+                <div style="background:rgba(255,71,87,0.05); border:1px solid rgba(255,71,87,0.2); border-radius:10px; padding:10px; margin-bottom:12px;">
+                    <p style="font-size:0.78rem; font-weight:bold; color:var(--danger); margin:0 0 8px 0;"><i class="fas fa-lock"></i> Pflicht – kann nicht deaktiviert werden</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,71,87,0.15);">
+                        <span style="font-size:0.85rem;"><i class="fas fa-shield-alt" style="color:var(--main); width:16px; margin-right:5px;"></i>2FA Code (Aktivierung &amp; Deaktivierung)</span>
+                        <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,71,87,0.15);">
+                        <span style="font-size:0.85rem;"><i class="fas fa-key" style="color:#e67e22; width:16px; margin-right:5px;"></i>Passwort geändert</span>
+                        <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0;">
+                        <span style="font-size:0.85rem;"><i class="fas fa-sign-in-alt" style="color:var(--success); width:16px; margin-right:5px;"></i>In Account eingeloggt</span>
+                        <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
+                    </div>
+                </div>
+
+                <!-- OPTIONALE EMAILS -->
+                <p style="font-size:0.78rem; font-weight:bold; color:var(--txt); margin:0 0 8px 0;"><i class="fas fa-sliders-h" style="color:var(--main);"></i> Optional – nach Wunsch ein/ausschalten</p>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
+                    <span style="font-size:0.85rem;"><i class="fas fa-comment" style="color:var(--main); width:16px; margin-right:5px;"></i>Chat-Nachrichten (wenn gemutet)</span>
+                    <input type="checkbox" id="enotif-chatMessages" checked onchange="saveEmailNotifSetting('chatMessages', this.checked); updateCooldownVisibility()" style="width:18px;height:18px;margin:0;cursor:pointer;">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
+                    <span style="font-size:0.85rem;"><i class="fas fa-inbox" style="color:var(--success); width:16px; margin-right:5px;"></i>Posteingang / Admin-Nachrichten</span>
+                    <input type="checkbox" id="enotif-inbox" checked onchange="saveEmailNotifSetting('inbox', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
+                    <span style="font-size:0.85rem;"><i class="fas fa-shopping-bag" style="color:var(--gold); width:16px; margin-right:5px;"></i>Bundle-Kauf Bestätigung</span>
+                    <input type="checkbox" id="enotif-bundlePurchase" checked onchange="saveEmailNotifSetting('bundlePurchase', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
+                    <span style="font-size:0.85rem;"><i class="fas fa-ban" style="color:var(--danger); width:16px; margin-right:5px;"></i>Account gesperrt / entsperrt</span>
+                    <input type="checkbox" id="enotif-banStatus" checked onchange="saveEmailNotifSetting('banStatus', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
+                    <span style="font-size:0.85rem;"><i class="fas fa-user-check" style="color:var(--success); width:16px; margin-right:5px;"></i>Freundschaftsanfrage angenommen</span>
+                    <input type="checkbox" id="enotif-friendAccepted" checked onchange="saveEmailNotifSetting('friendAccepted', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0;">
+                    <span style="font-size:0.85rem;"><i class="fas fa-trash" style="color:var(--danger); width:16px; margin-right:5px;"></i>Account gelöscht</span>
+                    <input type="checkbox" id="enotif-accountDeleted" checked onchange="saveEmailNotifSetting('accountDeleted', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
+                </div>
+
+                <!-- COOLDOWN SEKTION – nur sichtbar wenn Chat-Nachrichten aktiv -->
+                <div id="emailChatCooldownSection" style="margin-top:12px; border:1px solid var(--brd); border-radius:10px; padding:12px; background:rgba(88,101,242,0.04);">
+                    <h4 style="margin:0 0 4px 0; font-size:0.9rem;"><i class="fas fa-clock" style="color:var(--main);"></i> Email-Benachrichtigungs-Einstellungen</h4>
+                    <p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Cooldown für Chat-Nachrichten Emails.</p>
+                    <div id="cooldownNoneWarning" class="hidden" style="background:rgba(255,71,87,0.1); border:1px solid var(--danger); border-radius:8px; padding:8px; font-size:0.78rem; color:var(--danger); margin-bottom:8px;">
+                        ⚠️ <b>Warnung:</b> Ohne Cooldown kannst du bei Spam sehr viele Emails erhalten!
+                    </div>
+                    <select id="emailCooldownSelectMain" onchange="saveEmailCooldownMain()" style="width:100%;">
+                        <option value="none">Kein Cooldown ⚠️</option>
+                        <option value="5">Alle 5 Minuten</option>
+                        <option value="15" selected>Alle 15 Minuten (empfohlen)</option>
+                        <option value="30">Alle 30 Minuten</option>
+                        <option value="45">Alle 45 Minuten</option>
+                        <option value="60">Alle 60 Minuten</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:5px;">Zurück</button>
         </div>
 
         <!-- TAB: PROFIL -->
@@ -1499,20 +1577,111 @@
 
         function switchSettingsTab(tab) {
             const secContent = document.getElementById('settingsTabContentSecurity');
+            const emailContent = document.getElementById('settingsTabContentEmail');
             const proContent = document.getElementById('settingsTabContentProfile');
             const secBtn = document.getElementById('settingsTabSecurity');
+            const emailBtn = document.getElementById('settingsTabEmail');
             const proBtn = document.getElementById('settingsTabProfile');
+            [secContent, emailContent, proContent].forEach(el => el.classList.add('hidden'));
+            [secBtn, emailBtn, proBtn].forEach(btn => { btn.style.background = 'var(--hover)'; btn.style.color = 'var(--txt)'; });
             if(tab === 'security') {
                 secContent.classList.remove('hidden');
-                proContent.classList.add('hidden');
                 secBtn.style.background = 'var(--main)'; secBtn.style.color = 'white';
-                proBtn.style.background = 'var(--hover)'; proBtn.style.color = 'var(--txt)';
+            } else if(tab === 'email') {
+                emailContent.classList.remove('hidden');
+                emailBtn.style.background = 'var(--main)'; emailBtn.style.color = 'white';
+                loadEmailTabData();
             } else {
                 proContent.classList.remove('hidden');
-                secContent.classList.add('hidden');
                 proBtn.style.background = 'var(--main)'; proBtn.style.color = 'white';
-                secBtn.style.background = 'var(--hover)'; secBtn.style.color = 'var(--txt)';
             }
+        }
+
+        // ===== EMAIL TAB FUNCTIONS =====
+        let emailTabVisible = false;
+        let emailTabCurrentEmail = '';
+        let emailNotifSettings = {};
+
+        function loadEmailTabData() {
+            db.ref('users/' + currentUser).once('value', snap => {
+                const data = snap.val() || {};
+                emailTabCurrentEmail = data.email || '';
+                emailNotifSettings = data.emailNotif || {};
+                // Update email display
+                updateEmailTabDisplay();
+                // Load notification checkboxes
+                const notifKeys = ['chatMessages','inbox','bundlePurchase','banStatus','friendAccepted','accountDeleted'];
+                notifKeys.forEach(k => {
+                    const cb = document.getElementById('enotif-' + k);
+                    if(cb) {
+                        // Default: true (all enabled) if not set
+                        cb.checked = emailNotifSettings[k] !== false;
+                    }
+                });
+                // Load cooldown
+                const mainSel = document.getElementById('emailCooldownSelectMain');
+                if(mainSel) mainSel.value = data.emailCooldown || '15';
+                updateCooldownVisibility();
+            });
+        }
+
+        function updateEmailTabDisplay() {
+            const maskedEl = document.getElementById('emailTabMasked');
+            const btn = document.getElementById('emailTabToggleBtn');
+            if(!maskedEl || !btn) return;
+            if(emailTabVisible && emailTabCurrentEmail) {
+                maskedEl.textContent = emailTabCurrentEmail;
+                btn.textContent = 'Ausblenden';
+            } else {
+                const parts = emailTabCurrentEmail ? emailTabCurrentEmail.split('@') : ['',''];
+                const masked = (parts[0] ? parts[0][0] + '•'.repeat(Math.max(2,parts[0].length-1)) : '••••••') + (parts[1] ? '@' + parts[1] : '');
+                maskedEl.textContent = emailTabCurrentEmail ? masked : '(Keine Email hinterlegt)';
+                btn.textContent = 'Anzeigen';
+            }
+        }
+
+        function toggleEmailVisibility() {
+            emailTabVisible = !emailTabVisible;
+            updateEmailTabDisplay();
+        }
+
+        function saveEmailFromTab() {
+            const newEmail = document.getElementById('emailTabChangeInput').value.trim().toLowerCase();
+            if(!newEmail || !newEmail.includes('@') || !newEmail.includes('.')) {
+                triggerEmbed("Gültige Email-Adresse eingeben!", "danger");
+                return;
+            }
+            pendingEmailChange = newEmail;
+            document.getElementById('emailChangePendingDisplay').innerText = newEmail;
+            document.getElementById('emailChangeStep1').classList.remove('hidden');
+            document.getElementById('emailChangeStep2').classList.add('hidden');
+            document.getElementById('emailChangeVerifyEmbed').classList.remove('hidden');
+        }
+
+        function saveEmailNotifSetting(key, enabled) {
+            emailNotifSettings[key] = enabled;
+            db.ref('users/' + currentUser + '/emailNotif/' + key).set(enabled);
+        }
+
+        function updateCooldownVisibility() {
+            const chatCb = document.getElementById('enotif-chatMessages');
+            const cooldownSection = document.getElementById('emailChatCooldownSection');
+            if(!chatCb || !cooldownSection) return;
+            cooldownSection.style.display = chatCb.checked ? 'block' : 'none';
+        }
+
+        function saveEmailCooldownMain() {
+            const val = document.getElementById('emailCooldownSelectMain').value;
+            const warning = document.getElementById('cooldownNoneWarning');
+            if(warning) warning.classList.toggle('hidden', val !== 'none');
+            db.ref('users/' + currentUser + '/emailCooldown').set(val);
+            // Also sync to legacy select
+            const legacySel = document.getElementById('emailCooldownSelect');
+            if(legacySel) legacySel.value = val;
+        }
+
+        function getEmailNotifSetting(key) {
+            return emailNotifSettings[key] !== false;
         }
 
         
@@ -1570,7 +1739,7 @@
         }
 
         // Send system message to user's inbox + Email-Benachrichtigung
-        function systemInboxMsg(targetUser, title, body) {
+        function systemInboxMsg(targetUser, title, body, notifType) {
             db.ref('users/' + targetUser + '/inbox').push({
                 from: '📬 System',
                 title: title,
@@ -1578,7 +1747,7 @@
                 timestamp: Date.now()
             });
             // Email senden wenn Email hinterlegt
-            sendInboxEmailNotification(targetUser, title, body);
+            sendInboxEmailNotification(targetUser, title, body, notifType || 'inbox');
         }
 
         // Admin: open send message modal
@@ -1898,6 +2067,7 @@
                 myNameColor = data.nameColor || "";
                 myBg = data.bgGradient || "default";
                 mutedChats = data.muted || {};
+                emailNotifSettings = data.emailNotif || {};
                 // Privacy Setting
                 document.getElementById('requestToggle').checked = (data.allowRequests !== false);
                 // Email Settings Sync
@@ -2459,17 +2629,17 @@
             }
 
             const maxTags = myBundles['tagbundle'] ? 2 : 1;
-            const activeCount = availableTags.filter(t => myActiveTags[t.key] !== false && myActiveTags[t.key] !== null && myActiveTags[t.key] !== undefined ? (myActiveTags[t.key] === true) : true).length;
+            const activeCount = availableTags.filter(t => myActiveTags[t.key] === true).length;
             container.innerHTML += `<p style="font-size:0.78rem; color:#888; margin:0 0 8px 0;">Du kannst maximal <b>${maxTags}</b> Tag${maxTags > 1 ? 's' : ''} gleichzeitig tragen${myBundles['tagbundle'] ? '' : ' (2 mit Tag Bundle)'}.</p>`;
 
             availableTags.forEach(tag => {
-                const isActive = myActiveTags[tag.key] !== false;
+                const isActive = myActiveTags[tag.key] === true; // Must be explicitly set to true
                 container.innerHTML += `
                 <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--brd);">
                     <span style="${tag.style}; color:white; border-radius:4px; padding:2px 8px; font-size:0.75rem; font-weight:bold;">${tag.label}</span>
                     <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.85rem;">
                         <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleTag('${tag.key}', this.checked)" style="width:18px; height:18px; margin:0; cursor:pointer;">
-                        Anzeigen
+                        Ausrüsten
                     </label>
                 </div>`;
             });
@@ -2479,12 +2649,10 @@
             // Max tags: 1 normally, 2 with tag bundle
             const maxTags = myBundles['tagbundle'] ? 2 : 1;
             if(enabled) {
-                const currentActive = Object.keys(myActiveTags).filter(k => myActiveTags[k] === true || myActiveTags[k] !== false);
-                // Count how many are currently truly active
-                const activeCount = Object.keys(myActiveTags).filter(k => myActiveTags[k] !== false && myActiveTags[k] !== null).length;
+                // Count how many are currently truly active (explicitly set to true)
+                const activeCount = Object.keys(myActiveTags).filter(k => myActiveTags[k] === true).length;
                 if(activeCount >= maxTags) {
                     triggerEmbed(`Maximal ${maxTags} Tag${maxTags > 1 ? 's' : ''} erlaubt!`, "danger");
-                    // Revert the checkbox
                     renderTagSettings();
                     return;
                 }
@@ -2640,25 +2808,27 @@
             logToApi('Purchase', `${currentUser} bought ${name} for ${price}€`);
             
             // Bundle-Kauf Email senden
-            db.ref('users/' + currentUser + '/email').once('value', snap => {
-                const mail = snap.val();
-                if(mail) {
-                    sendEmailViaScript({
-                        to: mail,
-                        subject: `🛒 Vielen Dank für deinen Kauf – John Chat`,
-                        htmlBody: buildEmailHtml(
-                            "Vielen Dank für deinen Kauf!",
-                            `Hallo <b>${currentUser}</b>,<br><br>
-                            du hast das folgende Bundle erfolgreich erworben:<br>
-                            <div class="box"><b>${name}</b><br>
-                            <span style="color:#43b581; font-weight:bold;">Preis: ${price.toFixed(2).replace('.',',')}€</span></div>
-                            Dein neues Guthaben beträgt: <b>${newBal.toFixed(2).replace('.',',')}€</b><br><br>
-                            Viel Spaß mit deinem neuen Bundle! 🎉`,
-                            "John Chat Shop · Kaufbestätigung"
-                        )
-                    });
-                }
-            });
+            if(getEmailNotifSetting('bundlePurchase')) {
+                db.ref('users/' + currentUser + '/email').once('value', snap => {
+                    const mail = snap.val();
+                    if(mail) {
+                        sendEmailViaScript({
+                            to: mail,
+                            subject: `🛒 Vielen Dank für deinen Kauf – John Chat`,
+                            htmlBody: buildEmailHtml(
+                                "Vielen Dank für deinen Kauf!",
+                                `Hallo <b>${currentUser}</b>,<br><br>
+                                du hast das folgende Bundle erfolgreich erworben:<br>
+                                <div class="box"><b>${name}</b><br>
+                                <span style="color:#43b581; font-weight:bold;">Preis: ${price.toFixed(2).replace('.',',')}€</span></div>
+                                Dein neues Guthaben beträgt: <b>${newBal.toFixed(2).replace('.',',')}€</b><br><br>
+                                Viel Spaß mit deinem neuen Bundle! 🎉`,
+                                "John Chat Shop · Kaufbestätigung"
+                            )
+                        });
+                    }
+                });
+            }
 
             updatePlusUI();
             pendingBundle = null;
@@ -2739,9 +2909,9 @@
             db.ref('users/'+currentUser+'/friends/'+n).set(true);
             db.ref('users/'+n+'/friends/'+currentUser).set(true); 
             db.ref('users/'+currentUser+'/requests/'+n).remove();
-            // Inbox-Benachrichtigung an beide
-            systemInboxMsg(n, '✅ Freundschaftsanfrage angenommen', currentUser + ' hat deine Freundschaftsanfrage angenommen. Ihr seid jetzt befreundet!');
-            systemInboxMsg(currentUser, '✅ Freund hinzugefügt', 'Du hast die Anfrage von ' + n + ' angenommen. Ihr seid jetzt befreundet!');
+            // Inbox-Benachrichtigung + Email mit passender Kategorie
+            systemInboxMsg(n, '✅ Freundschaftsanfrage angenommen', currentUser + ' hat deine Freundschaftsanfrage angenommen. Ihr seid jetzt befreundet!', 'friendAccepted');
+            systemInboxMsg(currentUser, '✅ Freund hinzugefügt', 'Du hast die Anfrage von ' + n + ' angenommen. Ihr seid jetzt befreundet!', 'friendAccepted');
         }
         function deny(n) { 
             db.ref('users/'+currentUser+'/requests/'+n).remove(); 
@@ -3504,7 +3674,7 @@
                     duration: duration,
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), sicherTag: !!(mySicherTag && myActiveTags['sicher'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles["mega"] && myActiveTags["mega"] === true), superTag: !!(myBundles["tagbundle"] && myActiveTags["super"] === true), krassTag: !!(myBundles["tagbundle"] && myActiveTags["krass"] === true), crazyTag: !!(myBundles["tagbundle"] && myActiveTags["crazy"] === true), ogTag: !!(myOgTag && myActiveTags["og"] === true), verifiziert: !!(myVerifiziert && myActiveTags["verifiziert"] === true), brotTag: !!(myBrotTag && myActiveTags["brot"] === true), officialTag: !!(myOfficialTag && myActiveTags["official"] === true), sicherTag: !!(mySicherTag && myActiveTags["sicher"] === true), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 resetVoiceUI();
@@ -3623,15 +3793,15 @@
                 isAdminSender: userIsGlobalAdmin, 
                 plusData: { 
                     emoji: myEmoji, color: myNameColor, 
-                    megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false),
-                    superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false),
-                    krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false),
-                    crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false),
-                    ogTag: !!(myOgTag && myActiveTags['og'] !== false),
-                    verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false),
-                    brotTag: !!(myBrotTag && myActiveTags['brot'] !== false),
-                    officialTag: !!(myOfficialTag && myActiveTags['official'] !== false),
-                    sicherTag: !!(mySicherTag && myActiveTags['sicher'] !== false),
+                    megaTag: !!(myBundles["mega"] && myActiveTags["mega"] === true),
+                    superTag: !!(myBundles["tagbundle"] && myActiveTags["super"] === true),
+                    krassTag: !!(myBundles["tagbundle"] && myActiveTags["krass"] === true),
+                    crazyTag: !!(myBundles["tagbundle"] && myActiveTags["crazy"] === true),
+                    ogTag: !!(myOgTag && myActiveTags["og"] === true),
+                    verifiziert: !!(myVerifiziert && myActiveTags["verifiziert"] === true),
+                    brotTag: !!(myBrotTag && myActiveTags["brot"] === true),
+                    officialTag: !!(myOfficialTag && myActiveTags["official"] === true),
+                    sicherTag: !!(mySicherTag && myActiveTags["sicher"] === true),
                     activeTags: myActiveTags 
                 }
             };
@@ -3666,7 +3836,7 @@
                     type: isVideo ? 'video' : 'img',
                     timestamp: Date.now(),
                     isAdminSender: userIsGlobalAdmin,
-                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles['mega'] && myActiveTags['mega'] !== false), superTag: !!(myBundles['tagbundle'] && myActiveTags['super'] !== false), krassTag: !!(myBundles['tagbundle'] && myActiveTags['krass'] !== false), crazyTag: !!(myBundles['tagbundle'] && myActiveTags['crazy'] !== false), ogTag: !!(myOgTag && myActiveTags['og'] !== false), verifiziert: !!(myVerifiziert && myActiveTags['verifiziert'] !== false), brotTag: !!(myBrotTag && myActiveTags['brot'] !== false), officialTag: !!(myOfficialTag && myActiveTags['official'] !== false), sicherTag: !!(mySicherTag && myActiveTags['sicher'] !== false), activeTags: myActiveTags }
+                    plusData: { emoji: myEmoji, color: myNameColor, megaTag: !!(myBundles["mega"] && myActiveTags["mega"] === true), superTag: !!(myBundles["tagbundle"] && myActiveTags["super"] === true), krassTag: !!(myBundles["tagbundle"] && myActiveTags["krass"] === true), crazyTag: !!(myBundles["tagbundle"] && myActiveTags["crazy"] === true), ogTag: !!(myOgTag && myActiveTags["og"] === true), verifiziert: !!(myVerifiziert && myActiveTags["verifiziert"] === true), brotTag: !!(myBrotTag && myActiveTags["brot"] === true), officialTag: !!(myOfficialTag && myActiveTags["official"] === true), sicherTag: !!(mySicherTag && myActiveTags["sicher"] === true), activeTags: myActiveTags }
                 };
                 db.ref(path).push(msgData);
                 triggerEmailNotification(isVideo ? "Hat ein Video gesendet" : "Hat ein Bild gesendet", isGroup, activeChatID);
@@ -3802,11 +3972,15 @@
         }
 
         // Email-Benachrichtigung für Posteingang (Inbox)
-        function sendInboxEmailNotification(targetUser, title, body) {
+        function sendInboxEmailNotification(targetUser, title, body, notifType) {
             if(!EMAIL_API_URL || EMAIL_API_URL.includes("HIER_DEINE")) return;
-            db.ref('users/' + targetUser + '/email').once('value', snap => {
-                const mail = snap.val();
+            db.ref('users/' + targetUser).once('value', snap => {
+                const d = snap.val() || {};
+                const mail = d.email;
                 if(!mail) return;
+                // Check notification setting – default: enabled
+                const key = notifType || 'inbox';
+                if(d.emailNotif && d.emailNotif[key] === false) return;
                 sendEmailViaScript({
                     to: mail,
                     subject: `📬 ${title} – John Chat Posteingang`,
@@ -4174,11 +4348,11 @@
                         }
                     });
                     // E-Mail senden VOR dem Löschen
-                    db.ref('users/' + currentUser + '/email').once('value', emailSnap => {
-                        const mail = emailSnap.val();
-                        if(mail) {
+                    db.ref('users/' + currentUser).once('value', emailSnap => {
+                        const d = emailSnap.val() || {};
+                        if(d.email && d.emailNotif?.accountDeleted !== false) {
                             sendEmailViaScript({
-                                to: mail,
+                                to: d.email,
                                 subject: "🗑️ Dein John Chat Account wurde gelöscht",
                                 htmlBody: buildEmailHtml(
                                     "Account gelöscht",
@@ -4545,9 +4719,10 @@
                 triggerEmbed("User gesperrt!", "success");
                 logToApi('AdminAction', `Banned ${adminTargetUser} for ${duration} days. Reason: ${reason}`);
                 // Email an User senden
-                db.ref('users/' + adminTargetUser + '/email').once('value', snap => {
-                    const mail = snap.val();
-                    if(mail) {
+                db.ref('users/' + adminTargetUser).once('value', snap => {
+                    const d = snap.val() || {};
+                    if(d.email && d.emailNotif?.banStatus !== false) {
+                        const mail = d.email;
                         const durationText = duration === 'perm' ? 'permanent' :
                             duration === '1' ? '1 Tag' : duration === '3' ? '3 Tage' :
                             duration === '7' ? '1 Woche' : '1 Monat';
@@ -4579,11 +4754,11 @@
                 triggerEmbed("User entsperrt", "success");
                 logToApi('AdminAction', `Unbanned ${adminTargetUser}`);
                 // Email an User senden
-                db.ref('users/' + adminTargetUser + '/email').once('value', snap => {
-                    const mail = snap.val();
-                    if(mail) {
+                db.ref('users/' + adminTargetUser).once('value', snap => {
+                    const d = snap.val() || {};
+                    if(d.email && d.emailNotif?.banStatus !== false) {
                         sendEmailViaScript({
-                            to: mail,
+                            to: d.email,
                             subject: `✅ Dein John Chat Account wurde entsperrt`,
                             htmlBody: buildEmailHtml(
                                 "Account entsperrt",
