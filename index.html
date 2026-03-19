@@ -165,6 +165,7 @@
         /* HEADER ICONS */
         .settings-icon { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.3rem; color: var(--txt); padding: 5px; }
         .shop-icon { position: absolute; top: 20px; right: 80px; cursor: pointer; font-size: 1.3rem; color: var(--gold); padding: 5px; }
+        .games-icon { position: absolute; top: 20px; right: 113px; cursor: pointer; font-size: 1.3rem; color: #5865F2; padding: 5px; }
         .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); padding: 5px; }
 
         /* SHOP STYLES */
@@ -531,6 +532,7 @@
 
     <div id="mainView" class="view view-large hidden">
         <span id="adminBtn" class="admin-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
+        <span class="games-icon" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-gamepad"></i></span>
         <span class="shop-icon" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
         <span class="inbox-icon" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-envelope"></i></span>
         <span class="inbox-badge" id="inboxBadge"></span>
@@ -1060,6 +1062,58 @@
     </div>
 
     <!-- SHOP VIEW -->
+    <div id="gamesView" class="view hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2 style="margin:0;"><i class="fas fa-gamepad" style="color:#5865F2;"></i> Spiele</h2>
+            <button onclick="showView('mainView')" class="secondary" style="padding:7px 14px; font-size:0.85rem;"><i class="fas fa-chevron-left"></i> Zurück</button>
+        </div>
+        <p style="font-size:0.82rem; color:#888; margin:0 0 15px 0;">Spiele direkt mit deinen John Chat Freunden.</p>
+
+        <!-- TIC TAC TOE KARTE -->
+        <div onclick="window.open('https://john-chat-game-tictactoe.netlify.app', '_blank')"
+             style="
+                border: 2px solid #5865F2;
+                border-radius: 18px;
+                padding: 20px;
+                background: linear-gradient(135deg, rgba(88,101,242,0.08), rgba(88,101,242,0.03));
+                cursor: pointer;
+                transition: 0.2s;
+                text-align: left;
+                position: relative;
+                overflow: hidden;
+             "
+             onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(88,101,242,0.2)'"
+             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+            <div style="position:absolute; top:-15px; right:-10px; font-size:5.5rem; opacity:0.07; pointer-events:none;">❌⭕</div>
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+                <div style="
+                    width: 52px; height: 52px; border-radius: 14px;
+                    background: linear-gradient(135deg, #5865F2, #7289DA);
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1.7rem; flex-shrink: 0;
+                    box-shadow: 0 4px 12px rgba(88,101,242,0.35);
+                ">🎮</div>
+                <div>
+                    <div style="font-weight: bold; font-size: 1.1rem; color: var(--txt);">Tic Tac Toe</div>
+                    <div style="font-size: 0.78rem; color: #888; margin-top: 2px;">1v1 · Best of 3 · Mit Freunden & KI</div>
+                </div>
+                <div style="margin-left:auto; color:#5865F2; font-size:1.1rem;"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span style="background:rgba(88,101,242,0.12); color:#5865F2; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">👥 Freundes Spiel</span>
+                <span style="background:rgba(67,181,129,0.12); color:#43b581; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🤖 Solo vs KI</span>
+                <span style="background:rgba(255,159,67,0.12); color:#ff9f43; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🔍 Spielsuche</span>
+            </div>
+        </div>
+
+        <!-- Placeholder mehr Spiele -->
+        <div style="margin-top:15px; border: 2px dashed var(--brd); border-radius: 18px; padding: 22px; text-align:center; color:#aaa;">
+            <div style="font-size:2rem; margin-bottom:6px;">🕹️</div>
+            <div style="font-size:0.88rem; font-weight:600; color:#bbb;">Mehr Spiele bald verfügbar</div>
+            <div style="font-size:0.75rem; margin-top:4px; color:#ccc;">Stay tuned!</div>
+        </div>
+    </div>
+
     <div id="shopView" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <h2 style="margin:0;"><i class="fas fa-store" style="color:var(--gold);"></i> Shop</h2>
