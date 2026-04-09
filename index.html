@@ -1760,6 +1760,13 @@
         }
 
         // 3-dots menu helpers
+        function _dotsOutsideHandler(e) {
+            const dd = document.getElementById('dotsDropdown');
+            const btn = document.getElementById('btn3dots');
+            if (dd && !dd.contains(e.target) && btn && !btn.contains(e.target)) {
+                closeDotsMenu();
+            }
+        }
         function openDotsMenu() {
             // sync admin + badge before opening
             const ab = document.getElementById('adminBtn');
@@ -1769,13 +1776,13 @@
             const ibm = document.getElementById('inboxBadgeMenu');
             if(ib && ibm) { ibm.textContent = ib.textContent; ibm.style.display = ib.style.display === 'none' || !ib.textContent ? 'none' : 'inline'; }
             document.getElementById('dotsDropdown').classList.remove('hidden');
-            const ov = document.createElement('div');
-            ov.id = 'dotsOverlay'; ov.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99998;';
-            ov.onclick = closeDotsMenu;
-            document.body.appendChild(ov);
+            // Use setTimeout so this click event doesn't immediately trigger the outside handler
+            setTimeout(() => document.addEventListener('click', _dotsOutsideHandler), 0);
         }
         function closeDotsMenu() {
             document.getElementById('dotsDropdown').classList.add('hidden');
+            document.removeEventListener('click', _dotsOutsideHandler);
+            // Legacy cleanup just in case
             const ov = document.getElementById('dotsOverlay');
             if(ov) ov.remove();
         }
