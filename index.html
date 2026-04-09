@@ -50,122 +50,107 @@
             min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s;
         }
         
-        /* === FULLSCREEN VIEWS (Mobile) === */
+        /* MOBILE: fullscreen */
         .view { 
             animation: fadeIn 0.4s;
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--bg); 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
             padding: 20px; box-sizing: border-box;
             display: flex; flex-direction: column;
         }
+        /* Auth views stay as cards on mobile */
+        #homeView, #loginView, #registerView, #bannedView {
+            position: relative; top: auto; left: auto;
+            width: 90%; max-width: 420px; height: auto; max-height: 85vh;
+            background: var(--cont);
+            border: 1px solid var(--brd); border-radius: 20px; padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center; margin: auto;
+        }
         .view-large { padding: 20px; }
 
-        /* Card style for auth views on mobile */
-        .view-card {
-            position: relative !important; top: auto !important; left: auto !important;
-            width: 90% !important; max-width: 420px !important; height: auto !important; max-height: 85vh !important;
-            background: var(--cont) !important; border: 1px solid var(--brd) !important;
-            border-radius: 20px !important; padding: 25px !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; margin: auto;
-        }
-
-        /* === DESKTOP / TABLET SPLIT LAYOUT (≥768px) === */
+        /* DESKTOP / TABLET (≥768px): sidebar layout */
         @media (min-width: 768px) {
             body { align-items: stretch; justify-content: flex-start; }
 
-            .view {
-                position: fixed; top: 0;
-                border-radius: 0; border: none; box-shadow: none;
-                max-width: none; max-height: none; height: 100vh;
-            }
-
-            /* Sidebar: always visible left 25% */
+            /* Sidebar: left 25%, always stays */
             #mainView {
-                left: 0 !important; width: 25% !important;
+                position: fixed !important; top: 0 !important; left: 0 !important;
+                width: 25% !important; height: 100vh !important;
+                background: var(--cont) !important;
                 border-right: 1px solid var(--brd) !important;
-                background: var(--cont) !important;
-                display: flex !important; /* override .hidden on desktop */
+                border-radius: 0 !important; box-shadow: none !important;
+                padding: 16px 14px !important;
             }
-
-            /* Content panel: right 75% */
-            #chatWindow, #settingsView, #shopView, #gamesView, #inboxView, #adminPanelView {
-                left: 25% !important; width: 75% !important;
+            /* Content views: right 75% */
+            #chatWindow, #settingsView, #shopView, #gamesView,
+            #inboxView, #adminPanelView {
+                position: fixed !important; top: 0 !important; left: 25% !important;
+                width: 75% !important; height: 100vh !important;
                 background: var(--bg) !important;
+                border-radius: 0 !important; box-shadow: none !important;
             }
-
-            /* Auth views stay centered card */
-            .view-card {
+            /* Auth cards centered */
+            #homeView, #loginView, #registerView, #bannedView {
                 position: fixed !important;
-                left: 50% !important; top: 50% !important;
+                top: 50% !important; left: 50% !important;
                 transform: translate(-50%, -50%) !important;
-                width: 90% !important; max-width: 420px !important; height: auto !important;
-                border-radius: 20px !important; border: 1px solid var(--brd) !important;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
-                background: var(--cont) !important;
+                width: 90% !important; max-width: 420px !important;
+                height: auto !important;
             }
-
-            /* Hide old top-right icons on desktop */
-            .mobile-nav-icon { display: none !important; }
-
-            /* Show 3-dots menu button only on desktop */
-            #menuBtn3dots { display: flex !important; }
-
-            /* Sidebar header area */
-            .sidebar-header { display: flex !important; }
+            /* Old floating icons: hide on desktop */
+            .desktop-hide { display: none !important; }
+            /* 3-dots menu button: show on desktop */
+            #btn3dots { display: flex !important; }
+            /* Sidebar title row */
+            #sidebarTitleRow { display: flex !important; }
+            /* Mobile greeting h2 */
+            #userGreeting { display: none !important; }
         }
 
-        /* Desktop placeholder */
+        /* Desktop right-panel placeholder */
         #desktopPlaceholder {
             position: fixed; top: 0; left: 25%; width: 75%; height: 100vh;
-            display: none; align-items: center; justify-content: center;
-            flex-direction: column; gap: 12px; color: #aaa;
-            background: var(--bg);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            gap: 10px; color: #bbb; background: var(--bg); pointer-events: none;
         }
 
-        /* 3-dots menu button (hidden on mobile) */
-        #menuBtn3dots {
+        /* 3-dots btn (hidden on mobile by default) */
+        #btn3dots {
             display: none;
-            position: absolute; top: 16px; left: 14px;
             background: transparent; border: none; color: var(--txt);
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 34px; height: 34px; border-radius: 50%;
             align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; transition: 0.2s; padding: 0;
-            z-index: 10; flex-shrink: 0;
+            font-size: 1.15rem; cursor: pointer; transition: 0.2s; padding: 0;
+            flex-shrink: 0;
         }
-        #menuBtn3dots:hover { background: var(--hover); transform: none; }
+        #btn3dots:hover { background: var(--hover); }
 
-        /* Sidebar header */
-        .sidebar-header {
-            display: none;
-            align-items: center; justify-content: center;
+        /* Sidebar title row (hidden on mobile) */
+        #sidebarTitleRow {
+            display: none; align-items: center; gap: 8px;
             padding-bottom: 12px; margin-bottom: 4px;
-            border-bottom: 1px solid var(--brd);
-            position: relative; flex-shrink: 0;
+            border-bottom: 1px solid var(--brd); flex-shrink: 0;
         }
+        #sidebarTitleRow h2 { margin: 0; font-size: 1.05rem; flex: 1; text-align: center; }
 
-        /* Desktop dropdown menu */
-        #desktopMenuDropdown {
-            position: absolute; top: 52px; left: 10px;
+        /* Dropdown menu */
+        #dotsDropdown {
+            position: fixed; top: 54px; left: 10px;
             background: var(--cont); border: 1px solid var(--brd);
-            border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-            z-index: 9999; min-width: 210px; overflow: hidden;
+            border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 99999; min-width: 200px; overflow: hidden;
             animation: fadeIn 0.15s;
         }
-        #desktopMenuDropdown.hidden { display: none !important; }
-        .dmenu-item {
+        #dotsDropdown.hidden { display: none !important; }
+        .dd-item {
             display: flex; align-items: center; gap: 14px;
-            padding: 14px 20px; cursor: pointer;
-            transition: background 0.15s; font-size: 0.95rem;
-            border-bottom: 1px solid var(--brd);
+            padding: 13px 20px; cursor: pointer; transition: background 0.15s;
+            font-size: 0.95rem; border-bottom: 1px solid var(--brd);
         }
-        .dmenu-item:last-child { border-bottom: none; }
-        .dmenu-item:hover { background: var(--hover); }
-        .dmenu-item i { width: 20px; text-align: center; font-size: 1.1rem; }
-        .dmenu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 9998;
-        }
+        .dd-item:last-child { border-bottom: none; }
+        .dd-item:hover { background: var(--hover); }
+        .dd-item i { width: 20px; text-align: center; font-size: 1.05rem; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -561,7 +546,7 @@
         </div>
     </div>
 
-    <div id="homeView" class="view view-card">
+    <div id="homeView" class="view">
         <h1>John Chat</h1>
         <div style="display:flex; flex-direction:column; gap:10px;">
            <button onclick="showView('loginView')">Anmelden</button>
@@ -569,7 +554,7 @@
         </div>
     </div>
 
-    <div id="bannedView" class="view view-card hidden">
+    <div id="bannedView" class="view hidden">
         <h1 style="font-size: 3rem;"><i class="fas fa-ban"></i></h1>
         <h2>GESPERRT</h2>
         <p id="banMessage">Dein Account wurde permanent gesperrt.</p>
@@ -577,7 +562,7 @@
         <button onclick="executeLogout()" style="background: white; color: #ff4757; margin-top: 20px;">Abmelden</button>
     </div>
 
-    <div id="registerView" class="view view-card hidden">
+    <div id="registerView" class="view hidden">
         <h1>Konto erstellen</h1>
         <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
         <input type="password" id="regPass" placeholder="Passwort">
@@ -603,7 +588,7 @@
          </div>
     </div>
 
-    <div id="loginView" class="view view-card hidden">
+    <div id="loginView" class="view hidden">
         <h1>Login</h1>
         <input type="text" id="loginUser" placeholder="Benutzername">
         <input type="password" id="loginPass" placeholder="Passwort">
@@ -638,64 +623,51 @@
 
     <div id="mainView" class="view view-large hidden">
 
-        <!-- Sidebar header (desktop only) -->
-        <div class="sidebar-header">
-            <!-- 3-dots menu button (desktop) -->
-            <button id="menuBtn3dots" onclick="openDesktopMenu()" title="Menü">
-                <i class="fas fa-ellipsis-v"></i>
-            </button>
-            <h2 id="userGreeting" style="margin:0; font-size:1.1rem;">Hi</h2>
+        <!-- Desktop: Sidebar title row with 3-dots -->
+        <div id="sidebarTitleRow">
+            <button id="btn3dots" onclick="openDotsMenu()" title="Menü"><i class="fas fa-ellipsis-v"></i></button>
+            <h2 id="sidebarTitle">John Chat</h2>
+            <span style="width:34px;"></span><!-- spacer to center title -->
         </div>
 
-        <!-- Desktop dropdown menu -->
-        <div id="desktopMenuDropdown" class="hidden">
-            <div class="dmenu-item" onclick="closeDesktopMenu(); showView('settingsView')">
-                <i class="fas fa-cog" style="color:var(--txt);"></i> Einstellungen
-            </div>
-            <div class="dmenu-item" onclick="closeDesktopMenu(); showView('gamesView')">
-                <i class="fas fa-gamepad" style="color:#5865F2;"></i> Games
-            </div>
-            <div class="dmenu-item" onclick="closeDesktopMenu(); showView('shopView')">
-                <i class="fas fa-store" style="color:var(--gold);"></i> Shop
-            </div>
-            <div class="dmenu-item" onclick="closeDesktopMenu(); showView('inboxView')">
-                <i class="fas fa-envelope" style="color:var(--success);"></i> Postfach
-                <span id="inboxBadgeMenu" style="background:var(--danger);color:white;border-radius:50%;padding:2px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span>
-            </div>
-            <div id="adminMenuBtn" class="dmenu-item hidden" onclick="closeDesktopMenu(); showView('adminPanelView')">
-                <i class="fas fa-user-shield" style="color:var(--danger);"></i> Admin Panel
-            </div>
+        <!-- Desktop dropdown -->
+        <div id="dotsDropdown" class="hidden">
+            <div class="dd-item" onclick="closeDotsMenu();showView('settingsView')"><i class="fas fa-cog" style="color:var(--txt)"></i>Einstellungen</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('gamesView')"><i class="fas fa-gamepad" style="color:#5865F2"></i>Games</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('shopView')"><i class="fas fa-store" style="color:var(--gold)"></i>Shop</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('inboxView')"><i class="fas fa-envelope" style="color:var(--success)"></i>Postfach <span id="inboxBadgeMenu" style="background:var(--danger);color:#fff;border-radius:50%;padding:1px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span></div>
+            <div id="adminDotsBtn" class="dd-item hidden" onclick="closeDotsMenu();showView('adminPanelView')"><i class="fas fa-user-shield" style="color:var(--danger)"></i>Admin Panel</div>
+            <div class="dd-item" onclick="closeDotsMenu();confirmLogout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i>Abmelden</div>
         </div>
 
-        <!-- Mobile top icons (hidden on desktop) -->
-        <span id="adminBtn" class="admin-icon mobile-nav-icon hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
-        <span class="games-icon mobile-nav-icon" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-gamepad"></i></span>
-        <span class="shop-icon mobile-nav-icon" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
-        <span class="inbox-icon mobile-nav-icon" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-envelope"></i></span>
-        <span class="inbox-badge mobile-nav-icon" id="inboxBadge"></span>
-        <span class="settings-icon mobile-nav-icon" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
+        <!-- Mobile: original floating icons (hidden on desktop via CSS) -->
+        <span id="adminBtn" class="admin-icon desktop-hide hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
+        <span class="games-icon desktop-hide" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-gamepad"></i></span>
+        <span class="shop-icon desktop-hide" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
+        <span class="inbox-icon desktop-hide" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-envelope"></i></span>
+        <span class="inbox-badge desktop-hide" id="inboxBadge"></span>
+        <span class="settings-icon desktop-hide" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
         
-        <!-- Mobile greeting (hidden on desktop since sidebar-header shows it) -->
-        <h2 id="userGreetingMobile" class="mobile-nav-icon" style="display:none;"></h2>
+        <h2 id="userGreeting">Hi</h2>
         
         <div style="background: rgba(88, 101, 242, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 10px; flex-shrink:0;">
             <input type="text" id="targetFriend" placeholder="Username adden..." style="margin:0">
             <button onclick="sendRequest()" style="width: 100%; margin-top:5px;"><i class="fas fa-user-plus"></i> Adden</button>
         </div>
         <button onclick="openGroupCreator()" class="secondary" style="font-size:0.8rem; margin-bottom:10px; flex-shrink:0;">+ Neue Gruppe erstellen</button>
-        <div id="pendingRequests"></div>
+        <div id="pendingRequests" style="flex-shrink:0;"></div>
         <div class="scroll-area">
             <div id="friendsList"></div>
             <div id="groupsList"></div>
         </div>
-        <button onclick="confirmLogout()" class="secondary" style="width:100%; margin-top:8px; flex-shrink:0;">Abmelden</button>
+        <button onclick="confirmLogout()" class="secondary desktop-hide" style="width:100%; margin-top:8px; flex-shrink:0;">Abmelden</button>
     </div>
 
-    <!-- Desktop right panel placeholder (shown when no view is open) -->
+    <!-- Desktop right-panel placeholder -->
     <div id="desktopPlaceholder">
-        <i class="fas fa-comment-dots" style="font-size:3.5rem; color:var(--brd);"></i>
-        <p style="font-size:1rem; margin:0;">Wähle einen Chat aus</p>
-        <p style="font-size:0.82rem; margin:0; color:#bbb;">Deine Nachrichten erscheinen hier</p>
+        <i class="fas fa-comment-dots" style="font-size:3.5rem;"></i>
+        <p style="margin:0;font-size:1rem;">Wähle einen Chat aus</p>
+        <p style="margin:0;font-size:0.82rem;">Deine Nachrichten erscheinen hier</p>
     </div>
 
     <div id="adminPanelView" class="view view-large hidden">
@@ -728,7 +700,7 @@
             <div id="reportsListContainer"></div>
         </div>
 
-        <button onclick="goBackToMain()" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:auto;">Zurück</button>
     </div>
 
     <!-- SIGN OUT ALL DEVICES CONFIRM EMBED -->
@@ -1065,7 +1037,7 @@
 
             <button onclick="confirmDeleteAccount()" class="danger" style="width:100%; margin-top:15px;">Konto löschen</button>
 
-            <button onclick="goBackToMain()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+            <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
         </div>
 
         <!-- TAB: EMAIL -->
@@ -1152,7 +1124,7 @@
                 </div>
             </div>
 
-            <button onclick="goBackToMain()" class="secondary" style="width:100%; margin-top:5px;">Zurück</button>
+            <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:5px;">Zurück</button>
         </div>
 
         <!-- TAB: PROFIL -->
@@ -1190,7 +1162,7 @@
                 <button id="downloadApkBtn" onclick="downloadApk()" style="width:100%; background:linear-gradient(135deg,#43b581,#2ecc71); color:white;">Android App Herunterladen</button>
             </div>
 
-            <button onclick="goBackToMain()" class="secondary" style="width:100%;">Zurück</button>
+            <button onclick="showView('mainView')" class="secondary" style="width:100%;">Zurück</button>
         </div>
     </div>
     
@@ -1203,14 +1175,14 @@
         <div class="scroll-area" id="inboxList" style="padding-right:5px;">
             <p style="color:#888; font-size:0.9rem; text-align:center; margin-top:20px;" id="inboxEmpty">Keine Nachrichten.</p>
         </div>
-        <button onclick="goBackToMain()" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
     </div>
 
     <!-- SHOP VIEW -->
     <div id="gamesView" class="view hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h2 style="margin:0;"><i class="fas fa-gamepad" style="color:#5865F2;"></i> Spiele</h2>
-            <button onclick="goBackToMain()" class="secondary" style="padding:7px 14px; font-size:0.85rem;"><i class="fas fa-chevron-left"></i> Zurück</button>
+            <button onclick="showView('mainView')" class="secondary" style="padding:7px 14px; font-size:0.85rem;"><i class="fas fa-chevron-left"></i> Zurück</button>
         </div>
         <p style="font-size:0.82rem; color:#888; margin:0 0 15px 0;">Spiele direkt mit deinen John Chat Freunden.</p>
 
@@ -1429,7 +1401,7 @@
             </div>
 
         </div>
-        <button onclick="goBackToMain()" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
+        <button onclick="showView('mainView')" class="secondary" style="width:100%; margin-top:10px; flex-shrink:0;">Zurück</button>
     </div>
 
     <!-- SHOP CONFIRM MODAL -->
@@ -1665,43 +1637,6 @@
         let reportsListener = null;
         // Global Refresh
         let globalRefreshListener = null;
-        // Desktop/mobile responsive handler
-        function applyResponsiveLayout() {
-            const isDesktop = window.innerWidth >= 768;
-            // Mobile-only nav icons
-            document.querySelectorAll('.mobile-nav-icon').forEach(el => {
-                el.style.display = isDesktop ? 'none' : '';
-            });
-            // Desktop menu button
-            const mb = document.getElementById('menuBtn3dots');
-            if(mb) mb.style.display = isDesktop ? 'flex' : 'none';
-            // Sidebar header
-            const sh = document.querySelector('.sidebar-header');
-            if(sh) sh.style.display = isDesktop ? 'flex' : 'none';
-
-            // If a content view is visible, keep sidebar also visible
-            if(isDesktop) {
-                const mv = document.getElementById('mainView');
-                if(mv && !mv.classList.contains('hidden')) {
-                    // already showing
-                }
-                // Show placeholder if no content view open
-                const contentViews = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView'];
-                const anyOpen = contentViews.some(id => {
-                    const el = document.getElementById(id);
-                    return el && !el.classList.contains('hidden');
-                });
-                const ph = document.getElementById('desktopPlaceholder');
-                if(ph && mv && !mv.classList.contains('hidden')) {
-                    ph.style.display = anyOpen ? 'none' : 'flex';
-                }
-            } else {
-                const ph = document.getElementById('desktopPlaceholder');
-                if(ph) ph.style.display = 'none';
-            }
-        }
-        window.addEventListener('resize', applyResponsiveLayout);
-
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('johnChatUser');
             if(savedUser) {
@@ -1737,7 +1672,7 @@
                             }
                         }
 
-                        (function(t){document.getElementById('userGreeting').innerText=t;var m=document.getElementById('userGreetingMobile');if(m)m.innerText=t;}("Hi " + formatName(currentUser)));
+                        document.getElementById('userGreeting').innerText = "Hi " + formatName(currentUser);
                         if(data.theme === 'dark') document.body.classList.add('dark-mode');
                         
                         if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -1747,7 +1682,7 @@
                         startSync();
                         setTimeout(() => {
                             hideGlobalLoading();
-                            showView('mainView'); applyResponsiveLayout();
+                            showView('mainView');
                         }, 2500);
                     } else {
                         hideGlobalLoading();
@@ -1799,72 +1734,67 @@
         }
 
         function toggleAgb(s) { document.getElementById('agbEmbed').classList.toggle('hidden', !s); }
-        function showView(id) { 
-            const isDesktop = window.innerWidth >= 768;
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-
-            // On desktop: always keep mainView (sidebar) visible
-            if(isDesktop) {
+            // Desktop: always keep mainView (sidebar) visible + manage placeholder
+            if(window.innerWidth >= 768) {
                 const mv = document.getElementById('mainView');
                 if(mv) mv.classList.remove('hidden');
+                const contentViews = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView'];
+                const ph = document.getElementById('desktopPlaceholder');
+                if(ph) ph.style.display = contentViews.includes(id) ? 'none' : 'flex';
+                // Sync admin btn to dropdown
+                const ab = document.getElementById('adminBtn');
+                const adb = document.getElementById('adminDotsBtn');
+                if(ab && adb) adb.classList.toggle('hidden', ab.classList.contains('hidden'));
+                // Sync inbox badge
+                const ib = document.getElementById('inboxBadge');
+                const ibm = document.getElementById('inboxBadgeMenu');
+                if(ib && ibm) { ibm.textContent = ib.textContent; ibm.style.display = ib.style.display === 'none' || !ib.textContent ? 'none' : 'inline'; }
             }
-
-            // Desktop placeholder logic
-            const ph = document.getElementById('desktopPlaceholder');
-            const contentViews = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView'];
-            if(ph) {
-                ph.style.display = (isDesktop && !contentViews.includes(id)) ? 'flex' : 'none';
-            }
-            
-            if(id === 'inboxView') loadInboxView(); 
-            if(id === 'settingsView') { loadBlockedUsers(); switchSettingsTab('security'); } 
+            if(id === 'inboxView') loadInboxView();
+            if(id === 'settingsView') { loadBlockedUsers(); switchSettingsTab('security'); }
             const bModal = document.getElementById('blockConfirmModal');
             if(bModal) bModal.classList.add('hidden');
         }
 
-        function goBackToMain() {
-            if(window.innerWidth >= 768) {
-                // On desktop: hide the current content view, show placeholder
-                const contentViews = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView'];
-                contentViews.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.classList.add('hidden');
-                });
-                const ph = document.getElementById('desktopPlaceholder');
-                if(ph) ph.style.display = 'flex';
-            } else {
-                showView('mainView'); applyResponsiveLayout();
-            }
-        }
-
-        function openDesktopMenu() {
-            // Sync inbox badge to menu
-            const badge = document.getElementById('inboxBadge');
-            const badgeMenu = document.getElementById('inboxBadgeMenu');
-            if(badge && badgeMenu) {
-                badgeMenu.textContent = badge.textContent;
-                badgeMenu.style.display = (badge.style.display === 'flex' || badge.style.display === 'inline-flex') ? 'inline-block' : 'none';
-            }
-            // Sync admin button
-            const adminBtn = document.getElementById('adminBtn');
-            const adminMenuBtn = document.getElementById('adminMenuBtn');
-            if(adminBtn && adminMenuBtn) {
-                adminMenuBtn.classList.toggle('hidden', adminBtn.classList.contains('hidden'));
-            }
-            document.getElementById('desktopMenuDropdown').classList.remove('hidden');
-            // Overlay to close on outside click
+        // 3-dots menu helpers
+        function openDotsMenu() {
+            // sync admin + badge before opening
+            const ab = document.getElementById('adminBtn');
+            const adb = document.getElementById('adminDotsBtn');
+            if(ab && adb) adb.classList.toggle('hidden', ab.classList.contains('hidden'));
+            const ib = document.getElementById('inboxBadge');
+            const ibm = document.getElementById('inboxBadgeMenu');
+            if(ib && ibm) { ibm.textContent = ib.textContent; ibm.style.display = ib.style.display === 'none' || !ib.textContent ? 'none' : 'inline'; }
+            document.getElementById('dotsDropdown').classList.remove('hidden');
             const ov = document.createElement('div');
-            ov.className = 'dmenu-overlay'; ov.id = 'dmenuOverlay';
-            ov.onclick = closeDesktopMenu;
+            ov.id = 'dotsOverlay'; ov.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99998;';
+            ov.onclick = closeDotsMenu;
             document.body.appendChild(ov);
         }
-
-        function closeDesktopMenu() {
-            document.getElementById('desktopMenuDropdown').classList.add('hidden');
-            const ov = document.getElementById('dmenuOverlay');
+        function closeDotsMenu() {
+            document.getElementById('dotsDropdown').classList.add('hidden');
+            const ov = document.getElementById('dotsOverlay');
             if(ov) ov.remove();
         }
+
+        // On resize: show/hide placeholder if mainView is active
+        window.addEventListener('resize', () => {
+            if(window.innerWidth >= 768) {
+                const mv = document.getElementById('mainView');
+                if(mv && !mv.classList.contains('hidden')) {
+                    const anyContent = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView']
+                        .some(id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
+                    const ph = document.getElementById('desktopPlaceholder');
+                    if(ph) ph.style.display = anyContent ? 'none' : 'flex';
+                }
+            } else {
+                const ph = document.getElementById('desktopPlaceholder');
+                if(ph) ph.style.display = 'none';
+            }
+        });
         
         function formatName(n) { return (myNicknames && myNicknames[n]) ? myNicknames[n] : n; }
 
@@ -2214,7 +2144,7 @@
                         }
                     }
 
-                    (function(t){document.getElementById('userGreeting').innerText=t;var m=document.getElementById('userGreetingMobile');if(m)m.innerText=t;}("Hi " + formatName(user)));
+                    document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
                     if(data.theme === 'dark') document.body.classList.add('dark-mode');
                     
                     // Sicherheitswarnung per Email senden (nur wenn kein 2FA aktiv, sonst redundant)
@@ -2239,7 +2169,7 @@
                     
                     setTimeout(() => {
                         hideGlobalLoading();
-                        showView('mainView'); applyResponsiveLayout();
+                        showView('mainView');
                     }, 2000);
                 } else {
                     hideGlobalLoading();
@@ -2318,7 +2248,7 @@
                 } else {
                     // If currently on Banned View but banned is false/null -> Unban!
                     if(!document.getElementById('bannedView').classList.contains('hidden')) {
-                        showView('mainView'); applyResponsiveLayout();
+                        showView('mainView');
                     }
                 }
                 
@@ -3599,7 +3529,7 @@
                 const ph = document.getElementById('desktopPlaceholder');
                 if(ph) ph.style.display = 'flex';
             } else {
-                showView('mainView'); applyResponsiveLayout();
+                showView('mainView');
             }
         }
 
@@ -4548,14 +4478,14 @@
                     db.ref('users/' + username + '/nicknames').set(myNicknames);
                     localStorage.removeItem('nicknames_' + username);
                 }
-                (function(t){document.getElementById('userGreeting').innerText=t;var m=document.getElementById('userGreetingMobile');if(m)m.innerText=t;}("Hi " + formatName(username)));
+                document.getElementById('userGreeting').innerText = "Hi " + formatName(username);
                 if(data.theme === 'dark') document.body.classList.add('dark-mode');
                 if(stayLoggedIn && ("Notification" in window)) {
                     Notification.requestPermission();
                 }
                 startSync();
                 hideGlobalLoading();
-                showView('mainView'); applyResponsiveLayout();
+                showView('mainView');
             });
         }
 
