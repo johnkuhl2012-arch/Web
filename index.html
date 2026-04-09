@@ -97,6 +97,8 @@
                 transform: translate(-50%, -50%) !important;
                 width: 90% !important; max-width: 420px !important;
                 height: auto !important;
+                max-height: 90vh !important;
+                overflow-y: auto !important;
             }
             /* Old floating icons: hide on desktop */
             .desktop-hide { display: none !important; }
@@ -106,6 +108,28 @@
             #sidebarTitleRow { display: flex !important; }
             /* Mobile greeting h2 */
             #userGreeting { display: none !important; }
+        }
+
+        /* Tablet (768px–1024px): etwas breitere Sidebar für bessere Lesbarkeit */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            #mainView {
+                width: 32% !important;
+                padding: 14px 10px !important;
+            }
+            #chatWindow, #settingsView, #shopView, #gamesView,
+            #inboxView, #adminPanelView {
+                left: 32% !important;
+                width: 68% !important;
+            }
+            #desktopPlaceholder {
+                left: 32% !important;
+                width: 68% !important;
+            }
+            /* Eingaben und Buttons auf Tablets etwas größer */
+            input, select, textarea { font-size: 1rem !important; }
+            button { font-size: 0.95rem !important; }
+            /* Chat-Nachrichten etwas schmaler damit sie nicht zu breit werden */
+            .msg { max-width: 80% !important; }
         }
 
         /* Desktop right-panel placeholder */
@@ -1737,13 +1761,25 @@
         function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            // Desktop: always keep mainView (sidebar) visible + manage placeholder
+            // Desktop: mainView (Sidebar) nur anzeigen wenn User eingeloggt ist
+            const authViews = ['homeView','loginView','registerView','bannedView'];
             if(window.innerWidth >= 768) {
                 const mv = document.getElementById('mainView');
-                if(mv) mv.classList.remove('hidden');
-                const contentViews = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView'];
                 const ph = document.getElementById('desktopPlaceholder');
-                if(ph) ph.style.display = contentViews.includes(id) ? 'none' : 'flex';
+                if(currentUser && !authViews.includes(id)) {
+                    // Eingeloggt und kein Auth-View → Sidebar immer sichtbar
+                    if(mv) mv.classList.remove('hidden');
+                    const contentViews = ['chatWindow','settingsView','shopView','gamesView','inboxView','adminPanelView'];
+                    if(ph) ph.style.display = contentViews.includes(id) ? 'none' : 'flex';
+                } else if(authViews.includes(id)) {
+                    // Auth-View → Sidebar verstecken
+                    if(mv) mv.classList.add('hidden');
+                    if(ph) ph.style.display = 'none';
+                } else {
+                    // Eingeloggt, navigiert zu mainView selbst
+                    if(mv) mv.classList.remove('hidden');
+                    if(ph) ph.style.display = 'flex';
+                }
                 // Sync admin btn to dropdown
                 const ab = document.getElementById('adminBtn');
                 const adb = document.getElementById('adminDotsBtn');
@@ -2057,7 +2093,7 @@
                             // Email-Index schreiben (best-effort, kein Fehler wenn keine Berechtigung)
                             db.ref('emailIndex/' + emailKey).set(user).catch(() => {});
                             resetBtn();
-                            showAlert("Konto erstellt!", "success");
+                            showAlert("Konto erstellt! Du wirst angemeldet...", "success");
                             sendEmailViaScript({
                                 to: email,
                                 subject: "🎉 Willkommen bei John Chat!",
@@ -2068,7 +2104,20 @@
                                     "John Chat · Automatische Benachrichtigung"
                                 )
                             });
-                            showView('loginView');
+                            // Auto-Login: direkt einloggen und in localStorage speichern
+                            currentUser = user;
+                            myNicknames = {};
+                            localStorage.setItem('johnChatUser', user);
+                            document.getElementById('userGreeting').innerText = "Hi " + formatName(user);
+                            if("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+                                Notification.requestPermission();
+                            }
+                            showGlobalLoading();
+                            startSync();
+                            setTimeout(() => {
+                                hideGlobalLoading();
+                                showView('mainView');
+                            }, 2000);
                         }).catch(err => {
                             resetBtn();
                             console.error("Register set error:", err);
@@ -2193,7 +2242,7 @@
         function executeLogout() { 
             document.getElementById('logoutConfirmModal').classList.add('hidden');
             localStorage.removeItem('johnChatUser');
-            currentUser = null;
+            // Alle Firebase-Listener vor currentUser = null aufräumen
             if(currentChatPath) db.ref(currentChatPath).off();
             for(let id in watchedChats) { db.ref(watchedChats[id]).off(); }
             if(currentUser) db.ref('users/' + currentUser + '/lastRead').off();
@@ -2201,14 +2250,20 @@
             if(typingListener) db.ref(typingListener).off();
             if(reportsListener) db.ref('reports').off();
             if(globalRefreshListener) db.ref('system/forceRefresh').off();
-            if(inboxListener) { db.ref('users/' + currentUser + '/inbox').off(); inboxListener = null; }
+            if(inboxListener && currentUser) { db.ref('users/' + currentUser + '/inbox').off(); inboxListener = null; }
+            if(currentUser) { db.ref('users/' + currentUser).off(); db.ref('users/' + currentUser + '/forceLogout').off(); }
             
+            currentUser = null;
+            activeChatID = null;
             pfpListeners = {};
             pfpCache = {};
             watchedChats = {};
             seenMessages = new Set();
             document.body.classList.remove('dark-mode');
-            document.body.className = ""; 
+            document.body.className = "";
+            // Auf Desktop: mainView explizit verstecken, damit kein alter Zustand sichtbar bleibt
+            document.getElementById('mainView').classList.add('hidden');
+            document.getElementById('desktopPlaceholder').style.display = 'none';
             showView('homeView');
         }
 
