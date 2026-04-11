@@ -262,8 +262,8 @@
         }
 
         .msg img { max-width: 100%; border-radius: 12px; margin-top: 5px; display: block; cursor: pointer; }
-        .msg .del-btn { float: right; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.7rem; margin-left: 8px; padding-top: 2px;}
-        .msg.msg-other .del-btn { color: #ff4757; }
+        .msg .del-btn { display: none; } /* ersetzt durch 3-Punkte-Menü */
+        .msg.msg-other .del-btn { display: none; }
         
         .system-msg { color: #888; font-size: 0.8rem; text-align: center; align-self: center; background: transparent; max-width: 90%; margin: 10px 0; }
         
@@ -309,12 +309,13 @@
         
         .chat-input-area { 
             display: flex; gap: 8px; align-items: center; flex-shrink: 0;
-            background: var(--cont); padding: 5px 0; margin-top: 5px; position: relative;
+            background: transparent; padding: 5px 0; margin-top: 5px; position: relative;
         }
         
         .chat-input-wrapper {
             flex: 1; display: flex; align-items: center; background: var(--hover); 
             border-radius: 25px; padding: 2px 15px; border: 1px solid transparent; transition: 0.2s;
+            min-width: 0; overflow: hidden;
         }
         .chat-input-wrapper:focus-within { border-color: var(--main); background: var(--cont); box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.1); }
 
@@ -324,7 +325,7 @@
         }
         .file-label:hover { opacity: 1; color: var(--main); }
 
-        #chatInput { border: none; background: transparent; padding: 10px 5px; margin: 0; width: 100%; }
+        #chatInput { border: none; background: transparent; padding: 10px 5px; margin: 0; width: 100%; min-width: 0; }
         #chatInput:focus { outline: none; }
         
         .send-btn {
@@ -531,16 +532,59 @@
         .msg-self .reply-quote-from { color: rgba(255,255,255,0.8); }
         .reply-quote-content { opacity: 0.8; }
 
-        .reply-btn {
-            display: none; position: absolute; right: -32px; top: 50%; transform: translateY(-50%);
-            background: var(--hover); border-radius: 50%; width: 26px; height: 26px;
+        .reply-btn { display: none; } /* ersetzt durch 3-Punkte-Menü */
+
+        /* === MSG 3-DOT MENU === */
+        .msg-dots-btn {
+            display: none; position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.15); border-radius: 50%; width: 22px; height: 22px;
             align-items: center; justify-content: center; cursor: pointer;
-            font-size: 0.75rem; color: var(--main); box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            transition: 0.2s; border: 1px solid var(--brd);
+            font-size: 0.7rem; color: white; transition: 0.15s; z-index: 5;
         }
-        .msg-other:hover .reply-btn, .msg-self:hover .reply-btn { display: flex; }
-        .msg-self .reply-btn { right: auto; left: -32px; }
-        .reply-btn:hover { background: var(--main); color: white; transform: translateY(-50%) scale(1.1); }
+        .msg-other .msg-dots-btn { background: rgba(0,0,0,0.12); color: var(--txt); right: 6px; }
+        .msg:hover .msg-dots-btn { display: flex; }
+        .msg-dots-btn:hover { background: rgba(0,0,0,0.3); }
+        .msg-menu-popup {
+            position: absolute; top: 28px; right: 0; z-index: 100;
+            background: var(--cont); border: 1px solid var(--brd);
+            border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+            min-width: 140px; overflow: hidden; animation: fadeIn 0.12s;
+        }
+        .msg-self .msg-menu-popup { right: 0; left: auto; }
+        .msg-other .msg-menu-popup { left: 0; right: auto; }
+        .msg-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; cursor: pointer; font-size: 0.88rem;
+            color: var(--txt); transition: background 0.12s;
+        }
+        .msg-menu-item:hover { background: var(--hover); }
+        .msg-menu-danger { color: var(--danger) !important; }
+        .msg-menu-item i { width: 16px; text-align: center; }
+
+        /* === FULLSCREEN IMAGE OVERLAY === */
+        #fullscreenImageOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92); z-index: 99999;
+            align-items: center; justify-content: center; cursor: zoom-out;
+        }
+        #fullscreenImageOverlay.active { display: flex; }
+        #fullscreenImageOverlay img {
+            max-width: 95vw; max-height: 90vh; object-fit: contain;
+            border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            cursor: default;
+        }
+        #fullscreenCloseBtn {
+            position: absolute; top: 18px; right: 20px;
+            background: rgba(255,255,255,0.15); border: none; color: white;
+            width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        #fullscreenCloseBtn:hover { background: rgba(255,255,255,0.3); }
+
+        /* Message link style */
+        .msg a.msg-link { color: #a0c4ff; text-decoration: underline; word-break: break-all; }
+        .msg-self a.msg-link { color: rgba(255,255,255,0.85); }
 
         /* Email notification tab styles */
         .email-notif-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd); }
@@ -927,7 +971,7 @@
                     <button class="reply-cancel-btn" onclick="clearReply()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="chat-input-wrapper" id="chatInputWrapper">
-                    <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()">
+                    <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
                     <div class="recording-bar" id="recordingBar">
                         <span class="rec-dot"></span>
                         <span class="rec-timer" id="recTimer">0:00 / 0:14</span>
@@ -3684,7 +3728,7 @@
                     if(d.type === 'video') {
                         content = `<video src="${d.txt}" controls style="max-width:100%; border-radius:12px; margin-top:5px; display:block; max-height:300px;"></video>`;
                     } else {
-                        content = d.type === 'img' ? `<img src="${d.txt}" onclick="window.open(this.src)">` : d.txt;
+                        content = d.type === 'img' ? `<img src="${d.txt}" onclick="openFullscreenImage('${d.txt.replace(/'/g,"\\'")}')">` : linkify(d.txt);
                     }
                 }
             }
@@ -3694,11 +3738,21 @@
             if(isSpectatorMode) canDelete = false;
             // Admins cant delete while spectating
 
-            let delBtn = canDelete ? `<span class="del-btn" onclick="showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i></span>` : "";
-            
-            // REPLY BUTTON (nur für echte Nachrichten, nicht gelöscht, nicht Spectator)
-            let replyBtn = (!isSystem && !d.isDeleted && !isSpectatorMode) ?
-                `<span class="reply-btn" onclick="setReply('${key}', '${d.from}', '${(d.type !== 'img' && d.type !== 'voice' ? (d.txt||'').replace(/'/g,"\\'").replace(/\n/g,' ') : '')}', '${d.type}')"><i class="fas fa-reply"></i></span>` : '';
+            let canReply = (!isSystem && !d.isDeleted && !isSpectatorMode);
+
+            // 3-Punkte Menü (ersetzt del-btn und reply-btn)
+            let dotsMenu = '';
+            if(!isSystem && (canDelete || canReply)) {
+                let menuItems = '';
+                if(canReply) {
+                    menuItems += `<div class="msg-menu-item" onclick="closeMsgMenu();setReply('${key}', '${d.from}', '${(d.type !== 'img' && d.type !== 'voice' ? (d.txt||'').replace(/'/g,"\\'").replace(/\n/g,' ') : '')}', '${d.type}')"><i class="fas fa-reply"></i> Antworten</div>`;
+                }
+                if(canDelete) {
+                    menuItems += `<div class="msg-menu-item msg-menu-danger" onclick="closeMsgMenu();showInlineConfirm('${key}', '${d.from}')"><i class="fas fa-trash"></i> Löschen</div>`;
+                }
+                dotsMenu = `<span class="msg-dots-btn" onclick="openMsgMenu(event,'msg-menu-${key}')"><i class="fas fa-ellipsis-h"></i></span>
+                <div class="msg-menu-popup hidden" id="msg-menu-${key}">${menuItems}</div>`;
+            }
 
             // REPLY QUOTE anzeigen (wenn Nachricht auf eine andere antwortet)
             let replyQuote = '';
@@ -3736,11 +3790,59 @@
                     ${displayNameHTML}
                     ${replyQuote}
                     <div style="display:inline-block;">${content}</div>
-                    ${delBtn}
-                    ${replyBtn}
+                    ${dotsMenu}
                     ${!isSystem ? `<span class="msg-time">${timeStr}</span>` : ''}
                 </div>`;
         }
+
+        // === LINKIFY: URLs in Nachrichten klickbar machen ===
+        function linkify(text) {
+            if(!text) return '';
+            // Escape HTML first
+            const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            // Then make URLs clickable
+            return escaped.replace(/(https?:\/\/[^\s<>"]+)/g, '<a class="msg-link" href="$1" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">$1</a>');
+        }
+
+        // === FULLSCREEN IMAGE ===
+        function openFullscreenImage(src) {
+            const overlay = document.getElementById('fullscreenImageOverlay');
+            const img = document.getElementById('fullscreenImageEl');
+            img.src = src;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeFullscreenImage() {
+            document.getElementById('fullscreenImageOverlay').classList.remove('active');
+            document.getElementById('fullscreenImageEl').src = '';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => {
+            if(e.key === 'Escape') closeFullscreenImage();
+        });
+
+        // === MSG 3-DOT MENU ===
+        let activeMsgMenu = null;
+        function openMsgMenu(e, menuId) {
+            e.stopPropagation();
+            // Schließe vorheriges Menu
+            if(activeMsgMenu && activeMsgMenu !== menuId) {
+                const prev = document.getElementById(activeMsgMenu);
+                if(prev) prev.classList.add('hidden');
+            }
+            const menu = document.getElementById(menuId);
+            if(!menu) return;
+            menu.classList.toggle('hidden');
+            activeMsgMenu = menu.classList.contains('hidden') ? null : menuId;
+        }
+        function closeMsgMenu() {
+            if(activeMsgMenu) {
+                const menu = document.getElementById(activeMsgMenu);
+                if(menu) menu.classList.add('hidden');
+                activeMsgMenu = null;
+            }
+        }
+        document.addEventListener('click', () => closeMsgMenu());
 
         function handleTyping() {
             if(!activeChatID || isSpectatorMode) return;
@@ -5728,6 +5830,12 @@
                 <button onclick="closeEmailChangeVerify()" class="secondary" style="width:100%;">Abbrechen</button>
             </div>
         </div>
+    </div>
+
+    <!-- FULLSCREEN IMAGE OVERLAY -->
+    <div id="fullscreenImageOverlay" onclick="closeFullscreenImage()">
+        <button id="fullscreenCloseBtn" onclick="closeFullscreenImage()"><i class="fas fa-times"></i></button>
+        <img id="fullscreenImageEl" src="" onclick="event.stopPropagation()">
     </div>
 
     <!-- NICKNAME MODAL -->
