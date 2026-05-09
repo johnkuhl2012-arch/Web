@@ -610,7 +610,7 @@
         #typingIndicator { font-size: 0.7rem; color: #888; text-align: left; padding-left: 15px; height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic; }
 
         /* BANNED SCREEN */
-        #bannedView { background: #ff4757; color: white; z-index: 20000; }
+        #bannedView { z-index: 20000; }
         
         /* Email Settings Status */
         .email-status-box { border: 1px dashed var(--main); background: rgba(88, 101, 242, 0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
@@ -954,6 +954,459 @@
         .auth-card .agb-content { overflow-y: auto; max-height: 260px; margin-bottom: 12px; }
         .auth-card .agb-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.07) !important; font-size: 0.83rem; color: rgba(255,255,255,0.62); text-align: left; }
         .auth-card .agb-item strong { color: #a5b4fc; display: block; margin-bottom: 3px; }
+
+        /* ════════════════════════════════════════════════════════════
+           DARK GLASS UI — Complete Premium Override for App Interface
+           ════════════════════════════════════════════════════════════ */
+
+        /* Force dark glass variables globally */
+        body, body.dark-mode,
+        body.bg-yellow, body.bg-red, body.bg-blue, body.bg-purple,
+        body.bg-orange, body.bg-darkred,
+        body.dark-mode.bg-yellow, body.dark-mode.bg-red,
+        body.dark-mode.bg-blue, body.dark-mode.bg-purple,
+        body.dark-mode.bg-orange, body.dark-mode.bg-darkred {
+            --bg: #0a0c14 !important;
+            --txt: #e2e4ee !important;
+            --cont: rgba(255,255,255,0.055) !important;
+            --brd: rgba(255,255,255,0.1) !important;
+            --hover: rgba(255,255,255,0.08) !important;
+            --msg-other: rgba(255,255,255,0.09) !important;
+            --msg-self-txt: #ffffff !important;
+        }
+
+        body {
+            background: linear-gradient(135deg,#0d0f1a 0%,#111827 45%,#0a0e1a 75%,#0e1020 100%) !important;
+            background-attachment: fixed !important;
+        }
+
+        #globalLoading {
+            background: linear-gradient(135deg,#0d0f1a 0%,#111827 45%,#0a0e1a 75%,#0e1020 100%) !important;
+        }
+        .loader-icon { color: #5865F2 !important; }
+
+        /* ── SIDEBAR ─────────────────────────────────────────── */
+        #mainView {
+            background: rgba(10,12,20,0.88) !important;
+            backdrop-filter: blur(28px) !important;
+            -webkit-backdrop-filter: blur(28px) !important;
+            border-right: 1px solid rgba(255,255,255,0.07) !important;
+        }
+        #sidebarTitleRow {
+            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+        }
+        #sidebarTitleRow h2 {
+            background: linear-gradient(135deg,#fff 30%,#a5b4fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; font-weight: 900 !important;
+        }
+        #btn3dots {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            color: rgba(255,255,255,0.75) !important;
+        }
+        #btn3dots:hover { background: rgba(255,255,255,0.12) !important; }
+
+        /* Friend/group send request box */
+        #mainView > div[style*="rgba(88, 101, 242"] {
+            background: rgba(88,101,242,0.1) !important;
+            border: 1px solid rgba(88,101,242,0.22) !important;
+            border-radius: 14px !important;
+        }
+
+        /* Neue Gruppe button */
+        #mainView > button.secondary {
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: rgba(255,255,255,0.6) !important;
+        }
+
+        /* Friend / group list items */
+        .friend-item {
+            border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+            border-radius: 12px !important;
+            margin-bottom: 3px !important;
+            padding: 11px 10px !important;
+        }
+        .friend-item:hover { background: rgba(255,255,255,0.07) !important; }
+        .pfp { border-color: rgba(255,255,255,0.15) !important; background: rgba(255,255,255,0.07) !important; }
+
+        /* Logout button mobile */
+        #mainView > button.secondary.desktop-hide {
+            background: rgba(255,71,87,0.12) !important;
+            border: 1px solid rgba(255,71,87,0.25) !important;
+            color: #ff6b78 !important;
+        }
+
+        /* ── DROPDOWN MENU ────────────────────────────────────── */
+        #dotsDropdown {
+            background: rgba(10,12,20,0.97) !important;
+            backdrop-filter: blur(28px) !important;
+            -webkit-backdrop-filter: blur(28px) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(88,101,242,0.1) !important;
+        }
+        .dd-item {
+            color: rgba(255,255,255,0.78) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+            transition: background 0.15s !important;
+        }
+        .dd-item:hover { background: rgba(255,255,255,0.08) !important; }
+        .dd-item i { opacity: 0.9; }
+
+        /* ── MAIN CONTENT AREA ────────────────────────────────── */
+        #chatWindow, #settingsView, #shopView, #gamesView, #inboxView, #adminPanelView {
+            background: linear-gradient(160deg,#0d0f1a 0%,#111827 55%,#0a0e1a 100%) !important;
+        }
+        #desktopPlaceholder {
+            background: transparent !important;
+            color: rgba(255,255,255,0.18) !important;
+        }
+
+        /* ── CHAT VIEW ────────────────────────────────────────── */
+        .chat-header {
+            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+            background: rgba(10,12,20,0.5) !important;
+            backdrop-filter: blur(12px) !important;
+            padding: 12px 16px 12px !important;
+            border-radius: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        #chatWithTitle { color: #fff !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
+
+        .msg.msg-other {
+            background: rgba(255,255,255,0.09) !important;
+            color: rgba(255,255,255,0.88) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            border-radius: 14px !important;
+            border-bottom-left-radius: 4px !important;
+        }
+        .msg.msg-self {
+            background: linear-gradient(135deg,#5865F2,#4752d6) !important;
+            box-shadow: 0 4px 16px rgba(88,101,242,0.38) !important;
+            border-radius: 14px !important;
+            border-bottom-right-radius: 4px !important;
+        }
+        .system-msg {
+            color: rgba(255,255,255,0.32) !important;
+            background: rgba(255,255,255,0.04) !important;
+            border-radius: 10px !important;
+            padding: 6px 14px !important;
+        }
+
+        .chat-input-wrapper {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 16px !important;
+            padding: 4px 16px !important;
+        }
+        .chat-input-wrapper:focus-within {
+            border-color: rgba(88,101,242,0.5) !important;
+            background: rgba(88,101,242,0.08) !important;
+            box-shadow: 0 0 0 3px rgba(88,101,242,0.15) !important;
+        }
+        #chatInput { color: #fff !important; }
+        #chatInput::placeholder { color: rgba(255,255,255,0.3) !important; }
+
+        .send-btn {
+            background: linear-gradient(135deg,#5865F2,#4752d6) !important;
+            box-shadow: 0 4px 14px rgba(88,101,242,0.42) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            transition: all 0.22s !important;
+        }
+        .send-btn:hover { transform: scale(1.08) !important; box-shadow: 0 6px 20px rgba(88,101,242,0.55) !important; }
+
+        #replyPreviewBar {
+            background: rgba(88,101,242,0.1) !important;
+            border-left: 3px solid #5865F2 !important;
+            border-radius: 10px !important;
+        }
+        #replyPreviewBar .reply-from { color: #a5b4fc !important; }
+        #replyPreviewBar .reply-text { color: rgba(255,255,255,0.55) !important; }
+
+        #typingIndicator { color: rgba(255,255,255,0.38) !important; }
+        #chatLoading { color: #a5b4fc !important; }
+
+        .voice-btn { color: rgba(255,255,255,0.5) !important; }
+        .voice-btn:hover { color: #ff6b78 !important; opacity: 1 !important; }
+        .file-label { color: rgba(255,255,255,0.5) !important; }
+        .file-label:hover { color: #a5b4fc !important; opacity: 1 !important; }
+
+        /* Reply quote in messages */
+        .reply-quote {
+            background: rgba(255,255,255,0.08) !important;
+            border-left-color: rgba(255,255,255,0.3) !important;
+        }
+        .msg-self .reply-quote {
+            background: rgba(0,0,0,0.15) !important;
+            border-left-color: rgba(255,255,255,0.5) !important;
+        }
+
+        /* ── INPUTS & SELECTS (global) ────────────────────────── */
+        input:not([type=checkbox]):not([type=radio]):not([type=file]),
+        select, textarea {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+            border-radius: 10px !important;
+            transition: all 0.2s !important;
+        }
+        input:not([type=checkbox]):not([type=radio])::placeholder,
+        textarea::placeholder { color: rgba(255,255,255,0.3) !important; }
+        input:not([type=checkbox]):not([type=radio]):focus,
+        select:focus, textarea:focus {
+            border-color: rgba(88,101,242,0.55) !important;
+            background: rgba(88,101,242,0.09) !important;
+            box-shadow: 0 0 0 3px rgba(88,101,242,0.18) !important;
+        }
+        select option { background: #111827 !important; color: #e2e4ee !important; }
+
+        /* ── BUTTONS (global) ─────────────────────────────────── */
+        button:not(.send-btn):not(.voice-btn):not(.icon-btn):not(.three-dot-btn):not(.kick-btn)
+               :not(.report-btn):not(.rec-cancel):not(.rec-send):not(.lp-btn-ghost)
+               :not(.lp-btn-primary):not(.lp-cta-main):not(.lp-cta-sec) {
+            border-radius: 10px !important;
+            transition: all 0.2s !important;
+        }
+        /* Primary (unclassed) buttons */
+        button:not([class]):not(.send-btn),
+        button[class=""] {
+            background: rgba(88,101,242,0.18) !important;
+            color: rgba(255,255,255,0.9) !important;
+            border: 1px solid rgba(88,101,242,0.3) !important;
+        }
+        button.secondary {
+            background: rgba(255,255,255,0.07) !important;
+            color: rgba(255,255,255,0.72) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        button.secondary:hover { background: rgba(255,255,255,0.12) !important; opacity: 1 !important; }
+        button.danger {
+            background: linear-gradient(135deg,#ff4757,#d63031) !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(255,71,87,0.3) !important;
+        }
+        button.green-btn {
+            background: linear-gradient(135deg,#27ae60,#1e8449) !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(39,174,96,0.28) !important;
+        }
+        button.gold-btn {
+            background: linear-gradient(135deg,#d4a017,#b8860b) !important;
+            border: none !important;
+        }
+        button.icon-btn {
+            background: transparent !important;
+            color: rgba(255,255,255,0.58) !important;
+            border: 1px solid transparent !important;
+        }
+        button.icon-btn:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; }
+        button.three-dot-btn { color: rgba(255,255,255,0.55) !important; background: transparent !important; }
+        button.three-dot-btn:hover { background: rgba(255,255,255,0.08) !important; }
+
+        /* ── MODALS ───────────────────────────────────────────── */
+        .modal-overlay { background: rgba(0,0,0,0.72) !important; }
+        .modal-card {
+            background: rgba(10,12,20,0.97) !important;
+            backdrop-filter: blur(28px) !important;
+            -webkit-backdrop-filter: blur(28px) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 22px !important;
+            box-shadow: 0 28px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(88,101,242,0.1) !important;
+            color: rgba(255,255,255,0.88) !important;
+        }
+        .modal-card h2, .modal-card h3 { color: rgba(255,255,255,0.95) !important; }
+        .modal-card p { color: rgba(255,255,255,0.6) !important; }
+        .modal-card strong { color: rgba(255,255,255,0.88) !important; }
+
+        /* Delete confirm card */
+        .delete-confirm-card {
+            background: rgba(10,12,20,0.97) !important;
+            backdrop-filter: blur(28px) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 28px 70px rgba(0,0,0,0.7) !important;
+            color: rgba(255,255,255,0.88) !important;
+        }
+        .delete-confirm-card p { color: rgba(255,255,255,0.55) !important; }
+
+        /* Admin confirm / sign-out embeds */
+        #adminConfirmEmbed > div, #signOutAllEmbed {
+            background: rgba(10,12,20,0.97) !important;
+            backdrop-filter: blur(24px) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 18px !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important;
+        }
+
+        /* ── CONTEXT SHEET (user/group options) ───────────────── */
+        .context-sheet-inner {
+            background: rgba(10,12,20,0.97) !important;
+            backdrop-filter: blur(28px) !important;
+            -webkit-backdrop-filter: blur(28px) !important;
+            border-top: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 28px 28px 0 0 !important;
+            box-shadow: 0 -16px 50px rgba(0,0,0,0.6) !important;
+        }
+        .context-sheet-handle { background: rgba(255,255,255,0.18) !important; }
+        .context-sheet-title { border-bottom: 1px solid rgba(255,255,255,0.08) !important; color: #a5b4fc !important; }
+        .context-sheet-item { color: rgba(255,255,255,0.82) !important; }
+        .context-sheet-item:hover { background: rgba(255,255,255,0.07) !important; }
+        .context-sheet-item.danger-item { color: #ff6b78 !important; }
+        .context-sheet-item.warn-item { color: #ffa94d !important; }
+
+        /* ── SHOP ─────────────────────────────────────────────── */
+        .shop-bundle {
+            background: rgba(255,255,255,0.04) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 18px !important;
+            transition: all 0.25s !important;
+        }
+        .shop-bundle:hover {
+            border-color: rgba(88,101,242,0.4) !important;
+            background: rgba(88,101,242,0.07) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3) !important;
+        }
+        .shop-bundle-header { color: rgba(255,255,255,0.92) !important; }
+        .shop-bundle ul li { color: rgba(255,255,255,0.6) !important; }
+        .balance-display {
+            background: rgba(39,174,96,0.12) !important;
+            border: 1px solid rgba(39,174,96,0.3) !important;
+            color: #4ade80 !important;
+            border-radius: 10px !important;
+        }
+
+        /* ── INBOX ────────────────────────────────────────────── */
+        .inbox-msg-card {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            border-radius: 16px !important;
+            transition: background 0.15s !important;
+        }
+        .inbox-msg-card:hover { background: rgba(255,255,255,0.08) !important; }
+        .inbox-msg-title { color: #a5b4fc !important; }
+        .inbox-msg-body { color: rgba(255,255,255,0.7) !important; }
+        .inbox-msg-time, .inbox-msg-from { color: rgba(255,255,255,0.38) !important; }
+        .inbox-delete-btn { color: rgba(255,255,255,0.3) !important; }
+        .inbox-delete-btn:hover { color: #ff6b78 !important; }
+
+        /* ── GROUP MEMBERS GRID ───────────────────────────────── */
+        .member-grid { background: rgba(255,255,255,0.04) !important; border-radius: 14px !important; }
+        .member-card {
+            background: rgba(255,255,255,0.06) !important;
+            border: 2px solid rgba(255,255,255,0.1) !important;
+            border-radius: 12px !important;
+            color: rgba(255,255,255,0.82) !important;
+        }
+        .member-card:hover { border-color: rgba(88,101,242,0.5) !important; }
+        .member-card.selected {
+            background: linear-gradient(135deg,#5865F2,#4752d6) !important;
+            border-color: #5865F2 !important;
+            box-shadow: 0 4px 14px rgba(88,101,242,0.38) !important;
+        }
+
+        /* ── PLUS OPTIONS ─────────────────────────────────────── */
+        .plus-option-item {
+            border: 2px solid rgba(255,255,255,0.15) !important;
+            background: rgba(255,255,255,0.06) !important;
+        }
+        .plus-option-item.locked { background: rgba(255,255,255,0.03) !important; opacity: 0.5 !important; }
+        .lock-icon { background: rgba(10,12,20,0.9) !important; color: rgba(255,255,255,0.6) !important; }
+        .chat-plus-container {
+            background: linear-gradient(to bottom, rgba(255,215,0,0.07), rgba(255,255,255,0.02)) !important;
+            border: 1px solid rgba(255,215,0,0.28) !important;
+            border-radius: 18px !important;
+        }
+
+        /* ── INFO LIST ITEMS (settings/group/admin) ───────────── */
+        .info-list-item { border-bottom: 1px solid rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.82) !important; }
+        .history-item { border-bottom: 1px solid rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.78) !important; }
+
+        /* ── SETTINGS EMAIL BOX ───────────────────────────────── */
+        .email-status-box {
+            background: rgba(88,101,242,0.08) !important;
+            border: 1px dashed rgba(88,101,242,0.38) !important;
+            border-radius: 10px !important;
+        }
+
+        /* ── AGB ROW (in mainView) ────────────────────────────── */
+        .agb-row {
+            background: rgba(88,101,242,0.09) !important;
+            border: 1px solid rgba(88,101,242,0.2) !important;
+            color: rgba(255,255,255,0.72) !important;
+        }
+
+        /* ── SYSTEM EMBED TOAST ───────────────────────────────── */
+        #systemEmbed {
+            backdrop-filter: blur(16px) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+        }
+
+        /* ── HEADING COLORS ───────────────────────────────────── */
+        h1, h2, h3 { color: rgba(255,255,255,0.92) !important; }
+        p { color: rgba(255,255,255,0.65) !important; }
+        label { color: rgba(255,255,255,0.72) !important; }
+        strong, b { color: rgba(255,255,255,0.88) !important; }
+
+        /* ── SCROLLBAR ────────────────────────────────────────── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(88,101,242,0.45); }
+
+        /* ── BANNED VIEW OVERRIDE (overrides inline bg) ───────── */
+        #bannedView { background: linear-gradient(135deg,#0d0f1a 0%,#1a0005 50%,#0d0000 100%) !important; }
+
+        /* Mobile icons */
+        .settings-icon { color: rgba(255,255,255,0.72) !important; }
+        .shop-icon { color: #fbbf24 !important; }
+        .admin-icon { color: #ff6b78 !important; }
+        .inbox-icon { color: #4ade80 !important; }
+
+        /* View section subtitles */
+        #settingsView, #shopView, #inboxView, #adminPanelView, #chatWindow, #gamesView {
+            color: rgba(255,255,255,0.85) !important;
+        }
+
+        /* Kick button */
+        .kick-btn { border-radius: 6px !important; }
+
+        /* Admin section dividers */
+        #adminPanelView > div[style*="border-top"] { border-top: 1px solid rgba(255,255,255,0.07) !important; }
+
+        /* Admin tab buttons */
+        #tabBtnUser, #tabBtnReport { border-radius: 10px !important; }
+        #tabBtnUser:not(.secondary) {
+            background: rgba(88,101,242,0.22) !important;
+            border: 1px solid rgba(88,101,242,0.35) !important;
+            color: #a5b4fc !important;
+        }
+
+        /* PFP no-content circles */
+        [id*="NoPfp"], .no-pfp-circle {
+            background: rgba(88,101,242,0.25) !important;
+            border: 1px solid rgba(88,101,242,0.4) !important;
+        }
+
+        /* Report button */
+        .report-btn { color: #ffa94d !important; }
+
+        /* Msg sender name */
+        .msg-sender-name { color: #a5b4fc !important; }
+
+        /* Unread badge */
+        .unread-badge { background: #ff4757 !important; }
+
+        /* Chat back button / action buttons */
+        #chatWindow .action-btn-group button.icon-btn { color: rgba(255,255,255,0.55) !important; }
+
+        /* View fade-in */
+        .view { animation: fadeIn 0.3s ease !important; }
+
+
 </style>
 </head>
 <body>
