@@ -89,7 +89,7 @@
             display: flex; flex-direction: column;
             z-index: 10;
         }
-        #homeView, #loginView, #registerView, #bannedView {
+        #homeView {
             position: relative; top: auto; left: auto;
             width: 90%; max-width: 420px; height: auto; max-height: 85vh;
             background: var(--cont);
@@ -97,6 +97,131 @@
             border-radius: 10px; padding: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             text-align: center; margin: auto;
+        }
+
+        /* ── AUTH VIEWS: fullscreen with landing-page dark glass theme ── */
+        #loginView, #registerView, #bannedView {
+            position: fixed !important; top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+            max-width: 100% !important; max-height: 100% !important;
+            background: linear-gradient(135deg,#0d0f1a 0%,#111827 40%,#0a0e1a 70%,#0e1020 100%) !important;
+            border: none !important; border-radius: 0 !important;
+            padding: 0 !important; box-shadow: none !important;
+            flex-direction: column !important;
+            align-items: center !important; justify-content: center !important;
+            overflow: hidden !important; text-align: center !important;
+        }
+        /* Orbs inside auth views */
+        .auth-orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.28;
+            animation: orbFloat linear infinite; pointer-events: none;
+        }
+        .auth-orb-1 { width: 420px; height: 420px; background: #5865F2; top: -100px; left: -100px; animation-duration: 22s; }
+        .auth-orb-2 { width: 320px; height: 320px; background: #7c3aed; bottom: -80px; right: -80px; animation-duration: 28s; animation-delay: -8s; }
+        .auth-orb-3 { width: 250px; height: 250px; background: #2563eb; top: 50%; left: 60%; animation-duration: 20s; animation-delay: -4s; }
+        /* Glassmorphism card inside auth views */
+        .auth-card {
+            position: relative; z-index: 2;
+            width: 90%; max-width: 420px;
+            background: rgba(255,255,255,0.045);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            padding: 36px 32px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.12);
+            animation: fadeSlideUp 0.6s cubic-bezier(.34,1.56,.64,1) both;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .auth-card h1 {
+            font-size: 1.7rem; font-weight: 900; color: #fff;
+            margin: 0 0 6px; letter-spacing: -0.03em;
+        }
+        .auth-card .auth-sub {
+            font-size: 0.85rem; color: rgba(255,255,255,0.42); margin: 0 0 24px;
+        }
+        .auth-logo {
+            width: 54px; height: 54px; background: linear-gradient(135deg,#5865F2,#7c3aed);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: #fff; margin: 0 auto 18px;
+            box-shadow: 0 8px 24px rgba(88,101,242,0.42);
+            animation: fadeSlideUp 0.5s ease both;
+        }
+        /* Inputs inside auth card */
+        .auth-card input[type=text], .auth-card input[type=password],
+        .auth-card input[type=email], .auth-card input[type=number] {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.13) !important;
+            color: #fff !important;
+            border-radius: 10px !important;
+            padding: 13px 16px !important;
+            font-size: 0.95rem !important;
+            transition: border-color 0.2s, background 0.2s !important;
+        }
+        .auth-card input::placeholder { color: rgba(255,255,255,0.32) !important; }
+        .auth-card input:focus {
+            border-color: rgba(88,101,242,0.6) !important;
+            background: rgba(88,101,242,0.09) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(88,101,242,0.18) !important;
+        }
+        /* Primary button inside auth card */
+        .auth-card button:not(.secondary):not(.danger) {
+            background: #5865F2 !important;
+            color: #fff !important; border: none !important;
+            border-radius: 10px !important; font-weight: 700 !important;
+            font-size: 0.96rem !important;
+            box-shadow: 0 6px 20px rgba(88,101,242,0.38) !important;
+            transition: all 0.22s !important;
+        }
+        .auth-card button:not(.secondary):not(.danger):hover {
+            background: #4752d6 !important; transform: translateY(-1px) !important;
+            box-shadow: 0 10px 28px rgba(88,101,242,0.52) !important; opacity: 1 !important;
+        }
+        /* Secondary button inside auth card */
+        .auth-card button.secondary {
+            background: rgba(255,255,255,0.07) !important;
+            color: rgba(255,255,255,0.72) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            border-radius: 10px !important; font-weight: 600 !important;
+        }
+        .auth-card button.secondary:hover {
+            background: rgba(255,255,255,0.12) !important; opacity: 1 !important;
+        }
+        /* AGB row inside auth card */
+        .auth-card .agb-row {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+            color: rgba(255,255,255,0.72) !important;
+        }
+        .auth-card .info-blue { color: #a5b4fc !important; }
+        /* AGB embed inside auth card */
+        .auth-card #agbEmbed {
+            background: rgba(13,15,26,0.98) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 16px !important;
+            color: rgba(255,255,255,0.82) !important;
+        }
+        .auth-card #agbEmbed .agb-item {
+            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+        }
+        /* Banned view special */
+        #bannedView .auth-card {
+            border-color: rgba(255,71,87,0.35) !important;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,71,87,0.2) !important;
+        }
+        #bannedView .auth-orb-1 { background: #ff4757; }
+        #bannedView .auth-orb-2 { background: #d63031; }
+        /* Forgot password overlay inside auth card */
+        .auth-card #forgotPasswordEmbed {
+            background: rgba(13,15,26,0.98) !important;
+            border-radius: 16px !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        .auth-card #forgotSuccessEmbed {
+            background: rgba(13,15,26,0.98) !important;
+            border-radius: 16px !important;
         }
         .view-large { padding: 20px; }
 
@@ -122,7 +247,7 @@
                 border-radius: 0 !important; box-shadow: none !important;
             }
             /* Auth cards centered */
-            #homeView, #loginView, #registerView, #bannedView {
+            #homeView {
                 position: fixed !important;
                 top: 50% !important; left: 50% !important;
                 transform: translate(-50%, -50%) !important;
@@ -130,6 +255,12 @@
                 height: auto !important;
                 max-height: 90vh !important;
                 overflow-y: auto !important;
+            }
+            /* Auth fullscreen views stay fullscreen on desktop too */
+            #loginView, #registerView, #bannedView {
+                top: 0 !important; left: 0 !important;
+                width: 100% !important; height: 100% !important;
+                transform: none !important;
             }
             /* Old floating icons: hide on desktop */
             .desktop-hide { display: none !important; }
@@ -818,7 +949,12 @@
             .lp-hero-title { font-size: clamp(1.4rem,4vw,2rem); }
             .lp-cards { grid-template-columns: repeat(3,1fr); }
         }
-    </style>
+    
+        /* Auth card AGB content styling */
+        .auth-card .agb-content { overflow-y: auto; max-height: 260px; margin-bottom: 12px; }
+        .auth-card .agb-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.07) !important; font-size: 0.83rem; color: rgba(255,255,255,0.62); text-align: left; }
+        .auth-card .agb-item strong { color: #a5b4fc; display: block; margin-bottom: 3px; }
+</style>
 </head>
 <body>
 
@@ -1249,65 +1385,87 @@
     </div>
 
     <div id="registerView" class="view hidden">
-        <h1>Konto erstellen</h1>
-        <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
-        <input type="password" id="regPass" placeholder="Passwort">
-        <input type="email" id="regEmail" placeholder="E-Mail Adresse">
-        <div class="agb-row">
-            <input type="checkbox" id="agbCheck">
-            <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
-        </div>
-        <button onclick="register()">Konto erstellen</button>
-        <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
-    
-        <div id="agbEmbed" class="hidden">
-            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-file-lines"></i> Nutzungsbedingungen & Regeln</h2>
-            <div class="agb-content">
-                <div class="agb-item"><strong>1. Projektinfo</strong>John Chat ist ein privates Projekt. Die Nutzung erfolgt auf eigene Gefahr. Es besteht kein Anspruch auf Verfügbarkeit.</div>
-                <div class="agb-item"><strong>2. Mindestalter</strong>Die Nutzung von John Chat setzt ein Mindestalter von 13 Jahren voraus.</div>
-                <div class="agb-item"><strong>3. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Regelverstößen einzusehen und Maßnahmen zu ergreifen.</div>
-                <div class="agb-item"><strong>4. Datenspeicherung</strong>Nachrichten und Bilder werden über Firebase (Google LLC, USA) verarbeitet. E-Mail-Adressen werden für die 2-Faktor-Authentifizierung gespeichert.</div>
-                <div class="agb-item"><strong>5. Verhalten</strong>Respektloser Umgang, Beleidigungen, Diskriminierung oder Harassment führen zum sofortigen Ausschluss.</div>
-                <div class="agb-item"><strong>6. Verbotene Inhalte</strong>Sexuelle, gewaltverherrlichende oder illegale Inhalte sind strikt verboten.</div>
-                <div class="agb-item"><strong>7. Kontosperrung</strong>Der Betreiber kann Accounts ohne Angabe von Gründen sperren oder löschen.</div>
-                <div class="agb-item"><strong>8. Haftung</strong>Der Betreiber übernimmt keine Haftung für Inhalte, die von Nutzern erstellt wurden, oder für technische Ausfälle.</div>
+        <div class="auth-orb auth-orb-1"></div>
+        <div class="auth-orb auth-orb-2"></div>
+        <div class="auth-orb auth-orb-3"></div>
+        <div class="auth-card">
+            <div class="auth-logo"><i class="fas fa-user-plus"></i></div>
+            <h1>Konto erstellen</h1>
+            <p class="auth-sub">Tritt John Chat bei &amp; chatte sicher</p>
+            <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7F\u00e4\u00f6\u00fc\u00c4\u00d6\u00dc\u00df]/g, '')">
+            <input type="password" id="regPass" placeholder="Passwort">
+            <input type="email" id="regEmail" placeholder="E-Mail Adresse">
+            <div class="agb-row">
+                <input type="checkbox" id="agbCheck">
+                <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln &amp; AGB</span></span>
             </div>
-            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--brd); font-size:0.78rem; color:#888; text-align:left; line-height:1.5;">
-                Betreiber: <strong>John</strong> · Kontakt: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main);">entspann.schick@gmail.com</a>
-            </div>
-            <button onclick="toggleAgb(false)" style="width:100%; margin-top:12px;">Schließen</button>
-         </div>
-    </div>
-
-    <div id="loginView" class="view hidden">
-        <h1>Login</h1>
-        <input type="text" id="loginUser" placeholder="Benutzername">
-        <input type="password" id="loginPass" placeholder="Passwort">
+            <button onclick="register()" style="width:100%; margin-top:8px;">Konto erstellen</button>
+            <button onclick="showView('homeView')" class="secondary" style="margin-top:10px; width:100%;">
+                <i class="fas fa-arrow-left"></i> Zurück
+            </button>
         
-        <div class="agb-row" style="justify-content: flex-start; background: transparent; padding-left: 0;">
-            <input type="checkbox" id="keepLogin">
-            <span>Angemeldet bleiben & Push zulassen</span>
+            <div id="agbEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:inherit; padding:28px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center; overflow-y:auto; background:rgba(13,15,26,0.97); backdrop-filter:blur(20px);">
+                <h2 style="color:#a5b4fc; margin-top:0;"><i class="fas fa-file-lines"></i> Nutzungsbedingungen &amp; Regeln</h2>
+                <div class="agb-content">
+                    <div class="agb-item"><strong>1. Projektinfo</strong>John Chat ist ein privates Projekt. Die Nutzung erfolgt auf eigene Gefahr. Es besteht kein Anspruch auf Verfügbarkeit.</div>
+                    <div class="agb-item"><strong>2. Mindestalter</strong>Die Nutzung von John Chat setzt ein Mindestalter von 13 Jahren voraus.</div>
+                    <div class="agb-item"><strong>3. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Regelverstößen einzusehen und Maßnahmen zu ergreifen.</div>
+                    <div class="agb-item"><strong>4. Datenspeicherung</strong>Nachrichten und Bilder werden über Firebase (Google LLC, USA) verarbeitet. E-Mail-Adressen werden für die 2-Faktor-Authentifizierung gespeichert.</div>
+                    <div class="agb-item"><strong>5. Verhalten</strong>Respektloser Umgang, Beleidigungen, Diskriminierung oder Harassment führen zum sofortigen Ausschluss.</div>
+                    <div class="agb-item"><strong>6. Verbotene Inhalte</strong>Sexuelle, gewaltverherrlichende oder illegale Inhalte sind strikt verboten.</div>
+                    <div class="agb-item"><strong>7. Kontosperrung</strong>Der Betreiber kann Accounts ohne Angabe von Gründen sperren oder löschen.</div>
+                    <div class="agb-item"><strong>8. Haftung</strong>Der Betreiber übernimmt keine Haftung für Inhalte, die von Nutzern erstellt wurden, oder für technische Ausfälle.</div>
+                </div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:0.78rem; color:rgba(255,255,255,0.36); text-align:left; line-height:1.5;">
+                    Betreiber: <strong>John</strong> · Kontakt: <a href="mailto:entspann.schick@gmail.com" style="color:#a5b4fc;">entspann.schick@gmail.com</a>
+                </div>
+                <button onclick="toggleAgb(false)" style="width:100%; margin-top:12px;">Schließen</button>
+            </div>
         </div>
+    </div>
+    <div id="loginView" class="view hidden">
+        <div class="auth-orb auth-orb-1"></div>
+        <div class="auth-orb auth-orb-2"></div>
+        <div class="auth-orb auth-orb-3"></div>
+        <div class="auth-card">
+            <div class="auth-logo"><i class="fas fa-comment-dots"></i></div>
+            <h1>Willkommen zurück</h1>
+            <p class="auth-sub">Melde dich bei John Chat an</p>
 
-        <button onclick="login()" style="width:100%">Einloggen</button>
-        <button onclick="showForgotPassword()" style="width:100%; margin-top:10px; background:#888; color:white;">Passwort vergessen</button>
-        <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+            <input type="text" id="loginUser" placeholder="Benutzername">
+            <input type="password" id="loginPass" placeholder="Passwort">
+            
+            <div class="agb-row" style="justify-content: flex-start; background: transparent; padding-left: 0;">
+                <input type="checkbox" id="keepLogin">
+                <span style="color:rgba(255,255,255,0.62); font-size:0.88rem;">Angemeldet bleiben &amp; Push zulassen</span>
+            </div>
 
-        <!-- Passwort Vergessen Embed -->
-        <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:8px; padding:25px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
-            <h2 style="margin-top:0;"><i class="fas fa-unlock-keyhole" style="color:var(--main);"></i> Passwort vergessen</h2>
-            <p style="font-size:0.9rem; color:#888; margin-bottom:15px;">Gib deinen Benutzernamen und deine hinterlegte E-Mail-Adresse ein. Du erhältst dann deinen Zugangscode per E-Mail.</p>
-            <input type="text" id="forgotUser" placeholder="Benutzername *" style="margin-bottom:8px;">
-            <input type="email" id="forgotEmail" placeholder="E-Mail-Adresse *" style="margin-bottom:15px;">
-            <button onclick="submitForgotPassword()" style="width:100%;">Code per E-Mail senden</button>
-            <button onclick="hideForgotPassword()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+            <button onclick="login()" style="width:100%; margin-top:8px;">
+                <i class="fas fa-right-to-bracket"></i> Einloggen
+            </button>
+            <button onclick="showForgotPassword()" style="width:100%; margin-top:10px;" class="secondary">
+                <i class="fas fa-key"></i> Passwort vergessen
+            </button>
+            <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:8px;">
+                <i class="fas fa-arrow-left"></i> Zurück
+            </button>
 
-            <!-- Erfolgs-Embed innerhalb Passwort vergessen -->
-            <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:8px; padding:25px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-                <div style="font-size:3rem; margin-bottom:15px;">📧</div>
-                <h2 style="color:var(--success); margin-top:0;">E-Mail gesendet!</h2>
-                <p style="color:#888; font-size:0.9rem;">Wir haben dir eine E-Mail mit deinem Zugangscode zugesendet.</p>
-                <button onclick="hideForgotPassword()" style="width:100%; margin-top:20px;">Zurück zum Login</button>
+            <!-- Passwort Vergessen Embed -->
+            <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(13,15,26,0.97); backdrop-filter:blur(20px); border-radius:inherit; padding:28px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
+                <h2 style="margin-top:0; color:#fff;"><i class="fas fa-unlock-keyhole" style="color:#a5b4fc;"></i> Passwort vergessen</h2>
+                <p style="font-size:0.9rem; color:rgba(255,255,255,0.48); margin-bottom:15px;">Gib deinen Benutzernamen und deine hinterlegte E-Mail-Adresse ein. Du erhältst dann deinen Zugangscode per E-Mail.</p>
+                <input type="text" id="forgotUser" placeholder="Benutzername *" style="margin-bottom:8px;">
+                <input type="email" id="forgotEmail" placeholder="E-Mail-Adresse *" style="margin-bottom:15px;">
+                <button onclick="submitForgotPassword()" style="width:100%;">Code per E-Mail senden</button>
+                <button onclick="hideForgotPassword()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+
+                <!-- Erfolgs-Embed innerhalb Passwort vergessen -->
+                <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(13,15,26,0.98); border-radius:inherit; padding:28px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                    <div style="font-size:3rem; margin-bottom:15px;">📧</div>
+                    <h2 style="color:#4ade80; margin-top:0;">E-Mail gesendet!</h2>
+                    <p style="color:rgba(255,255,255,0.48); font-size:0.9rem;">Wir haben dir eine E-Mail mit deinem Zugangscode zugesendet.</p>
+                    <button onclick="hideForgotPassword()" style="width:100%; margin-top:20px;">Zurück zum Login</button>
+                </div>
             </div>
         </div>
     </div>
