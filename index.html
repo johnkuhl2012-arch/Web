@@ -664,23 +664,25 @@
             position: relative;
         }
         .legal-tabs {
-            display: flex; border-bottom: 1px solid var(--brd);
+            display: flex; align-items: center; border-bottom: 1px solid var(--brd);
             position: sticky; top: 0; background: var(--cont); z-index: 2;
         }
         .legal-tab {
-            flex: 1; padding: 12px 6px; text-align: center; font-size: 0.82rem;
+            flex: 1; padding: 13px 6px; text-align: center; font-size: 0.82rem;
             font-weight: 600; cursor: pointer; color: #888;
             border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
         }
         .legal-tab.active { color: var(--main); border-bottom-color: var(--main); }
         .legal-tab:hover { color: var(--txt); }
         .legal-close-btn {
-            position: absolute; top: 10px; right: 12px; background: none;
-            border: none; cursor: pointer; font-size: 1.1rem; color: #999;
-            width: 28px; height: 28px; display: flex; align-items: center;
+            flex-shrink: 0; margin-right: 8px;
+            background: var(--hover); border: 1px solid var(--brd);
+            cursor: pointer; font-size: 0.95rem; color: var(--txt);
+            width: 30px; height: 30px; display: flex; align-items: center;
             justify-content: center; border-radius: 50%; padding: 0; box-shadow: none;
+            transition: background 0.15s;
         }
-        .legal-close-btn:hover { background: var(--hover); color: var(--txt); }
+        .legal-close-btn:hover { background: var(--danger); color: white; border-color: transparent; }
         .legal-panel { display: none; padding: 22px 24px 28px; }
         .legal-panel.active { display: block; }
         .legal-panel h3 {
@@ -701,6 +703,121 @@
         .legal-panel ul li i { color: var(--success); margin-top: 3px; flex-shrink: 0; }
         .legal-divider { border: none; border-top: 1px solid var(--brd); margin: 14px 0; }
         .legal-section { margin-bottom: 6px; }
+
+        /* ═══════════════════════════════════════
+           LANDING PAGE – homeView redesign
+           ═══════════════════════════════════════ */
+        #homeView {
+            position: fixed !important; top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+            max-width: 100% !important; max-height: 100% !important;
+            padding: 0 !important; border: none !important;
+            border-radius: 0 !important; box-shadow: none !important;
+            background: transparent !important;
+            overflow-y: auto !important; overflow-x: hidden !important;
+            text-align: left !important; transform: none !important;
+        }
+        .lp-bg { position: fixed; inset: 0; z-index: -1; background: linear-gradient(135deg,#0d0f1a 0%,#111827 40%,#0a0e1a 70%,#0e1020 100%); overflow: hidden; }
+        .lp-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.32; animation: orbFloat linear infinite; }
+        .lp-orb-1 { width: 520px; height: 520px; background: #5865F2; top: -140px; left: -120px; animation-duration: 22s; }
+        .lp-orb-2 { width: 420px; height: 420px; background: #7c3aed; top: 45%; right: -130px; animation-duration: 27s; animation-delay: -9s; }
+        .lp-orb-3 { width: 320px; height: 320px; background: #2563eb; bottom: -80px; left: 32%; animation-duration: 19s; animation-delay: -5s; }
+        @keyframes orbFloat { 0%{transform:translate(0,0) scale(1);} 33%{transform:translate(40px,-30px) scale(1.08);} 66%{transform:translate(-30px,50px) scale(0.94);} 100%{transform:translate(0,0) scale(1);} }
+        .lp-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; position: sticky; top: 0; z-index: 100; background: rgba(10,12,25,0.8); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .lp-logo { display: flex; align-items: center; gap: 9px; font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+        .lp-logo i { color: #5865F2; font-size: 1.35rem; }
+        .lp-nav-actions { display: flex; align-items: center; gap: 9px; }
+        .lp-btn-ghost { padding: 8px 18px; border-radius: 8px; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.82); background: transparent; }
+        .lp-btn-ghost:hover { background: rgba(255,255,255,0.09); color: #fff; }
+        .lp-btn-primary { padding: 8px 20px; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; background: #5865F2; color: white; box-shadow: 0 4px 14px rgba(88,101,242,0.38); }
+        .lp-btn-primary:hover { background: #4752d6; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(88,101,242,0.5); }
+        .lp-hero { min-height: 100vh; display: flex; align-items: center; padding: 80px 32px 60px; position: relative; }
+        .lp-hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; width: 100%; max-width: 1100px; margin: 0 auto; align-items: center; }
+        .lp-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.35); padding: 5px 13px; border-radius: 20px; font-size: 0.76rem; font-weight: 600; color: #a5b4fc; margin-bottom: 20px; animation: fadeSlideUp 0.6s ease both; }
+        .lp-hero-badge span { width: 7px; height: 7px; border-radius: 50%; background: #5865F2; display: inline-block; animation: pulseDot 2s infinite; }
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(1.5);} }
+        .lp-hero-title { font-size: clamp(2.2rem,4.5vw,3.8rem); font-weight: 900; color: #fff; line-height: 1.12; letter-spacing: -0.03em; margin: 0 0 18px; animation: fadeSlideUp 0.7s 0.1s ease both; }
+        .lp-hero-title .grad { background: linear-gradient(135deg,#5865F2 0%,#a78bfa 50%,#60a5fa 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .lp-hero-sub { font-size: 1rem; color: rgba(255,255,255,0.52); line-height: 1.68; margin: 0 0 34px; max-width: 480px; animation: fadeSlideUp 0.7s 0.2s ease both; }
+        .lp-hero-cta { display: flex; gap: 12px; flex-wrap: wrap; animation: fadeSlideUp 0.7s 0.3s ease both; }
+        .lp-cta-main { padding: 13px 30px; border-radius: 10px; font-size: 0.98rem; font-weight: 700; cursor: pointer; border: none; background: #5865F2; color: white; box-shadow: 0 6px 22px rgba(88,101,242,0.42); transition: all 0.22s; display: flex; align-items: center; gap: 9px; }
+        .lp-cta-main:hover { background: #4752d6; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(88,101,242,0.52); }
+        .lp-cta-sec { padding: 13px 26px; border-radius: 10px; font-size: 0.98rem; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.15); transition: all 0.22s; display: flex; align-items: center; gap: 9px; }
+        .lp-cta-sec:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .lp-hero-right { display: flex; justify-content: center; align-items: center; animation: fadeSlideUp 0.8s 0.2s ease both; }
+        .lp-chat-card { width: 100%; max-width: 340px; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; backdrop-filter: blur(20px); box-shadow: 0 24px 60px rgba(0,0,0,0.4); animation: cardFloat 6s ease-in-out infinite; }
+        @keyframes cardFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-14px);} }
+        .lp-chat-header { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+        .lp-chat-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
+        .lp-chat-name { font-size: 0.86rem; font-weight: 700; color: #fff; }
+        .lp-chat-status { font-size: 0.7rem; color: rgba(255,255,255,0.42); }
+        .lp-chat-msgs { display: flex; flex-direction: column; gap: 9px; }
+        .lp-msg { max-width: 84%; padding: 8px 13px; border-radius: 14px; font-size: 0.8rem; line-height: 1.45; }
+        .lp-msg-in { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.82); border-bottom-left-radius: 4px; }
+        .lp-msg-out { background: #5865F2; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+        .lp-msg-typing { display: flex; align-items: center; gap: 4px; padding: 9px 13px; }
+        .lp-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); animation: typingBounce 1.2s infinite; }
+        .lp-typing-dot:nth-child(2){animation-delay:.2s;} .lp-typing-dot:nth-child(3){animation-delay:.4s;}
+        @keyframes typingBounce { 0%,80%,100%{transform:translateY(0);opacity:0.4;} 40%{transform:translateY(-6px);opacity:1;} }
+        .lp-scroll-hint { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; animation: fadeSlideUp 1s 0.9s ease both; pointer-events:none; }
+        .lp-scroll-hint span { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; }
+        .lp-scroll-arrow { width: 22px; height: 36px; border: 2px solid rgba(255,255,255,0.18); border-radius: 11px; display: flex; justify-content: center; padding-top: 6px; }
+        .lp-scroll-dot { width: 4px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 2px; animation: scrollDot 2s infinite; }
+        @keyframes scrollDot { 0%{transform:translateY(0);opacity:1;} 100%{transform:translateY(14px);opacity:0;} }
+        .lp-features { padding: 100px 32px 60px; max-width: 1100px; margin: 0 auto; }
+        .lp-section-label { text-align: center; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #5865F2; margin-bottom: 10px; }
+        .lp-section-title { text-align: center; font-size: clamp(1.7rem,3.5vw,2.6rem); font-weight: 900; color: #fff; margin: 0 0 12px; letter-spacing: -0.03em; }
+        .lp-section-sub { text-align: center; font-size: 0.95rem; color: rgba(255,255,255,0.42); margin: 0 auto 54px; max-width: 480px; line-height: 1.65; }
+        .lp-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; perspective: 1200px; }
+        .lp-card { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 28px 24px; transition: transform 0.55s cubic-bezier(.34,1.56,.64,1), opacity 0.55s, box-shadow 0.35s, border-color 0.35s; transform: translateY(50px) rotateX(12deg); opacity: 0; transform-style: preserve-3d; }
+        .lp-card.lp-visible { transform: translateY(0) rotateX(0deg); opacity: 1; }
+        .lp-card:nth-child(2){transition-delay:.1s;} .lp-card:nth-child(3){transition-delay:.2s;} .lp-card:nth-child(4){transition-delay:.05s;} .lp-card:nth-child(5){transition-delay:.15s;} .lp-card:nth-child(6){transition-delay:.25s;}
+        .lp-card:hover { transform: translateY(-10px) rotateX(0deg) scale(1.025); box-shadow: 0 22px 55px rgba(88,101,242,0.22); border-color: rgba(88,101,242,0.38); }
+        .lp-card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.28); }
+        .lp-card-title { font-size: 1.02rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .lp-card-desc { font-size: 0.84rem; color: rgba(255,255,255,0.44); line-height: 1.65; }
+        .lp-stats { display: flex; justify-content: center; border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07); max-width: 860px; margin: 10px auto 80px; }
+        .lp-stat { flex: 1; text-align: center; padding: 34px 16px; border-right: 1px solid rgba(255,255,255,0.07); }
+        .lp-stat:last-child { border-right: none; }
+        .lp-stat-num { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.04em; }
+        .lp-stat-num .grad { background: linear-gradient(135deg,#5865F2,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .lp-stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.38); margin-top: 4px; }
+        .lp-cta-block { text-align: center; padding: 80px 32px 100px; background: radial-gradient(ellipse at center,rgba(88,101,242,0.12) 0%,transparent 70%); }
+        .lp-cta-block h2 { font-size: clamp(1.7rem,3.5vw,2.6rem); font-weight: 900; color: #fff; margin: 0 0 12px; letter-spacing: -0.03em; }
+        .lp-cta-block p { font-size: 0.95rem; color: rgba(255,255,255,0.42); margin: 0 0 34px; }
+        .lp-cta-block-btns { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .lp-footer { text-align: center; padding: 26px 32px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.76rem; color: rgba(255,255,255,0.28); display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
+        .lp-footer a { color: rgba(255,255,255,0.42); text-decoration: none; transition: color 0.15s; cursor: pointer; }
+        .lp-footer a:hover { color: #a5b4fc; }
+        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(22px);} to{opacity:1;transform:translateY(0);} }
+        @media (max-width: 767px) {
+            .lp-nav { padding: 12px 16px; }
+            .lp-hero { padding: 64px 16px 56px; min-height: 100svh; }
+            .lp-hero-inner { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+            .lp-hero-badge { margin: 0 auto 16px; }
+            .lp-hero-sub { margin: 0 auto 28px; }
+            .lp-hero-cta { justify-content: center; }
+            .lp-hero-right { order: -1; }
+            .lp-chat-card { max-width: 290px; }
+            .lp-features { padding: 60px 16px 40px; }
+            .lp-cards { grid-template-columns: 1fr; }
+            .lp-stats { flex-direction: column; margin: 10px 16px 50px; }
+            .lp-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); padding: 22px 16px; }
+            .lp-stat:last-child { border-bottom: none; }
+            .lp-cta-block { padding: 60px 16px 80px; }
+            .lp-footer { gap: 10px; padding: 22px 16px; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .lp-hero { min-height: auto; padding: 56px 24px 36px; }
+            .lp-hero-inner { grid-template-columns: 1fr 1fr; gap: 28px; text-align: left; }
+            .lp-hero-badge { margin: 0 0 12px; }
+            .lp-hero-sub { margin: 0 0 20px; max-width: 100%; }
+            .lp-hero-cta { justify-content: flex-start; }
+            .lp-hero-right { order: 0; }
+            .lp-chat-card { max-width: 240px; padding: 12px; }
+            .lp-hero-title { font-size: clamp(1.4rem,4vw,2rem); }
+            .lp-cards { grid-template-columns: repeat(3,1fr); }
+        }
     </style>
 </head>
 <body>
@@ -710,8 +827,6 @@
          ════════════════════════════════════════════════ -->
     <div id="legalModalOverlay" onclick="if(event.target===this)closeLegalModal()">
       <div class="legal-modal-box">
-        <button class="legal-close-btn" onclick="closeLegalModal()"><i class="fas fa-xmark"></i></button>
-
         <div class="legal-tabs">
           <div class="legal-tab active" id="ltab-datenschutz" onclick="switchLegalTab('datenschutz')">
             <i class="fas fa-shield-halved"></i> Datenschutz
@@ -722,6 +837,7 @@
           <div class="legal-tab" id="ltab-kontakt" onclick="switchLegalTab('kontakt')">
             <i class="fas fa-envelope"></i> Kontakt
           </div>
+          <button class="legal-close-btn" onclick="closeLegalModal()" title="Schließen"><i class="fas fa-xmark"></i></button>
         </div>
 
         <!-- ── Datenschutzerklärung ── -->
@@ -953,18 +1069,175 @@
     </div>
 
     <div id="homeView" class="view">
-        <h1>John Chat</h1>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-           <button onclick="showView('loginView')">Anmelden</button>
-           <button onclick="showView('registerView')" class="secondary">Registrieren</button>
+
+        <!-- Animated background orbs -->
+        <div class="lp-bg">
+            <div class="lp-orb lp-orb-1"></div>
+            <div class="lp-orb lp-orb-2"></div>
+            <div class="lp-orb lp-orb-3"></div>
         </div>
-        <div style="margin-top:20px; padding-top:14px; border-top:1px solid var(--brd); text-align:center; font-size:0.78rem; color:#999; display:flex; flex-wrap:wrap; justify-content:center; gap:6px 14px;">
-            <span onclick="openLegalModal('datenschutz')" style="cursor:pointer; color:var(--main); font-weight:600;"><i class="fas fa-shield-halved"></i> Datenschutz</span>
-            <span style="color:var(--brd)">|</span>
-            <span onclick="openLegalModal('nutzung')" style="cursor:pointer; color:var(--main); font-weight:600;"><i class="fas fa-file-lines"></i> Nutzungsbedingungen</span>
-            <span style="color:var(--brd)">|</span>
-            <span onclick="openLegalModal('kontakt')" style="cursor:pointer; color:var(--main); font-weight:600;"><i class="fas fa-envelope"></i> Kontakt</span>
+
+        <!-- NAV -->
+        <nav class="lp-nav">
+            <div class="lp-logo">
+                <i class="fas fa-comments"></i> John Chat
+            </div>
+            <div class="lp-nav-actions">
+                <button class="lp-btn-ghost" onclick="showView('loginView')"><i class="fas fa-right-to-bracket"></i> Anmelden</button>
+                <button class="lp-btn-primary" onclick="showView('registerView')"><i class="fas fa-user-plus"></i> Registrieren</button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <section class="lp-hero">
+            <div class="lp-hero-inner">
+                <div class="lp-hero-left">
+                    <div class="lp-hero-badge">
+                        <span></span> Live · Echtzeit-Nachrichten
+                    </div>
+                    <h1 class="lp-hero-title">
+                        Chat with the<br>
+                        <span class="grad">whole world.</span>
+                    </h1>
+                    <p class="lp-hero-sub">
+                        Verbinde dich mit Freunden, erstelle Gruppen und schreibe in Echtzeit – sicher, schnell und kostenlos. Überall. Immer.
+                    </p>
+                    <div class="lp-hero-cta">
+                        <button class="lp-cta-main" onclick="showView('registerView')">
+                            <i class="fas fa-rocket"></i> Jetzt starten
+                        </button>
+                        <button class="lp-cta-sec" onclick="showView('loginView')">
+                            <i class="fas fa-right-to-bracket"></i> Anmelden
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lp-hero-right">
+                    <div class="lp-chat-card">
+                        <div class="lp-chat-header">
+                            <div class="lp-chat-avatar" style="background:linear-gradient(135deg,#5865F2,#a78bfa);">👤</div>
+                            <div>
+                                <div class="lp-chat-name">John Chat</div>
+                                <div class="lp-chat-status">● Online · 42 Nutzer aktiv</div>
+                            </div>
+                        </div>
+                        <div class="lp-chat-msgs">
+                            <div class="lp-msg lp-msg-in">Hey! Bist du heute Abend dabei? 👋</div>
+                            <div class="lp-msg lp-msg-out">Ja klar! Was ist geplant? 🎉</div>
+                            <div class="lp-msg lp-msg-in">Komm einfach in den Chat rein 😄</div>
+                            <div class="lp-msg lp-msg-out">Bin dabei! ✅</div>
+                            <div class="lp-msg lp-msg-in lp-msg-typing">
+                                <div class="lp-typing-dot"></div>
+                                <div class="lp-typing-dot"></div>
+                                <div class="lp-typing-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lp-scroll-hint">
+                <span>Scroll</span>
+                <div class="lp-scroll-arrow">
+                    <div class="lp-scroll-dot"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS STRIP -->
+        <div class="lp-stats">
+            <div class="lp-stat">
+                <div class="lp-stat-num"><span class="grad">100%</span></div>
+                <div class="lp-stat-label">Kostenlos</div>
+            </div>
+            <div class="lp-stat">
+                <div class="lp-stat-num"><span class="grad">Echtzeit</span></div>
+                <div class="lp-stat-label">Nachrichten</div>
+            </div>
+            <div class="lp-stat">
+                <div class="lp-stat-num"><span class="grad">2FA</span></div>
+                <div class="lp-stat-label">Sicherheit</div>
+            </div>
+            <div class="lp-stat">
+                <div class="lp-stat-num"><span class="grad">∞</span></div>
+                <div class="lp-stat-label">Gruppen & Chats</div>
+            </div>
         </div>
+
+        <!-- FEATURES -->
+        <section class="lp-features">
+            <div class="lp-section-label"><i class="fas fa-sparkles"></i> Features</div>
+            <h2 class="lp-section-title">Alles was du brauchst</h2>
+            <p class="lp-section-sub">Designed für echte Verbindungen – mit Funktionen, die deinen Chat besser machen.</p>
+
+            <div class="lp-cards" id="lpCardsGrid">
+                <div class="lp-card">
+                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#5865F2,#4752d6);">
+                        <i class="fas fa-shield-halved" style="color:#fff;"></i>
+                    </div>
+                    <div class="lp-card-title">Maximale Sicherheit</div>
+                    <div class="lp-card-desc">2-Faktor-Authentifizierung per E-Mail, Sicherheitswarnungen bei neuen Anmeldungen und verschlüsselte Passwörter schützen deinen Account.</div>
+                </div>
+                <div class="lp-card">
+                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#10b981,#059669);">
+                        <i class="fas fa-bolt" style="color:#fff;"></i>
+                    </div>
+                    <div class="lp-card-title">Echtzeit-Chat</div>
+                    <div class="lp-card-desc">Nachrichten werden blitzschnell via Firebase übertragen. Tipp-Anzeige, Lesebestätigungen und sofortige Benachrichtigungen inklusive.</div>
+                </div>
+                <div class="lp-card">
+                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                        <i class="fas fa-users" style="color:#fff;"></i>
+                    </div>
+                    <div class="lp-card-title">Gruppen & Freunde</div>
+                    <div class="lp-card-desc">Erstelle beliebig viele Gruppen, lade Freunde ein, verwalte Mitglieder und chatte gleichzeitig mit mehreren Personen.</div>
+                </div>
+                <div class="lp-card">
+                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#ec4899,#db2777);">
+                        <i class="fas fa-image" style="color:#fff;"></i>
+                    </div>
+                    <div class="lp-card-title">Bilder & Sprachnachrichten</div>
+                    <div class="lp-card-desc">Teile Bilder direkt im Chat oder schicke Sprachnachrichten per Mikrofon – für Momente, bei denen Worte allein nicht reichen.</div>
+                </div>
+                <div class="lp-card">
+                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
+                        <i class="fas fa-bag-shopping" style="color:#fff;"></i>
+                    </div>
+                    <div class="lp-card-title">Premium Shop</div>
+                    <div class="lp-card-desc">Personalisiere deinen Chat mit exklusiven Themes, Name-Farben, Badges und Emoji-Paketen aus dem integrierten Shop.</div>
+                </div>
+                <div class="lp-card">
+                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#06b6d4,#0284c7);">
+                        <i class="fas fa-moon" style="color:#fff;"></i>
+                    </div>
+                    <div class="lp-card-title">Dark Mode & Themes</div>
+                    <div class="lp-card-desc">Wähle zwischen Light und Dark Mode oder schalte farbige Premium-Hintergründe frei – dein Chat, dein Look.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTTOM CTA -->
+        <section class="lp-cta-block">
+            <h2>Bereit zu chatten?</h2>
+            <p>Kostenlos registrieren – in 30 Sekunden startklar.</p>
+            <div class="lp-cta-block-btns">
+                <button class="lp-cta-main" onclick="showView('registerView')">
+                    <i class="fas fa-rocket"></i> Jetzt kostenlos starten
+                </button>
+                <button class="lp-cta-sec" onclick="showView('loginView')">
+                    <i class="fas fa-right-to-bracket"></i> Ich habe schon einen Account
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="lp-footer">
+            <span>© 2025 John Chat · Privates Projekt</span>
+            <a onclick="openLegalModal('datenschutz')"><i class="fas fa-shield-halved"></i> Datenschutz</a>
+            <a onclick="openLegalModal('nutzung')"><i class="fas fa-file-lines"></i> Nutzungsbedingungen</a>
+            <a onclick="openLegalModal('kontakt')"><i class="fas fa-envelope"></i> Kontakt</a>
+        </footer>
+
     </div>
 
     <div id="bannedView" class="view hidden">
@@ -1051,7 +1324,6 @@
         <!-- Desktop dropdown -->
         <div id="dotsDropdown" class="hidden">
             <div class="dd-item" onclick="closeDotsMenu();showView('settingsView')"><i class="fas fa-gear" style="color:var(--txt)"></i>Einstellungen</div>
-            <div class="dd-item" onclick="closeDotsMenu();showView('gamesView')"><i class="fas fa-dice-five" style="color:#5865F2"></i>Games</div>
             <div class="dd-item" onclick="closeDotsMenu();showView('shopView')"><i class="fas fa-bag-shopping" style="color:var(--gold)"></i>Shop</div>
             <div class="dd-item" onclick="closeDotsMenu();showView('inboxView')"><i class="fas fa-inbox" style="color:var(--success)"></i>Postfach <span id="inboxBadgeMenu" style="background:var(--danger);color:#fff;border-radius:50%;padding:1px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span></div>
             <div id="adminDotsBtn" class="dd-item hidden" onclick="closeDotsMenu();showView('adminPanelView')"><i class="fas fa-shield" style="color:var(--danger)"></i>Admin Panel</div>
@@ -1060,7 +1332,6 @@
 
         <!-- Mobile: original floating icons (hidden on desktop via CSS) -->
         <span id="adminBtn" class="admin-icon desktop-hide hidden" onclick="showView('adminPanelView')"><i class="fas fa-shield"></i></span>
-        <span class="games-icon desktop-hide" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-dice-five"></i></span>
         <span class="shop-icon desktop-hide" onclick="showView('shopView')" title="Shop"><i class="fas fa-bag-shopping"></i></span>
         <span class="inbox-icon desktop-hide" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-inbox"></i></span>
         <span class="inbox-badge desktop-hide" id="inboxBadge"></span>
@@ -6229,4 +6500,48 @@ function switchLegalTab(tab) {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeLegalModal();
 });
+</script>
+
+<script>
+/* ── LANDING PAGE SCROLL ANIMATIONS ──────────────────────── */
+(function() {
+    function initLandingAnimations() {
+        const cards = document.querySelectorAll('#lpCardsGrid .lp-card');
+        if (!cards.length) return;
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('lp-visible');
+                    obs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        cards.forEach(c => obs.observe(c));
+    }
+    // Run when homeView is shown or immediately if visible
+    const origShowView = window.showView;
+    if (typeof origShowView === 'function') {
+        window.showView = function(id) {
+            origShowView(id);
+            if (id === 'homeView') setTimeout(initLandingAnimations, 60);
+        };
+    }
+    // Also init on page load if homeView is the active view
+    window.addEventListener('load', function() {
+        const hv = document.getElementById('homeView');
+        if (hv && !hv.classList.contains('hidden')) {
+            setTimeout(initLandingAnimations, 200);
+        }
+    });
+    // Scroll within homeView: re-check on scroll
+    const homeEl = document.getElementById('homeView');
+    if (homeEl) {
+        homeEl.addEventListener('scroll', function() {
+            document.querySelectorAll('#lpCardsGrid .lp-card:not(.lp-visible)').forEach(c => {
+                const r = c.getBoundingClientRect();
+                if (r.top < window.innerHeight * 0.9) c.classList.add('lp-visible');
+            });
+        }, { passive: true });
+    }
+})();
 </script>
