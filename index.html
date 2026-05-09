@@ -25,29 +25,26 @@
            Layout / JS / HTML komplett unverändert
            ══════════════════════════════════════════ */
         :root {
-            --bg: #09091a;
-            --txt: rgba(255,255,255,0.90);
-            --main: #7b61ff;
-            --cont: rgba(255,255,255,0.08);
-            --brd: rgba(255,255,255,0.16);
-            --danger: #ff4757;
-            --success: #30d158;
-            --link: #a78bff;
-            --hover: rgba(255,255,255,0.10);
-            --gold: #ffd700;
-            --msg-other: rgba(255,255,255,0.10);
+            --bg: #f4f4f6;
+            --txt: #1a1a1a;
+            --main: #5865F2;
+            --cont: #ffffff;
+            --brd: #dde0e8;
+            --danger: #d63031;
+            --success: #27ae60;
+            --link: #5865F2;
+            --hover: #f0f1f5;
+            --gold: #b8860b;
+            --msg-other: #e8eaf0;
             --msg-self-txt: #ffffff;
-            --glass-blur: 40px;
-            --glass-shine: rgba(255,255,255,0.55);
         }
-        /* Dark mode = same glass, variables identical */
         .dark-mode {
-            --bg: #09091a;
-            --txt: rgba(255,255,255,0.90);
-            --cont: rgba(255,255,255,0.08);
-            --brd: rgba(255,255,255,0.16);
-            --hover: rgba(255,255,255,0.10);
-            --msg-other: rgba(255,255,255,0.10);
+            --bg: #1a1b1e;
+            --txt: #e8e9ed;
+            --cont: #25262b;
+            --brd: #373a40;
+            --hover: #2c2d33;
+            --msg-other: #2e3038;
         }
 
         /* Premium Backgrounds — keep as glass tints */
@@ -70,70 +67,36 @@
 
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
-        /* Animated background orbs */
-        .lg-bg {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background:
-                radial-gradient(ellipse 80% 60% at 20% 20%, #2d1b6e 0%, transparent 60%),
-                radial-gradient(ellipse 60% 60% at 80% 10%, #1a3a6e 0%, transparent 55%),
-                radial-gradient(ellipse 70% 50% at 50% 80%, #0d3d2e 0%, transparent 60%),
-                radial-gradient(ellipse 80% 80% at 90% 90%, #3d1a5c 0%, transparent 60%),
-                #060614;
-        }
-        .lg-orb {
-            position: fixed; border-radius: 50%; filter: blur(70px);
-            pointer-events: none; animation: orbDrift 14s ease-in-out infinite alternate;
-        }
-        .lg-orb1 { width:560px; height:560px; top:-180px; left:-180px; background:radial-gradient(circle,rgba(123,97,255,.5),rgba(61,155,233,.2)); animation-duration:16s; }
-        .lg-orb2 { width:440px; height:440px; bottom:-140px; right:-140px; background:radial-gradient(circle,rgba(255,107,157,.45),rgba(196,123,255,.25)); animation-delay:-6s; animation-duration:18s; }
-        .lg-orb3 { width:300px; height:300px; top:40%; left:35%; background:radial-gradient(circle,rgba(48,209,88,.25),transparent); animation-delay:-10s; animation-duration:22s; }
-        @keyframes orbDrift {
-            0%   { transform: translate(0,0) scale(1); }
             33%  { transform: translate(30px,-25px) scale(1.07); }
             66%  { transform: translate(-20px,40px) scale(.95); }
             100% { transform: translate(40px,20px) scale(1.1); }
         }
-        .lg-filter { position: absolute; width: 0; height: 0; }
+
 
         body {
             font-family: 'Segoe UI', sans-serif;
             background: var(--bg); color: var(--txt);
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s;
+            min-height: 100vh; min-height: -webkit-fill-available;
         }
 
         /* MOBILE: fullscreen glass panels */
         .view {
             animation: fadeIn 0.4s;
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+            background: var(--cont);
             padding: 20px; box-sizing: border-box;
             display: flex; flex-direction: column;
             z-index: 10;
         }
-        /* Auth views — glass cards on mobile */
         #homeView, #loginView, #registerView, #bannedView {
             position: relative; top: auto; left: auto;
             width: 90%; max-width: 420px; height: auto; max-height: 85vh;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.20);
-            border-radius: 28px; padding: 25px;
-            box-shadow:
-                0 2px 0 0 rgba(255,255,255,.18) inset,
-                0 -1px 0 0 rgba(255,255,255,.06) inset,
-                0 30px 80px -10px rgba(0,0,0,.55),
-                0 8px 24px rgba(0,0,0,.35);
-            backdrop-filter: blur(var(--glass-blur)) saturate(200%) brightness(1.05);
-            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%) brightness(1.05);
+            background: var(--cont);
+            border: 1px solid var(--brd);
+            border-radius: 10px; padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             text-align: center; margin: auto;
-        }
-        /* Top shine line on auth cards */
-        #homeView::before, #loginView::before, #registerView::before {
-            content: ''; position: absolute; top: 0; left: 12px; right: 12px; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--glass-shine) 40%, var(--glass-shine) 60%, transparent);
-            border-radius: 999px; pointer-events: none;
         }
         .view-large { padding: 20px; }
 
@@ -145,11 +108,9 @@
             #mainView {
                 position: fixed !important; top: 0 !important; left: 0 !important;
                 width: 25% !important; height: 100vh !important;
-                background: rgba(255,255,255,0.06) !important;
-                backdrop-filter: blur(var(--glass-blur)) saturate(180%) !important;
-                -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%) !important;
-                border-right: 1px solid rgba(255,255,255,0.12) !important;
-                border-radius: 0 !important; box-shadow: 4px 0 30px rgba(0,0,0,0.3) !important;
+                background: var(--cont) !important;
+                border-right: 1px solid var(--brd) !important;
+                border-radius: 0 !important; box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
                 padding: 16px 14px !important;
             }
             /* Content views: right 75%, glass tinted */
@@ -157,9 +118,7 @@
             #inboxView, #adminPanelView {
                 position: fixed !important; top: 0 !important; left: 25% !important;
                 width: 75% !important; height: 100vh !important;
-                background: rgba(255,255,255,0.03) !important;
-                backdrop-filter: blur(20px) !important;
-                -webkit-backdrop-filter: blur(20px) !important;
+                background: var(--bg) !important;
                 border-radius: 0 !important; box-shadow: none !important;
             }
             /* Auth cards centered */
@@ -214,13 +173,13 @@
         /* 3-dots btn (hidden on mobile by default) */
         #btn3dots {
             display: none;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: var(--txt);
+            background: var(--cont); border: 1px solid rgba(255,255,255,0.12); color: var(--txt);
             width: 34px; height: 34px; border-radius: 50%;
             align-items: center; justify-content: center;
             font-size: 1.15rem; cursor: pointer; transition: 0.2s; padding: 0;
             flex-shrink: 0;
         }
-        #btn3dots:hover { background: rgba(255,255,255,0.15); }
+        #btn3dots:hover { background: var(--cont); }
 
         /* Sidebar title row (hidden on mobile) */
         #sidebarTitleRow {
@@ -233,11 +192,9 @@
         /* Dropdown menu */
         #dotsDropdown {
             position: fixed; top: 54px; left: 10px;
-            background: rgba(20,15,45,0.85);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 18px; box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+            background: var(--cont);
+            border: 1px solid var(--brd);
+            border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
             z-index: 99999; min-width: 200px; overflow: hidden;
             animation: fadeIn 0.15s;
         }
@@ -249,91 +206,63 @@
             border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .dd-item:last-child { border-bottom: none; }
-        .dd-item:hover { background: rgba(255,255,255,0.10); }
+        .dd-item:hover { background: var(--cont); }
         .dd-item i { width: 20px; text-align: center; font-size: 1.05rem; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         button {
-            padding: 12px; border: none; border-radius: 14px;
-            background: rgba(255,255,255,0.88); color: #0f0f1e;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-            flex-shrink: 0; font-size: 0.95rem; position: relative; overflow: hidden;
-            box-shadow: 0 1px 0 0 white inset, 0 -1px 0 0 rgba(0,0,0,.12) inset,
-                        0 6px 20px rgba(0,0,0,.30), 0 2px 6px rgba(0,0,0,.18);
+            padding: 12px; border: 1px solid var(--brd); border-radius: 6px;
+            background: var(--cont); color: var(--txt);
+            font-weight: 600; cursor: pointer; transition: opacity 0.15s, background 0.15s;
+            flex-shrink: 0; font-size: 0.95rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
         }
-        button::before {
-            content: ''; position: absolute; top: 0; left: -120%; width: 80%; height: 100%;
-            background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.30) 50%, transparent 80%);
-            transform: skewX(-15deg); transition: left .5s cubic-bezier(.4,0,.2,1); pointer-events: none;
-        }
-        button:hover::before { left: 140%; }
-        button:hover { opacity: 0.95; transform: scale(1.02);
-            box-shadow: 0 1px 0 0 white inset, 0 -1px 0 0 rgba(0,0,0,.10) inset,
-                        0 14px 40px rgba(0,0,0,.40), 0 4px 12px rgba(0,0,0,.22); }
-        button:disabled { opacity: 0.5; transform: none; cursor: not-allowed;
-            background: rgba(255,255,255,0.20); color: rgba(255,255,255,0.4);
-            box-shadow: none; }
-        
+        button:hover { opacity: 0.88; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
         button.secondary {
-            background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.86);
-            border: 1px solid rgba(255,255,255,0.18);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 1px 0 0 rgba(255,255,255,.20) inset,
-                        0 -1px 0 0 rgba(255,255,255,.05) inset, 0 4px 16px rgba(0,0,0,.25);
+            background: var(--hover); color: var(--txt);
+            border: 1px solid var(--brd);
         }
-        button.secondary:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28); }
-        button.danger { background: rgba(255,71,87,0.80); color: white;
-            border: 1px solid rgba(255,100,130,0.30);
-            box-shadow: 0 1px 0 0 rgba(255,255,255,.18) inset, 0 4px 16px rgba(255,71,87,.30); }
-        button.danger:hover { background: rgba(255,71,87,0.95); }
-        button.gold-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000;
-            box-shadow: 0 2px 10px rgba(255,215,0,0.35); }
-        button.green-btn { background: rgba(48,209,88,0.85); color: white;
-            border: 1px solid rgba(48,209,88,0.30);
-            box-shadow: 0 1px 0 0 rgba(255,255,255,.18) inset, 0 4px 16px rgba(48,209,88,.30); }
+        button.secondary:hover { background: var(--brd); }
+        button.danger { background: var(--danger); color: white; border-color: transparent; }
+        button.danger:hover { opacity: 0.88; }
+        button.gold-btn { background: #c0900c; color: white; border-color: transparent; }
+        button.green-btn { background: var(--success); color: white; border-color: transparent; }
         
         input, select, textarea {
-            width: 100%; padding: 12px 16px; margin: 8px 0;
-            border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
-            background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90);
-            box-sizing: border-box; font-family: inherit; transition: 0.2s;
-            backdrop-filter: blur(20px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+            width: 100%; padding: 11px 14px; margin: 8px 0;
+            border: 1px solid var(--brd); border-radius: 6px;
+            background: var(--cont); color: var(--txt);
+            box-sizing: border-box; font-family: inherit; transition: border-color 0.15s;
         }
-        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.28); }
+        input::placeholder, textarea::placeholder { color: #aaa; }
         input:focus, select:focus, textarea:focus {
-            outline: none; border-color: rgba(140,180,255,0.60);
-            background: rgba(255,255,255,0.11);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 3px rgba(100,150,255,.18);
+            outline: none; border-color: var(--main);
+            box-shadow: 0 0 0 3px rgba(88,101,242,0.10);
         }
         
         .hidden { display: none !important; }
 
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.55); backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.45);
             display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-card {
-            background: rgba(255,255,255,0.09);
-            backdrop-filter: blur(40px) saturate(200%);
-            -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid rgba(255,255,255,0.20);
+            background: var(--cont);
+            border: 1px solid var(--brd);
             width: 90%; max-width: 380px;
-            padding: 25px; border-radius: 24px;
-            box-shadow: 0 2px 0 0 rgba(255,255,255,.16) inset,
-                        0 -1px 0 0 rgba(255,255,255,.06) inset,
-                        0 30px 80px -10px rgba(0,0,0,.55);
+            padding: 25px; border-radius: 10px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
             text-align: center; max-height: 90vh; overflow-y: auto; color: var(--txt);
         }
 
         #systemEmbed {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            min-width: 250px; color: white; padding: 12px 25px; border-radius: 99px; font-weight: bold;
-            backdrop-filter: blur(24px);
-            box-shadow: 0 8px 24px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.20) inset;
-            border: 1px solid rgba(255,255,255,0.15);
-            z-index: 10000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; top: -80px; left: 50%; transform: translateX(-50%);
+            min-width: 250px; color: white; padding: 11px 22px; border-radius: 6px; font-weight: 600;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            z-index: 10000; transition: top 0.3s ease;
             text-align: center;
         }
         #systemEmbed.show { top: 20px; }
@@ -350,14 +279,14 @@
         
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--cont); border-radius: 20px; padding: 25px; 
+            background: var(--cont); border-radius: 8px; padding: 25px; 
             box-sizing: border-box; z-index: 100; text-align: left; display: flex; flex-direction: column; 
         }
         .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
         .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
         .agb-item strong { color: var(--main); display: block; margin-bottom: 3px; }
 
-        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 50px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 6px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
         
         /* MODERN CHAT MESSAGES */
@@ -365,7 +294,7 @@
         
         .msg { 
             padding: 10px 14px; 
-            border-radius: 18px; 
+            border-radius: 8px; 
             word-break: break-word; 
             position: relative; 
             max-width: 75%; 
@@ -411,7 +340,7 @@
         .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); padding: 5px; }
 
         /* SHOP STYLES */
-        .shop-bundle { border: 2px solid var(--brd); border-radius: 16px; padding: 15px; margin-bottom: 12px; text-align: left; position: relative; background: var(--hover); transition: 0.2s; }
+        .shop-bundle { border: 2px solid var(--brd); border-radius: 6px; padding: 15px; margin-bottom: 12px; text-align: left; position: relative; background: var(--hover); transition: 0.2s; }
         .shop-bundle:hover { border-color: var(--main); }
         .shop-bundle-header { font-weight: bold; font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         .shop-bundle-price { position: absolute; top: 15px; right: 15px; font-weight: bold; font-size: 1rem; color: var(--success); }
@@ -426,7 +355,7 @@
         .bundle-mega { border-color: #ffd700; background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,71,87,0.08), rgba(88,101,242,0.08)); }
         .bundle-basic { border-color: #888; background: linear-gradient(to bottom, rgba(136,136,136,0.06), transparent); }
         .bundle-speed { border-color: #00b894; background: linear-gradient(to bottom, rgba(0,184,148,0.08), transparent); }
-        .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 50px; background: rgba(67, 181, 129, 0.1); }
+        .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 6px; background: rgba(67, 181, 129, 0.1); }
 
         /* CHAT UI STYLES */
         .chat-header {
@@ -440,8 +369,8 @@
         }
         
         .chat-input-wrapper {
-            flex: 1; display: flex; align-items: center; background: var(--hover); 
-            border-radius: 25px; padding: 2px 15px; border: 1px solid transparent; transition: 0.2s;
+            flex: 1; display: flex; align-items: center; background: var(--cont); 
+            border-radius: 6px; padding: 2px 15px; border: 1px solid var(--brd); transition: border-color 0.15s;
             min-width: 0; overflow: hidden;
         }
         .chat-input-wrapper:focus-within { border-color: var(--main); background: var(--cont); box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.1); }
@@ -457,7 +386,7 @@
         
         .send-btn {
             width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0;
-            background: var(--main); color: white; box-shadow: 0 4px 10px rgba(88, 101, 242, 0.3);
+            background: var(--main); color: white;
         }
         .send-btn:hover { transform: scale(1.1); }
         
@@ -486,12 +415,12 @@
         #userContextSheet.open { bottom: 0; }
         #userContextSheetBg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+            background: rgba(0,0,0,0.35);
             z-index: 4999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         #userContextSheetBg.open { opacity: 1; pointer-events: all; }
         .context-sheet-inner {
-            background: var(--cont); border-radius: 24px 24px 0 0; padding: 10px 0 30px 0;
+            background: var(--cont); border-radius: 10px 10px 0 0; padding: 10px 0 30px 0;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.2); border-top: 1px solid var(--brd);
         }
         .context-sheet-handle { width: 40px; height: 4px; background: var(--brd); border-radius: 2px; margin: 8px auto 12px auto; }
@@ -526,12 +455,12 @@
         .tag-admin { background: var(--main); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-owner { background: linear-gradient(45deg, #FFD700, #ff4757); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .tag-global-admin { background: #ff4757; color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .tag-mega { background: linear-gradient(45deg, #ffd700, #ff4757, #5865F2); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 8px rgba(255,215,0,0.5); animation: megaGlow 2s infinite alternate; }
-        @keyframes megaGlow { from { box-shadow: 0 2px 8px rgba(255,215,0,0.4); } to { box-shadow: 0 2px 16px rgba(255,71,87,0.8); } }
+        .tag-mega { background: linear-gradient(45deg, #ffd700, #ff4757, #5865F2); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+
         .tag-super { background: linear-gradient(45deg, #43b581, #00b894); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-krass { background: linear-gradient(45deg, #5865F2, #7289DA); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
-        .tag-crazy { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; animation: crazyGlow 1.5s infinite alternate; }
-        @keyframes crazyGlow { from { box-shadow: 0 1px 5px rgba(255,107,107,0.4); } to { box-shadow: 0 2px 10px rgba(238,90,36,0.7); } }
+        .tag-crazy { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
+
         .tag-og { background: linear-gradient(45deg, #1a1a1a, #444); color: #FFD700; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; border: 1px solid #FFD700; box-shadow: 0 1px 6px rgba(255,215,0,0.4); }
         .tag-verifiziert { background: linear-gradient(45deg, #1DA1F2, #0d6efd); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-brot { background: linear-gradient(45deg, #c8a06e, #a0522d); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
@@ -561,8 +490,8 @@
             background: var(--bg); color: var(--txt); z-index: 30000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .loader-icon { font-size: 4rem; color: var(--main); animation: pulse 1.5s infinite; margin-bottom: 20px; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+        .loader-icon { font-size: 3.5rem; color: var(--main); margin-bottom: 20px; }
+
 
         /* REPORT */
         .report-btn { color: #ff9f43; background: transparent; border: none; font-size: 1rem; cursor: pointer; }
@@ -597,10 +526,10 @@
             box-shadow: 0 2px 6px rgba(88,101,242,0.3); transition: 0.2s;
         }
         .voice-play-btn:hover { transform: scale(1.1); opacity: 0.9; }
-        .msg-self .voice-play-btn { background: rgba(255,255,255,0.25); box-shadow: none; }
+        .msg-self .voice-play-btn { background: var(--cont); box-shadow: none; }
         .voice-waveform { flex: 1; height: 28px; position: relative; display: flex; align-items: center; gap: 2px; overflow: hidden; }
         .voice-bar { width: 3px; border-radius: 2px; background: var(--main); opacity: 0.5; transition: opacity 0.1s; flex-shrink: 0; }
-        .msg-self .voice-bar { background: rgba(255,255,255,0.7); }
+        .msg-self .voice-bar { background: var(--cont); }
         .voice-bar.active { opacity: 1; }
         .voice-duration { font-size: 0.7rem; opacity: 0.75; white-space: nowrap; min-width: 28px; }
 
@@ -620,17 +549,15 @@
         /* === BEAUTIFUL DELETE CONFIRM MODAL === */
         #deleteConfirmModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.45);
             display: flex; justify-content: center; align-items: center; z-index: 19999;
-            animation: fadeIn 0.2s;
         }
         .delete-confirm-card {
             background: var(--cont); width: 85%; max-width: 310px;
-            padding: 26px 22px; border-radius: 22px; text-align: center;
-            border: 2px solid var(--danger); box-shadow: 0 15px 45px rgba(255,71,87,0.25);
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 22px 20px; border-radius: 8px; text-align: center;
+            border: 1px solid var(--brd); box-shadow: 0 6px 20px rgba(0,0,0,0.12);
         }
-        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
         .delete-confirm-icon { font-size: 2.8rem; margin-bottom: 10px; display: block; }
         .delete-confirm-card h3 { color: var(--danger); margin: 0 0 6px 0; font-size: 1.1rem; }
         .delete-confirm-card p { color: #888; font-size: 0.85rem; margin: 0 0 18px 0; line-height: 1.4; }
@@ -702,12 +629,12 @@
         }
         #fullscreenCloseBtn {
             position: absolute; top: 18px; right: 20px;
-            background: rgba(255,255,255,0.15); border: none; color: white;
+            background: var(--cont); border: none; color: white;
             width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: 0.2s;
         }
-        #fullscreenCloseBtn:hover { background: rgba(255,255,255,0.3); }
+        #fullscreenCloseBtn:hover { background: var(--cont); }
 
         /* Message link style */
         .msg a.msg-link { color: #a0c4ff; text-decoration: underline; word-break: break-all; }
@@ -717,15 +644,204 @@
         .email-notif-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd); }
         .email-notif-row span { font-size:0.85rem; flex:1; margin-right:10px; }
         .email-notif-row.mandatory span { color:#888; }
+
+        /* Message link – light theme */
+        .msg a.msg-link { color: #3b5bdb; }
+        .msg-self a.msg-link { color: rgba(255,255,255,0.9); }
+
+        /* ── LEGAL MODAL ───────────────────────────────────────────── */
+        #legalModalOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99995; padding: 1rem;
+        }
+        #legalModalOverlay.open { display: flex; }
+        .legal-modal-box {
+            background: var(--cont); border: 1px solid var(--brd);
+            border-radius: 10px; width: 100%; max-width: 540px;
+            max-height: 88vh; overflow-y: auto;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+            position: relative;
+        }
+        .legal-tabs {
+            display: flex; border-bottom: 1px solid var(--brd);
+            position: sticky; top: 0; background: var(--cont); z-index: 2;
+        }
+        .legal-tab {
+            flex: 1; padding: 12px 6px; text-align: center; font-size: 0.82rem;
+            font-weight: 600; cursor: pointer; color: #888;
+            border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+        }
+        .legal-tab.active { color: var(--main); border-bottom-color: var(--main); }
+        .legal-tab:hover { color: var(--txt); }
+        .legal-close-btn {
+            position: absolute; top: 10px; right: 12px; background: none;
+            border: none; cursor: pointer; font-size: 1.1rem; color: #999;
+            width: 28px; height: 28px; display: flex; align-items: center;
+            justify-content: center; border-radius: 50%; padding: 0; box-shadow: none;
+        }
+        .legal-close-btn:hover { background: var(--hover); color: var(--txt); }
+        .legal-panel { display: none; padding: 22px 24px 28px; }
+        .legal-panel.active { display: block; }
+        .legal-panel h3 {
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--txt); margin: 0 0 6px 0;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .legal-panel p { font-size: 0.86rem; color: #666; line-height: 1.65; margin: 0 0 14px 0; }
+        .dark-mode .legal-panel p { color: #aaa; }
+        .legal-panel ul {
+            list-style: none; padding: 0; margin: 0 0 14px 0;
+        }
+        .legal-panel ul li {
+            font-size: 0.86rem; color: #666; line-height: 1.65;
+            padding: 4px 0; display: flex; align-items: flex-start; gap: 8px;
+        }
+        .dark-mode .legal-panel ul li { color: #aaa; }
+        .legal-panel ul li i { color: var(--success); margin-top: 3px; flex-shrink: 0; }
+        .legal-divider { border: none; border-top: 1px solid var(--brd); margin: 14px 0; }
+        .legal-section { margin-bottom: 6px; }
     </style>
 </head>
 <body>
 
-    <div id="globalLoading" class="hidden">
-        <div class="loader-icon"><i class="fas fa-comment-dots"></i></div>
+    <!-- ════════════════════════════════════════════════
+         LEGAL MODAL – Datenschutz / Nutzung / Kontakt
+         ════════════════════════════════════════════════ -->
+    <div id="legalModalOverlay" onclick="if(event.target===this)closeLegalModal()">
+      <div class="legal-modal-box">
+        <button class="legal-close-btn" onclick="closeLegalModal()"><i class="fas fa-xmark"></i></button>
+
+        <div class="legal-tabs">
+          <div class="legal-tab active" id="ltab-datenschutz" onclick="switchLegalTab('datenschutz')">
+            <i class="fas fa-shield-halved"></i> Datenschutz
+          </div>
+          <div class="legal-tab" id="ltab-nutzung" onclick="switchLegalTab('nutzung')">
+            <i class="fas fa-file-lines"></i> Nutzung
+          </div>
+          <div class="legal-tab" id="ltab-kontakt" onclick="switchLegalTab('kontakt')">
+            <i class="fas fa-envelope"></i> Kontakt
+          </div>
+        </div>
+
+        <!-- ── Datenschutzerklärung ── -->
+        <div class="legal-panel active" id="lpanel-datenschutz">
+          <div class="legal-section">
+            <h3><i class="fas fa-user-tie"></i> Verantwortlicher</h3>
+            <p>Betreiber: <strong>John</strong> · Kontakt: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-database"></i> Erhobene Daten</h3>
+            <p>Beim Erstellen eines Kontos und der Nutzung von John Chat werden folgende Daten verarbeitet:</p>
+            <ul>
+              <li><i class="fas fa-check"></i> Benutzername</li>
+              <li><i class="fas fa-check"></i> Passwort (verschlüsselt gespeichert)</li>
+              <li><i class="fas fa-check"></i> E-Mail-Adresse (für 2-Faktor-Authentifizierung)</li>
+              <li><i class="fas fa-check"></i> Chatnachrichten und geteilte Medien</li>
+              <li><i class="fas fa-check"></i> Profilbild (optional)</li>
+              <li><i class="fas fa-check"></i> Zeitstempel von Aktivitäten</li>
+            </ul>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-fire"></i> Firebase / Google (Drittanbieter)</h3>
+            <p>John Chat nutzt <strong>Firebase (Google LLC, USA)</strong> für Datenbankdienste, Authentifizierung und Dateispeicherung. Damit findet eine Übermittlung in ein Drittland (USA) statt. Firebase stützt die Übermittlung auf Standardvertragsklauseln (SCCs) gem. Art. 46 Abs. 2 lit. c DSGVO. Weitere Infos: <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener" style="color:var(--main)">firebase.google.com/support/privacy</a></p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-clock"></i> Speicherdauer</h3>
+            <p>Daten werden für die Dauer der Kontoexistenz gespeichert. Nach Kontolöschung werden Daten innerhalb von 30 Tagen entfernt, sofern keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-gavel"></i> Rechtsgrundlage</h3>
+            <p>Die Verarbeitung erfolgt auf Basis deiner Einwilligung durch die Registrierung (Art. 6 Abs. 1 lit. a DSGVO) sowie zur Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).</p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-scale-balanced"></i> Deine Rechte (Art. 15–21 DSGVO)</h3>
+            <ul>
+              <li><i class="fas fa-check"></i> <strong>Auskunft</strong> über gespeicherte Daten (Art. 15)</li>
+              <li><i class="fas fa-check"></i> <strong>Berichtigung</strong> falscher Daten (Art. 16)</li>
+              <li><i class="fas fa-check"></i> <strong>Löschung</strong> deiner Daten (Art. 17)</li>
+              <li><i class="fas fa-check"></i> <strong>Einschränkung</strong> der Verarbeitung (Art. 18)</li>
+              <li><i class="fas fa-check"></i> <strong>Datenübertragbarkeit</strong> (Art. 20)</li>
+              <li><i class="fas fa-check"></i> <strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21)</li>
+            </ul>
+            <p>Anfragen an: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-flag"></i> Beschwerderecht</h3>
+            <p>Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO), z. B. beim Landesbeauftragten für Datenschutz deines Bundeslandes.</p>
+          </div>
+        </div>
+
+        <!-- ── Nutzungsbedingungen ── -->
+        <div class="legal-panel" id="lpanel-nutzung">
+          <div class="legal-section">
+            <h3><i class="fas fa-globe"></i> Geltungsbereich</h3>
+            <p>Diese Nutzungsbedingungen gelten für alle Nutzer von John Chat. Mit der Registrierung stimmst du ihnen zu. Betreiber: <strong>John</strong> · <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-child"></i> Mindestalter</h3>
+            <p>John Chat darf nur von Personen ab <strong>13 Jahren</strong> genutzt werden. Minderjährige unter 16 Jahren benötigen die Zustimmung eines Erziehungsberechtigten.</p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-user-check"></i> Nutzerpflichten</h3>
+            <ul>
+              <li><i class="fas fa-check"></i> Wahre Angaben bei der Registrierung</li>
+              <li><i class="fas fa-check"></i> Kein Missbrauch des Dienstes oder Mehrfach-Accounts</li>
+              <li><i class="fas fa-check"></i> Kein Versand von Spam, Malware oder unerwünschten Werbeangeboten</li>
+              <li><i class="fas fa-check"></i> Keine Beleidigungen, Diskriminierung oder Harassment</li>
+              <li><i class="fas fa-check"></i> Keine sexuellen, gewaltverherrlichenden oder illegalen Inhalte</li>
+            </ul>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-ban"></i> Sperrung & Kündigung</h3>
+            <p>Der Betreiber kann Accounts bei Regelverstößen <strong>ohne Vorwarnung sperren oder löschen</strong>. Du kannst dein Konto jederzeit selbst löschen.</p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-triangle-exclamation"></i> Haftungsausschluss</h3>
+            <p>John Chat ist ein privates Projekt und wird ohne Gewähr bereitgestellt. Der Betreiber übernimmt keine Haftung für Ausfälle, Datenverluste oder nutzergenerierte Inhalte.</p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-pen-to-square"></i> Änderungen</h3>
+            <p>Der Betreiber behält sich vor, diese Bedingungen jederzeit anzupassen. Wesentliche Änderungen werden im Chat bekannt gegeben.</p>
+          </div>
+        </div>
+
+        <!-- ── Kontakt ── -->
+        <div class="legal-panel" id="lpanel-kontakt">
+          <div class="legal-section">
+            <h3><i class="fas fa-user-tie"></i> Betreiber</h3>
+            <p><strong>John</strong></p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-envelope"></i> E-Mail</h3>
+            <p><a href="mailto:entspann.schick@gmail.com" style="color:var(--main); font-weight:600;">entspann.schick@gmail.com</a></p>
+            <p style="font-size:0.82rem;">Für Anfragen zu Datenschutz, Account-Löschung, Beschwerden oder allgemeine Fragen.</p>
+          </div>
+          <hr class="legal-divider">
+          <div class="legal-section">
+            <h3><i class="fas fa-circle-info"></i> Hinweis</h3>
+            <p>John Chat ist ein privates, nicht-kommerzielles Projekt. Es besteht kein gesetzlicher Impressumspflicht, da keine geschäftsmäßige Nutzung vorliegt.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+        <div class="loader-icon"><i class="fas fa-comments"></i></div>
         <h2 style="margin:0;">John Chat</h2>
         <p>Chats werden geladen...</p>
-        <button id="loadingLogoutBtn" onclick="executeLogout()" class="danger" style="display:none; margin-top:20px; padding:12px 30px; border-radius:50px; font-size:0.95rem;"><i class="fas fa-sign-out-alt"></i> Abmelden</button>
+        <button id="loadingLogoutBtn" onclick="executeLogout()" class="danger" style="display:none; margin-top:20px; padding:12px 30px; border-radius:6px; font-size:0.95rem;"><i class="fas fa-right-from-bracket"></i> Abmelden</button>
         <p id="loadingLogoutHint" style="display:none; font-size:0.8rem; color:#888; margin-top:5px;">Das Laden dauert ungewöhnlich lang...</p>
     </div>
 
@@ -733,7 +849,7 @@
     <div id="customAlert"></div>
 
     <!-- Inline Bestätigungs-Embed (kein Gerät-Dialog) -->
-    <div id="adminConfirmEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--main); border-radius:16px; padding:14px 20px; z-index:10001; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:260px; max-width:340px;">
+    <div id="adminConfirmEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--main); border-radius:8px; padding:14px 20px; z-index:10001; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:260px; max-width:340px;">
         <p id="adminConfirmMsg" style="margin:0 0 12px 0; font-size:0.9rem; font-weight:bold; color:var(--txt);"></p>
         <div style="display:flex; gap:10px; justify-content:center;">
             <button onclick="confirmAdminAction()" style="padding:8px 18px; font-size:0.85rem; background:var(--main);">✓ Ja</button>
@@ -747,10 +863,17 @@
            <button onclick="showView('loginView')">Anmelden</button>
            <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
+        <div style="margin-top:20px; padding-top:14px; border-top:1px solid var(--brd); text-align:center; font-size:0.78rem; color:#999; display:flex; flex-wrap:wrap; justify-content:center; gap:6px 14px;">
+            <span onclick="openLegalModal('datenschutz')" style="cursor:pointer; color:var(--main); font-weight:600;"><i class="fas fa-shield-halved"></i> Datenschutz</span>
+            <span style="color:var(--brd)">|</span>
+            <span onclick="openLegalModal('nutzung')" style="cursor:pointer; color:var(--main); font-weight:600;"><i class="fas fa-file-lines"></i> Nutzungsbedingungen</span>
+            <span style="color:var(--brd)">|</span>
+            <span onclick="openLegalModal('kontakt')" style="cursor:pointer; color:var(--main); font-weight:600;"><i class="fas fa-envelope"></i> Kontakt</span>
+        </div>
     </div>
 
     <div id="bannedView" class="view hidden">
-        <h1 style="font-size: 3rem;"><i class="fas fa-ban"></i></h1>
+        <h1 style="font-size: 3rem;"><i class="fas fa-circle-ban"></i></h1>
         <h2>GESPERRT</h2>
         <p id="banMessage">Dein Account wurde permanent gesperrt.</p>
         <p id="banReasonDisplay" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-weight: bold;"></p>
@@ -770,16 +893,21 @@
         <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
     
         <div id="agbEmbed" class="hidden">
-            <h2 style="color:var(--main); margin-top:0;">Regeln & Nutzung</h2>
+            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-file-lines"></i> Nutzungsbedingungen & Regeln</h2>
             <div class="agb-content">
-                <div class="agb-item"><strong>1. Projekt-Status</strong>Dies ist ein privates Projekt (PV). Die Nutzung erfolgt auf eigene Gefahr.</div>
-                <div class="agb-item"><strong>2. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Verstößen zu prüfen.</div>
-                <div class="agb-item"><strong>3. Datenspeicherung</strong>Bilder und Nachrichten werden über Firebase Storage/Database verarbeitet.</div>
-                <div class="agb-item"><strong>4. Verhalten</strong>Respektloser Umgang führt zum sofortigen Ausschluss.</div>
-                <div class="agb-item"><strong>5. Sicherheit</strong>John Chat Gewährleistet absolute Sicherheit.</div>
-                <div class="agb-item"><strong>6. Algemeine Regeln</strong>Sexuelle Inhalte sowie Beleidigungen sind verboten!</div>
+                <div class="agb-item"><strong>1. Projektinfo</strong>John Chat ist ein privates Projekt. Die Nutzung erfolgt auf eigene Gefahr. Es besteht kein Anspruch auf Verfügbarkeit.</div>
+                <div class="agb-item"><strong>2. Mindestalter</strong>Die Nutzung von John Chat setzt ein Mindestalter von 13 Jahren voraus.</div>
+                <div class="agb-item"><strong>3. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Regelverstößen einzusehen und Maßnahmen zu ergreifen.</div>
+                <div class="agb-item"><strong>4. Datenspeicherung</strong>Nachrichten und Bilder werden über Firebase (Google LLC, USA) verarbeitet. E-Mail-Adressen werden für die 2-Faktor-Authentifizierung gespeichert.</div>
+                <div class="agb-item"><strong>5. Verhalten</strong>Respektloser Umgang, Beleidigungen, Diskriminierung oder Harassment führen zum sofortigen Ausschluss.</div>
+                <div class="agb-item"><strong>6. Verbotene Inhalte</strong>Sexuelle, gewaltverherrlichende oder illegale Inhalte sind strikt verboten.</div>
+                <div class="agb-item"><strong>7. Kontosperrung</strong>Der Betreiber kann Accounts ohne Angabe von Gründen sperren oder löschen.</div>
+                <div class="agb-item"><strong>8. Haftung</strong>Der Betreiber übernimmt keine Haftung für Inhalte, die von Nutzern erstellt wurden, oder für technische Ausfälle.</div>
             </div>
-            <button onclick="toggleAgb(false)" style="width:100%;">Schließen</button>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--brd); font-size:0.78rem; color:#888; text-align:left; line-height:1.5;">
+                Betreiber: <strong>John</strong> · Kontakt: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main);">entspann.schick@gmail.com</a>
+            </div>
+            <button onclick="toggleAgb(false)" style="width:100%; margin-top:12px;">Schließen</button>
          </div>
     </div>
 
@@ -798,8 +926,8 @@
         <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
 
         <!-- Passwort Vergessen Embed -->
-        <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:20px; padding:25px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
-            <h2 style="margin-top:0;"><i class="fas fa-key" style="color:var(--main);"></i> Passwort vergessen</h2>
+        <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:8px; padding:25px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
+            <h2 style="margin-top:0;"><i class="fas fa-unlock-keyhole" style="color:var(--main);"></i> Passwort vergessen</h2>
             <p style="font-size:0.9rem; color:#888; margin-bottom:15px;">Gib deinen Benutzernamen und deine hinterlegte E-Mail-Adresse ein. Du erhältst dann deinen Zugangscode per E-Mail.</p>
             <input type="text" id="forgotUser" placeholder="Benutzername *" style="margin-bottom:8px;">
             <input type="email" id="forgotEmail" placeholder="E-Mail-Adresse *" style="margin-bottom:15px;">
@@ -807,7 +935,7 @@
             <button onclick="hideForgotPassword()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
 
             <!-- Erfolgs-Embed innerhalb Passwort vergessen -->
-            <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:20px; padding:25px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+            <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:8px; padding:25px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
                 <div style="font-size:3rem; margin-bottom:15px;">📧</div>
                 <h2 style="color:var(--success); margin-top:0;">E-Mail gesendet!</h2>
                 <p style="color:#888; font-size:0.9rem;">Wir haben dir eine E-Mail mit deinem Zugangscode zugesendet.</p>
@@ -820,28 +948,28 @@
 
         <!-- Desktop: Sidebar title row with 3-dots -->
         <div id="sidebarTitleRow">
-            <button id="btn3dots" onclick="openDotsMenu()" title="Menü"><i class="fas fa-ellipsis-v"></i></button>
+            <button id="btn3dots" onclick="openDotsMenu()" title="Menü"><i class="fas fa-bars"></i></button>
             <h2 id="sidebarTitle">John Chat</h2>
             <span style="width:34px;"></span><!-- spacer to center title -->
         </div>
 
         <!-- Desktop dropdown -->
         <div id="dotsDropdown" class="hidden">
-            <div class="dd-item" onclick="closeDotsMenu();showView('settingsView')"><i class="fas fa-cog" style="color:var(--txt)"></i>Einstellungen</div>
-            <div class="dd-item" onclick="closeDotsMenu();showView('gamesView')"><i class="fas fa-gamepad" style="color:#5865F2"></i>Games</div>
-            <div class="dd-item" onclick="closeDotsMenu();showView('shopView')"><i class="fas fa-store" style="color:var(--gold)"></i>Shop</div>
-            <div class="dd-item" onclick="closeDotsMenu();showView('inboxView')"><i class="fas fa-envelope" style="color:var(--success)"></i>Postfach <span id="inboxBadgeMenu" style="background:var(--danger);color:#fff;border-radius:50%;padding:1px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span></div>
-            <div id="adminDotsBtn" class="dd-item hidden" onclick="closeDotsMenu();showView('adminPanelView')"><i class="fas fa-user-shield" style="color:var(--danger)"></i>Admin Panel</div>
-            <div class="dd-item" onclick="closeDotsMenu();confirmLogout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i>Abmelden</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('settingsView')"><i class="fas fa-gear" style="color:var(--txt)"></i>Einstellungen</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('gamesView')"><i class="fas fa-dice-five" style="color:#5865F2"></i>Games</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('shopView')"><i class="fas fa-bag-shopping" style="color:var(--gold)"></i>Shop</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('inboxView')"><i class="fas fa-inbox" style="color:var(--success)"></i>Postfach <span id="inboxBadgeMenu" style="background:var(--danger);color:#fff;border-radius:50%;padding:1px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span></div>
+            <div id="adminDotsBtn" class="dd-item hidden" onclick="closeDotsMenu();showView('adminPanelView')"><i class="fas fa-shield" style="color:var(--danger)"></i>Admin Panel</div>
+            <div class="dd-item" onclick="closeDotsMenu();confirmLogout()" style="color:var(--danger)"><i class="fas fa-right-from-bracket"></i>Abmelden</div>
         </div>
 
         <!-- Mobile: original floating icons (hidden on desktop via CSS) -->
-        <span id="adminBtn" class="admin-icon desktop-hide hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
-        <span class="games-icon desktop-hide" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-gamepad"></i></span>
-        <span class="shop-icon desktop-hide" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
-        <span class="inbox-icon desktop-hide" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-envelope"></i></span>
+        <span id="adminBtn" class="admin-icon desktop-hide hidden" onclick="showView('adminPanelView')"><i class="fas fa-shield"></i></span>
+        <span class="games-icon desktop-hide" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-dice-five"></i></span>
+        <span class="shop-icon desktop-hide" onclick="showView('shopView')" title="Shop"><i class="fas fa-bag-shopping"></i></span>
+        <span class="inbox-icon desktop-hide" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-inbox"></i></span>
         <span class="inbox-badge desktop-hide" id="inboxBadge"></span>
-        <span class="settings-icon desktop-hide" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
+        <span class="settings-icon desktop-hide" onclick="showView('settingsView')"><i class="fas fa-gear"></i></span>
         
         <h2 id="userGreeting">Hi</h2>
         
@@ -860,17 +988,17 @@
 
     <!-- Desktop right-panel placeholder -->
     <div id="desktopPlaceholder">
-        <i class="fas fa-comment-dots" style="font-size:3.5rem;"></i>
+        <i class="fas fa-comments" style="font-size:3.5rem;"></i>
         <p style="margin:0;font-size:1rem;">Wähle einen Chat aus</p>
         <p style="margin:0;font-size:0.82rem;">Deine Nachrichten erscheinen hier</p>
     </div>
 
     <div id="adminPanelView" class="view view-large hidden">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <h2 style="color: var(--danger); margin:0;"><i class="fas fa-user-shield"></i> Admin Panel</h2>
+            <h2 style="color: var(--danger); margin:0;"><i class="fas fa-shield"></i> Admin Panel</h2>
             <div style="display:flex; gap:8px;">
-                <button onclick="triggerUpdateAnnouncement()" style="padding:8px 12px; font-size:0.85rem; background:var(--success); color:white;" title="Update ankündigen"><i class="fas fa-download"></i> Update</button>
-                <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button onclick="triggerUpdateAnnouncement()" style="padding:8px 12px; font-size:0.85rem; background:var(--success); color:white;" title="Update ankündigen"><i class="fas fa-circle-arrow-down"></i> Update</button>
+                <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-arrows-rotate"></i> Refresh</button>
             </div>
         </div>
         
@@ -899,8 +1027,8 @@
     </div>
 
     <!-- SIGN OUT ALL DEVICES CONFIRM EMBED -->
-    <div id="signOutAllEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--danger); border-radius:16px; padding:14px 20px; z-index:10002; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:280px; max-width:350px;">
-        <p style="margin:0 0 8px 0; font-size:0.9rem; font-weight:bold; color:var(--danger);"><i class="fas fa-sign-out-alt"></i> Von allen Geräten abmelden?</p>
+    <div id="signOutAllEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--danger); border-radius:8px; padding:14px 20px; z-index:10002; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:280px; max-width:350px;">
+        <p style="margin:0 0 8px 0; font-size:0.9rem; font-weight:bold; color:var(--danger);"><i class="fas fa-right-from-bracket"></i> Von allen Geräten abmelden?</p>
         <p style="margin:0 0 12px 0; font-size:0.8rem; color:#888;">Alle aktiven Sitzungen werden sofort beendet.</p>
         <div style="display:flex; gap:10px; justify-content:center;">
             <button onclick="executeSignOutAllDevices()" class="danger" style="padding:8px 18px; font-size:0.85rem;">✓ Ja, abmelden</button>
@@ -919,7 +1047,7 @@
             </div>
 
             <div style="margin-bottom:15px; background: rgba(255,71,87,0.06); padding:10px; border-radius:10px; border:1px solid rgba(255,71,87,0.2);">
-                <strong style="font-size:0.85rem;"><i class="fas fa-key"></i> Passwort</strong>
+                <strong style="font-size:0.85rem;"><i class="fas fa-unlock-keyhole"></i> Passwort</strong>
                 <p id="adminUserPasswordDisplay" style="margin:5px 0; font-family:monospace; font-size:1rem; letter-spacing:1px; color:var(--txt); background:var(--hover); padding:6px 10px; border-radius:8px; word-break:break-all;">–</p>
                 <div style="display:flex; gap:6px; margin-top:6px;">
                     <input type="text" id="adminNewPasswordInput" placeholder="Neues Passwort..." style="margin:0; font-size:0.85rem;">
@@ -962,7 +1090,7 @@
                     </div>
                 </div>
 
-                <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-envelope"></i> Nachricht senden</button>
+                <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-inbox"></i> Nachricht senden</button>
                 <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
             </div>
         </div>
@@ -970,7 +1098,7 @@
 
     <div id="adminMsgModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3><i class="fas fa-envelope" style="color:var(--main);"></i> Nachricht senden</h3>
+            <h3><i class="fas fa-inbox" style="color:var(--main);"></i> Nachricht senden</h3>
             <p style="font-size:0.85rem; color:#888; margin:0 0 10px 0;">An: <b id="adminMsgTarget">-</b></p>
             <input type="text" id="adminMsgTitle" placeholder="Betreff / Titel..." maxlength="60">
             <textarea id="adminMsgBody" placeholder="Nachrichtentext..." rows="4" style="resize:none;"></textarea>
@@ -1074,7 +1202,7 @@
             <h3 id="chatWithTitle" style="margin:0; font-size:1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">Chat</h3>
             <div style="display:flex; gap:5px;">
                 <button id="reportChatBtn" class="secondary" onclick="openReportModal()" style="font-size:1rem; padding:8px; color:#ff9f43;"><i class="fas fa-exclamation-triangle"></i></button>
-                <button id="groupSettingsBtn" class="secondary hidden" onclick="openGroupSettings()" style="font-size:1rem; padding: 8px;"><i class="fas fa-cog"></i></button>
+                <button id="groupSettingsBtn" class="secondary hidden" onclick="openGroupSettings()" style="font-size:1rem; padding: 8px;"><i class="fas fa-gear"></i></button>
                 <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:1rem; padding: 8px;"><i class="fas fa-info-circle"></i></button>
                 <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.8rem; padding: 8px;">Verlassen</button>
             </div>
@@ -1095,14 +1223,14 @@
                         <span class="reply-from" id="replyFromName"></span>
                         <span class="reply-text" id="replyPreviewText"></span>
                     </div>
-                    <button class="reply-cancel-btn" onclick="clearReply()"><i class="fas fa-times"></i></button>
+                    <button class="reply-cancel-btn" onclick="clearReply()"><i class="fas fa-xmark"></i></button>
                 </div>
                 <div class="chat-input-wrapper" id="chatInputWrapper">
                     <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
                     <div class="recording-bar" id="recordingBar">
                         <span class="rec-dot"></span>
                         <span class="rec-timer" id="recTimer">0:00 / 0:14</span>
-                        <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-times"></i></button>
+                        <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-xmark"></i></button>
                         <button class="rec-send" id="recSendBtn" onclick="sendVoiceMessage()" title="Senden" disabled><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -1122,7 +1250,7 @@
 
         <!-- APK DOWNLOAD -->
         <a href="https://github.com/johnkuhl2012-arch/Web/releases/download/V1.0/John-Chat.apk" download="John-Chat.apk" style="display:block; margin-bottom:12px; flex-shrink:0; text-decoration:none;">
-            <button style="width:100%; background:#43b581; font-size:0.95rem; border-radius:12px; padding:12px;"><i class="fas fa-download"></i> John Chat App herunterladen</button>
+            <button style="width:100%; background:#43b581; font-size:0.95rem; border-radius:12px; padding:12px;"><i class="fas fa-circle-arrow-down"></i> John Chat App herunterladen</button>
         </a>
 
         <!-- TABS -->
@@ -1166,17 +1294,17 @@
             </div>
 
             <!-- 2FA EMBED (Aktivieren) -->
-            <div id="twoFactorEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5000;">
-                <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <div id="twoFactorEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:5000;">
+                <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
                     <div id="twoFactorStep1" class="">
-                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-shield-alt"></i> 2FA Aktivieren</h3>
+                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-lock"></i> 2FA Aktivieren</h3>
                         <p style="font-size:0.9rem;">Ein 6-stelliger Code wird an deine hinterlegte Email-Adresse gesendet. Bitte überprüfe dein Postfach.</p>
                         <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Der Code ist <b>5 Minuten</b> gültig.</p>
-                        <button onclick="send2FACode('enable')" style="width:100%; margin-bottom:8px;"><i class="fas fa-envelope"></i> Code senden</button>
+                        <button onclick="send2FACode('enable')" style="width:100%; margin-bottom:8px;"><i class="fas fa-inbox"></i> Code senden</button>
                         <button onclick="close2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
                     </div>
                     <div id="twoFactorStep2" class="hidden">
-                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
                         <p style="font-size:0.9rem;">Bitte gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                         <input type="number" id="twoFactorCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                         <div id="twoFactorCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -1187,16 +1315,16 @@
             </div>
 
             <!-- 2FA EMBED (Deaktivieren) -->
-            <div id="twoFactorDisableEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5000;">
-                <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <div id="twoFactorDisableEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:5000;">
+                <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
                     <div id="twoFactorDisableStep1" class="">
-                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-shield-alt"></i> 2FA Deaktivieren</h3>
+                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-lock"></i> 2FA Deaktivieren</h3>
                         <p style="font-size:0.9rem;">Um 2FA zu deaktivieren, musst du deinen Code per Email bestätigen.</p>
-                        <button onclick="send2FACode('disable')" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-envelope"></i> Code senden</button>
+                        <button onclick="send2FACode('disable')" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-inbox"></i> Code senden</button>
                         <button onclick="close2FADisableEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
                     </div>
                     <div id="twoFactorDisableStep2" class="hidden">
-                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
                         <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                         <input type="number" id="twoFactorDisableCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                         <div id="twoFactorDisableCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -1245,10 +1373,10 @@
 
             <!-- EMAIL ANZEIGE -->
             <div style="border:1px solid var(--main); border-radius:12px; padding:14px; margin-bottom:12px; background:rgba(88,101,242,0.04);">
-                <h3 style="margin:0 0 8px 0; font-size:1rem;"><i class="fas fa-envelope" style="color:var(--main);"></i> Deine Email-Adresse</h3>
+                <h3 style="margin:0 0 8px 0; font-size:1rem;"><i class="fas fa-inbox" style="color:var(--main);"></i> Deine Email-Adresse</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 10px 0;"><i class="fas fa-lock"></i> Email ist Pflicht und kann nur geändert, nicht entfernt werden.</p>
                 <div style="display:flex; align-items:center; gap:8px; background:var(--hover); border-radius:10px; padding:10px 12px; margin-bottom:10px;">
-                    <i class="fas fa-envelope" style="color:var(--main);"></i>
+                    <i class="fas fa-inbox" style="color:var(--main);"></i>
                     <span id="emailTabMasked" style="font-size:0.9rem; font-family:monospace; flex:1; word-break:break-all;">••••••••••</span>
                     <button onclick="toggleEmailVisibility()" id="emailTabToggleBtn" class="secondary" style="padding:5px 10px; font-size:0.78rem; border-radius:8px; flex-shrink:0;">Anzeigen</button>
                 </div>
@@ -1265,15 +1393,15 @@
                 <div style="background:rgba(255,71,87,0.05); border:1px solid rgba(255,71,87,0.2); border-radius:10px; padding:10px; margin-bottom:12px;">
                     <p style="font-size:0.78rem; font-weight:bold; color:var(--danger); margin:0 0 8px 0;"><i class="fas fa-lock"></i> Pflicht – kann nicht deaktiviert werden</p>
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,71,87,0.15);">
-                        <span style="font-size:0.85rem;"><i class="fas fa-shield-alt" style="color:var(--main); width:16px; margin-right:5px;"></i>2FA Code (Aktivierung &amp; Deaktivierung)</span>
+                        <span style="font-size:0.85rem;"><i class="fas fa-lock" style="color:var(--main); width:16px; margin-right:5px;"></i>2FA Code (Aktivierung &amp; Deaktivierung)</span>
                         <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,71,87,0.15);">
-                        <span style="font-size:0.85rem;"><i class="fas fa-key" style="color:#e67e22; width:16px; margin-right:5px;"></i>Passwort geändert</span>
+                        <span style="font-size:0.85rem;"><i class="fas fa-unlock-keyhole" style="color:#e67e22; width:16px; margin-right:5px;"></i>Passwort geändert</span>
                         <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0;">
-                        <span style="font-size:0.85rem;"><i class="fas fa-sign-in-alt" style="color:var(--success); width:16px; margin-right:5px;"></i>In Account eingeloggt</span>
+                        <span style="font-size:0.85rem;"><i class="fas fa-right-to-bracket" style="color:var(--success); width:16px; margin-right:5px;"></i>In Account eingeloggt</span>
                         <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
                     </div>
                 </div>
@@ -1294,7 +1422,7 @@
                     <input type="checkbox" id="enotif-bundlePurchase" checked onchange="saveEmailNotifSetting('bundlePurchase', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
-                    <span style="font-size:0.85rem;"><i class="fas fa-ban" style="color:var(--danger); width:16px; margin-right:5px;"></i>Account gesperrt / entsperrt</span>
+                    <span style="font-size:0.85rem;"><i class="fas fa-circle-ban" style="color:var(--danger); width:16px; margin-right:5px;"></i>Account gesperrt / entsperrt</span>
                     <input type="checkbox" id="enotif-banStatus" checked onchange="saveEmailNotifSetting('banStatus', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
@@ -1369,7 +1497,7 @@
     <!-- INBOX VIEW -->
     <div id="inboxView" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; flex-shrink:0;">
-            <h2 style="margin:0;"><i class="fas fa-envelope" style="color:var(--success);"></i> Postfach</h2>
+            <h2 style="margin:0;"><i class="fas fa-inbox" style="color:var(--success);"></i> Postfach</h2>
             <button onclick="clearInbox()" class="danger" style="font-size:0.75rem; padding:6px 12px;">Alle löschen</button>
         </div>
         <div class="scroll-area" id="inboxList" style="padding-right:5px;">
@@ -1381,7 +1509,7 @@
     <!-- SHOP VIEW -->
     <div id="gamesView" class="view hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2 style="margin:0;"><i class="fas fa-gamepad" style="color:#5865F2;"></i> Spiele</h2>
+            <h2 style="margin:0;"><i class="fas fa-dice-five" style="color:#5865F2;"></i> Spiele</h2>
             <button onclick="showView('mainView')" class="secondary" style="padding:7px 14px; font-size:0.85rem;"><i class="fas fa-chevron-left"></i> Zurück</button>
         </div>
         <p style="font-size:0.82rem; color:#888; margin:0 0 15px 0;">Spiele direkt mit deinen John Chat Freunden.</p>
@@ -1390,7 +1518,7 @@
         <div onclick="window.open('https://john-chat-game-tictactoe.netlify.app', '_blank')"
              style="
                 border: 2px solid #5865F2;
-                border-radius: 18px;
+                border-radius: 8px;
                 padding: 20px;
                 background: linear-gradient(135deg, rgba(88,101,242,0.08), rgba(88,101,242,0.03));
                 cursor: pointer;
@@ -1404,7 +1532,7 @@
             <div style="position:absolute; top:-15px; right:-10px; font-size:5.5rem; opacity:0.07; pointer-events:none;">❌⭕</div>
             <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
                 <div style="
-                    width: 52px; height: 52px; border-radius: 14px;
+                    width: 52px; height: 52px; border-radius: 6px;
                     background: linear-gradient(135deg, #5865F2, #7289DA);
                     display: flex; align-items: center; justify-content: center;
                     font-size: 1.7rem; flex-shrink: 0;
@@ -1417,14 +1545,14 @@
                 <div style="margin-left:auto; color:#5865F2; font-size:1.1rem;"><i class="fas fa-chevron-right"></i></div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <span style="background:rgba(88,101,242,0.12); color:#5865F2; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">👥 Freundes Spiel</span>
-                <span style="background:rgba(67,181,129,0.12); color:#43b581; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🤖 Solo vs KI</span>
-                <span style="background:rgba(255,159,67,0.12); color:#ff9f43; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🔍 Spielsuche</span>
+                <span style="background:rgba(88,101,242,0.12); color:#5865F2; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600;">👥 Freundes Spiel</span>
+                <span style="background:rgba(67,181,129,0.12); color:#43b581; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🤖 Solo vs KI</span>
+                <span style="background:rgba(255,159,67,0.12); color:#ff9f43; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🔍 Spielsuche</span>
             </div>
         </div>
 
         <!-- Placeholder mehr Spiele -->
-        <div style="margin-top:15px; border: 2px dashed var(--brd); border-radius: 18px; padding: 22px; text-align:center; color:#aaa;">
+        <div style="margin-top:15px; border: 2px dashed var(--brd); border-radius: 8px; padding: 22px; text-align:center; color:#aaa;">
             <div style="font-size:2rem; margin-bottom:6px;">🕹️</div>
             <div style="font-size:0.88rem; font-weight:600; color:#bbb;">Mehr Spiele bald verfügbar</div>
             <div style="font-size:0.75rem; margin-top:4px; color:#ccc;">Stay tuned!</div>
@@ -1433,7 +1561,7 @@
 
     <div id="shopView" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <h2 style="margin:0;"><i class="fas fa-store" style="color:var(--gold);"></i> Shop</h2>
+            <h2 style="margin:0;"><i class="fas fa-bag-shopping" style="color:var(--gold);"></i> Shop</h2>
             <div style="text-align:right;">
                 <span style="font-size:0.8rem; color:#888;">Guthaben:</span><br>
                 <span id="shopBalanceDisplay" style="color:var(--success); font-weight:bold;">0.00€</span>
@@ -1736,7 +1864,7 @@
             <h2 style="margin-top:0; color:var(--danger);">Benutzer blockieren?</h2>
             <p><b id="blockTargetName"></b> wird aus deiner Freundesliste entfernt und kann dir keine Nachrichten mehr schicken.</p>
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
-                <button class="danger" onclick="executeBlock()"><i class="fas fa-ban"></i> Blockieren</button>
+                <button class="danger" onclick="executeBlock()"><i class="fas fa-circle-ban"></i> Blockieren</button>
                 <button onclick="document.getElementById('blockConfirmModal').classList.add('hidden')" class="secondary">Abbrechen</button>
             </div>
         </div>
@@ -2157,8 +2285,8 @@
             const msgs = Object.entries(data).sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0));
             list.innerHTML = msgs.map(([id, m]) => `
                 <div class="inbox-msg-card">
-                    <button class="inbox-delete-btn" onclick="deleteInboxMsg('${id}')"><i class="fas fa-times"></i></button>
-                    <div class="inbox-msg-from"><i class="fas fa-user-shield" style="color:var(--main);"></i> ${m.from || 'System'}</div>
+                    <button class="inbox-delete-btn" onclick="deleteInboxMsg('${id}')"><i class="fas fa-xmark"></i></button>
+                    <div class="inbox-msg-from"><i class="fas fa-shield" style="color:var(--main);"></i> ${m.from || 'System'}</div>
                     <div class="inbox-msg-title">${m.title || '(Kein Betreff)'}</div>
                     <div class="inbox-msg-body">${m.body || ''}</div>
                     <span class="inbox-msg-time">${m.timestamp ? new Date(m.timestamp).toLocaleString('de-DE') : ''}</span>
@@ -2577,7 +2705,7 @@
                         ${formatName(s)} addet dich 
                         <div class="action-btn-group">
                               <button onclick="accept('${s}')" style="padding:5px 10px;"><i class="fas fa-check"></i></button>
-                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;"><i class="fas fa-times"></i></button>
+                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;"><i class="fas fa-xmark"></i></button>
                         </div>
                       </div>`;
                 });
@@ -2594,7 +2722,7 @@
                             <img class="pfp" id="pfp-view-${f}" src="${pfpSrc}" style="${pfpStyle}">
                             <span><span id="fname-${f}">${formatName(f)}</span> <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
-                        <button class="three-dot-btn" onclick="openContextSheet('friend','${f}','${f}')"><i class="fas fa-ellipsis-v"></i></button>
+                        <button class="three-dot-btn" onclick="openContextSheet('friend','${f}','${f}')"><i class="fas fa-bars"></i></button>
                       </div>`;
                     watchChat(cid, 'private', f); 
                     loadPfp(f);
@@ -2618,7 +2746,7 @@
                                     ${iconHTML}
                                     <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
                                 </div>
-                                <button class="three-dot-btn" onclick="openContextSheet('group','${gid}','${gName}')"><i class="fas fa-ellipsis-v"></i></button>
+                                <button class="three-dot-btn" onclick="openContextSheet('group','${gid}','${gName}')"><i class="fas fa-bars"></i></button>
                             </div>`;
                             
                             watchChat(gid, 'group', gName);
@@ -3140,7 +3268,7 @@
             let badgeHTML = '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">';
             purchasedBundles.forEach(bid => {
                 const def = BUNDLE_DEFS[bid];
-                if(def) badgeHTML += `<span style="background:var(--main); color:white; border-radius:20px; padding:3px 10px; font-size:0.75rem; font-weight:bold;">${def.name}</span>`;
+                if(def) badgeHTML += `<span style="background:var(--main); color:white; border-radius:8px; padding:3px 10px; font-size:0.75rem; font-weight:bold;">${def.name}</span>`;
             });
             badgeHTML += '</div>';
             container.innerHTML += badgeHTML;
@@ -3156,7 +3284,7 @@
                     });
                 });
                 let emojiHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Custom Emoji:</p><div class="plus-options" id="emojiSelector">';
-                emojiHTML += `<div class="plus-option-item ${myEmoji==='' ? 'active-selection':''}" data-val="" onclick="setEmoji('')"><i class="fas fa-ban"></i></div>`;
+                emojiHTML += `<div class="plus-option-item ${myEmoji==='' ? 'active-selection':''}" data-val="" onclick="setEmoji('')"><i class="fas fa-circle-ban"></i></div>`;
                 emojiOrder.forEach(em => {
                     if(emojis.has(em)) {
                         emojiHTML += `<div class="plus-option-item ${myEmoji===em ? 'active-selection':''}" data-val="${em}" onclick="setEmoji('${em}')">${em}</div>`;
@@ -3195,7 +3323,7 @@
             }
 
             container.innerHTML += `<div style="border-top:1px dashed var(--gold); margin-top:10px; padding-top:8px;">
-                <p style="font-size:0.8rem; text-align:center; color:#888; margin:0;">Weitere Pakete im <b onclick="showView('shopView')" style="color:var(--gold);cursor:pointer;"><i class="fas fa-store"></i> Shop</b></p>
+                <p style="font-size:0.8rem; text-align:center; color:#888; margin:0;">Weitere Pakete im <b onclick="showView('shopView')" style="color:var(--gold);cursor:pointer;"><i class="fas fa-bag-shopping"></i> Shop</b></p>
             </div>`;
         }
         
@@ -3454,8 +3582,8 @@
                     const name = b.key;
                     list.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px solid var(--brd);">
-                        <span style="font-size:0.9rem;"><i class="fas fa-ban" style="color:var(--danger); margin-right:6px;"></i>${formatName(name)}</span>
-                        <button onclick="unblockUser('${name}')" class="secondary" style="font-size:0.78rem; padding:5px 10px; border-radius:20px;">Entsperren</button>
+                        <span style="font-size:0.9rem;"><i class="fas fa-circle-ban" style="color:var(--danger); margin-right:6px;"></i>${formatName(name)}</span>
+                        <button onclick="unblockUser('${name}')" class="secondary" style="font-size:0.78rem; padding:5px 10px; border-radius:8px;">Entsperren</button>
                     </div>`;
                 });
             });
@@ -4407,7 +4535,7 @@
                 .body h2{color:#5865F2;font-size:1.15rem;margin-top:0;}
                 .box{background:#f0f2f5;border-radius:12px;padding:15px 18px;margin:16px 0;border-left:4px solid #5865F2;font-size:0.95rem;color:#444;}
                 .footer{background:#f8f9fa;padding:16px 30px;text-align:center;color:#999;font-size:0.8rem;border-top:1px solid #eee;}
-                .badge{display:inline-block;background:#5865F2;color:#fff;border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:bold;margin-bottom:10px;}
+                .badge{display:inline-block;background:#5865F2;color:#fff;border-radius:8px;padding:3px 12px;font-size:0.78rem;font-weight:bold;margin-bottom:10px;}
             </style></head><body>
             <div class="wrap">
                 <div class="header"><div class="logo">💬</div><h1>John Chat</h1></div>
@@ -4553,7 +4681,7 @@
                 toggleBtn.classList.add('danger');
                 toggleBtn.classList.remove('green-btn');
             } else {
-                statusText.innerHTML = '<span style="color:#888;"><i class="fas fa-times-circle"></i> Deaktiviert</span>';
+                statusText.innerHTML = '<span style="color:#888;"><i class="fas fa-xmark-circle"></i> Deaktiviert</span>';
                 toggleBtn.innerText = 'Aktivieren';
                 toggleBtn.classList.remove('danger');
                 toggleBtn.classList.add('green-btn');
@@ -5639,20 +5767,20 @@
                 const cid = [currentUser, id].sort().join("_");
                 const isMuted = mutedChats[cid] === true;
                 const isOwner = id.toLowerCase() === OWNER_NAME;
-                items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
-                items += `<div class="context-sheet-item" onclick="openNicknameModal('${id}', '${name}'); closeContextSheet()"><i class="fas fa-tag" style="color:var(--main);"></i> Anzeigename ändern</div>`;
+                items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comments" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="openNicknameModal('${id}', '${name}'); closeContextSheet()"><i class="fas fa-pen-clip" style="color:var(--main);"></i> Anzeigename ändern</div>`;
                 items += `<div class="context-sheet-item" onclick="toggleMute('${cid}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
                 if(!isOwner) {
                     items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${cid}', 'user', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
-                    items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-ban"></i> Blockieren</div>`;
+                    items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-circle-ban"></i> Blockieren</div>`;
                 }
                 items += `<div class="context-sheet-item danger-item" onclick="askUnfriend('${id}'); closeContextSheet()"><i class="fas fa-user-times"></i> Entfreunden</div>`;
             } else if(type === 'group') {
                 const isMuted = mutedChats[id] === true;
-                items += `<div class="context-sheet-item" onclick="openChat('${id}', true, '${name}'); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="openChat('${id}', true, '${name}'); closeContextSheet()"><i class="fas fa-comments" style="color:var(--main);"></i> Chat öffnen</div>`;
                 items += `<div class="context-sheet-item" onclick="toggleMute('${id}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
                 items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${id}', 'group', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
-                items += `<div class="context-sheet-item danger-item" onclick="confirmLeaveGroupById('${id}', '${name}'); closeContextSheet()"><i class="fas fa-sign-out-alt"></i> Gruppe verlassen</div>`;
+                items += `<div class="context-sheet-item danger-item" onclick="confirmLeaveGroupById('${id}', '${name}'); closeContextSheet()"><i class="fas fa-right-from-bracket"></i> Gruppe verlassen</div>`;
             }
 
             document.getElementById('contextSheetItems').innerHTML = items;
@@ -5855,17 +5983,17 @@
     </script>
 
     <!-- EMAIL LÖSCHEN MIT 2FA BESTÄTIGUNG -->
-    <div id="deleteEmailWith2FAEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99998;">
-        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--danger);">
+    <div id="deleteEmailWith2FAEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:99998;">
+        <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--danger);">
             <div id="deleteEmail2FAStep1">
                 <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-exclamation-triangle"></i> Email entfernen</h3>
                 <p style="font-size:0.9rem;">Da <b>2FA aktiviert</b> ist, musst du das Entfernen der Email per Code bestätigen.</p>
                 <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">⚠️ 2FA wird dabei automatisch deaktiviert.</p>
-                <button onclick="sendDeleteEmail2FACode()" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-envelope"></i> Bestätigungscode senden</button>
+                <button onclick="sendDeleteEmail2FACode()" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-inbox"></i> Bestätigungscode senden</button>
                 <button onclick="closeDeleteEmail2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
             </div>
             <div id="deleteEmail2FAStep2" class="hidden">
-                <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
                 <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                 <input type="number" id="deleteEmail2FACodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="deleteEmail2FATimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -5876,22 +6004,22 @@
     </div>
 
     <!-- 2FA LOGIN EMBED - Außerhalb aller Views, immer sichtbar wenn aktiv -->
-    <div id="twoFactorLoginEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99999;">
-        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
-            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-shield-alt"></i> Zwei-Faktor-Authentifizierung</h2>
+    <div id="twoFactorLoginEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7)); display:flex; justify-content:center; align-items:center; z-index:99999;">
+        <div style="background:var(--cont); padding:30px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
+            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-lock"></i> Zwei-Faktor-Authentifizierung</h2>
             <p style="font-size:0.9rem;">Wir haben einen 6-stelligen Code an deine Email-Adresse gesendet.</p>
             <p style="font-size:0.8rem; color:#888;">Der Code ist <b>5 Minuten</b> gültig.</p>
             <input type="number" id="twoFactorLoginCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:15px 0;">
             <div id="twoFactorLoginTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
-            <button onclick="verifyLoginCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-sign-in-alt"></i> Anmelden</button>
-            <button onclick="resendLoginCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-redo"></i> Code erneut senden</button>
+            <button onclick="verifyLoginCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-right-to-bracket"></i> Anmelden</button>
+            <button onclick="resendLoginCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-rotate-right"></i> Code erneut senden</button>
             <button onclick="cancelLogin2FA()" class="danger" style="width:100%; font-size:0.85rem;">Abmelden</button>
         </div>
     </div>
 
     <!-- EMAIL VERKNÜPFT BESTÄTIGUNGS-EMBED -->
-    <div id="emailLinkedEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99998;">
-        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--success);">
+    <div id="emailLinkedEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:99998;">
+        <div style="background:var(--cont); padding:30px; border-radius:8px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--success);">
             <div style="font-size:3rem; margin-bottom:10px;">✅</div>
             <h2 style="color:var(--success); margin-top:0;">Email verknüpft!</h2>
             <p style="font-size:0.9rem;">Wir haben eine Bestätigungsmail an</p>
@@ -5903,12 +6031,12 @@
     </div>
 
     <!-- UPDATE OVERLAY - shown to all users -->
-    <div id="updateOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); backdrop-filter:blur(10px); display:flex; justify-content:center; align-items:center; z-index:999999;">
-        <div style="background:var(--cont); padding:35px 30px; border-radius:24px; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid var(--success);">
+    <div id="updateOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92)); display:flex; justify-content:center; align-items:center; z-index:999999;">
+        <div style="background:var(--cont); padding:35px 30px; border-radius:10px; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid var(--success);">
             <div style="font-size:3rem; margin-bottom:12px;">🔄</div>
             <h2 style="color:var(--success); margin:0 0 8px 0;">Update verfügbar</h2>
             <p style="font-size:0.95rem; color:var(--txt); margin:0 0 20px 0;">Aktualisiere die Seite, um die neueste Version von John Chat zu laden.</p>
-            <button onclick="location.reload()" style="width:100%; background:var(--success); color:white; font-size:1rem; padding:14px; border-radius:14px;"><i class="fas fa-redo"></i> Reload</button>
+            <button onclick="location.reload()" style="width:100%; background:var(--success); color:white; font-size:1rem; padding:14px; border-radius:6px;"><i class="fas fa-rotate-right"></i> Reload</button>
         </div>
     </div>
 
@@ -5923,8 +6051,8 @@
     </div>
 
     <!-- EMAIL PFLICHT POPUP (für Accounts ohne Email) -->
-    <div id="emailRequiredEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99997;">
-        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
+    <div id="emailRequiredEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85)); display:flex; justify-content:center; align-items:center; z-index:99997;">
+        <div style="background:var(--cont); padding:30px; border-radius:8px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
             <div style="font-size:2.5rem; margin-bottom:10px;">📧</div>
             <h2 style="color:var(--main); margin-top:0;">Email erforderlich</h2>
             <p style="font-size:0.9rem; color:#888;">Um John Chat nutzen zu können, musst du eine gültige E-Mail-Adresse hinterlegen und bestätigen.</p>
@@ -5937,24 +6065,24 @@
                 <input type="number" id="emailRequiredCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="emailRequiredTimer" style="font-size:0.8rem; color:#888; margin-bottom:8px;"></div>
                 <button onclick="verifyEmailRequiredCode()" style="width:100%; margin-bottom:8px;" class="green-btn">Email bestätigen</button>
-                <button onclick="resendEmailRequiredCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-redo"></i> Code erneut senden</button>
+                <button onclick="resendEmailRequiredCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-rotate-right"></i> Code erneut senden</button>
                 <button onclick="resetEmailRequiredStep()" class="secondary" style="width:100%; font-size:0.85rem;">Andere Email eingeben</button>
             </div>
         </div>
     </div>
 
     <!-- EMAIL ÄNDERN VERIFIZIERUNGS-EMBED (Settings) -->
-    <div id="emailChangeVerifyEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5001;">
-        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--main);">
+    <div id="emailChangeVerifyEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:5001;">
+        <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--main);">
             <div id="emailChangeStep1">
-                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-envelope"></i> Email bestätigen</h3>
+                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-inbox"></i> Email bestätigen</h3>
                 <p style="font-size:0.9rem;">Wir senden einen 6-stelligen Code an <b id="emailChangePendingDisplay"></b>.</p>
                 <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Der Code ist <b>5 Minuten</b> gültig.</p>
-                <button onclick="sendEmailChangeCode()" style="width:100%; margin-bottom:8px;"><i class="fas fa-envelope"></i> Code senden</button>
+                <button onclick="sendEmailChangeCode()" style="width:100%; margin-bottom:8px;"><i class="fas fa-inbox"></i> Code senden</button>
                 <button onclick="closeEmailChangeVerify()" class="secondary" style="width:100%;">Abbrechen</button>
             </div>
             <div id="emailChangeStep2" class="hidden">
-                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
+                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
                 <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                 <input type="number" id="emailChangeCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="emailChangeCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -5966,14 +6094,14 @@
 
     <!-- FULLSCREEN IMAGE OVERLAY -->
     <div id="fullscreenImageOverlay" onclick="closeFullscreenImage()">
-        <button id="fullscreenCloseBtn" onclick="closeFullscreenImage()"><i class="fas fa-times"></i></button>
+        <button id="fullscreenCloseBtn" onclick="closeFullscreenImage()"><i class="fas fa-xmark"></i></button>
         <img id="fullscreenImageEl" src="" onclick="event.stopPropagation()">
     </div>
 
     <!-- NICKNAME MODAL -->
-    <div id="nicknameModalOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99990;">
-        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:340px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
-            <h3 style="margin-top:0; color:var(--main);"><i class="fas fa-tag"></i> Anzeigename ändern</h3>
+    <div id="nicknameModalOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:99990;">
+        <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:340px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <h3 style="margin-top:0; color:var(--main);"><i class="fas fa-pen-clip"></i> Anzeigename ändern</h3>
             <p style="font-size:0.85rem; color:#888; margin-bottom:4px;">Nur du siehst diesen Namen.</p>
             <p style="font-size:0.9rem; margin-bottom:12px;">Freund: <b id="nicknameModalRealName"></b></p>
             <input type="hidden" id="nicknameModalFriendId">
@@ -5985,3 +6113,25 @@
 
 </body>
 </html>
+
+<script>
+/* ── LEGAL MODAL ─────────────────────────────────────────────── */
+function openLegalModal(tab) {
+    document.getElementById('legalModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (tab) switchLegalTab(tab);
+}
+function closeLegalModal() {
+    document.getElementById('legalModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+function switchLegalTab(tab) {
+    ['datenschutz','nutzung','kontakt'].forEach(t => {
+        document.getElementById('ltab-' + t).classList.toggle('active', t === tab);
+        document.getElementById('lpanel-' + t).classList.toggle('active', t === tab);
+    });
+}
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLegalModal();
+});
+</script>
