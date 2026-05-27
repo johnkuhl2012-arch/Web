@@ -25,26 +25,29 @@
            Layout / JS / HTML komplett unverändert
            ══════════════════════════════════════════ */
         :root {
-            --bg: #f4f4f6;
-            --txt: #1a1a1a;
-            --main: #5865F2;
-            --cont: #ffffff;
-            --brd: #dde0e8;
-            --danger: #d63031;
-            --success: #27ae60;
-            --link: #5865F2;
-            --hover: #f0f1f5;
-            --gold: #b8860b;
-            --msg-other: #e8eaf0;
+            --bg: #09091a;
+            --txt: rgba(255,255,255,0.90);
+            --main: #7b61ff;
+            --cont: rgba(255,255,255,0.08);
+            --brd: rgba(255,255,255,0.16);
+            --danger: #ff4757;
+            --success: #30d158;
+            --link: #a78bff;
+            --hover: rgba(255,255,255,0.10);
+            --gold: #ffd700;
+            --msg-other: rgba(255,255,255,0.10);
             --msg-self-txt: #ffffff;
+            --glass-blur: 40px;
+            --glass-shine: rgba(255,255,255,0.55);
         }
+        /* Dark mode = same glass, variables identical */
         .dark-mode {
-            --bg: #1a1b1e;
-            --txt: #e8e9ed;
-            --cont: #25262b;
-            --brd: #373a40;
-            --hover: #2c2d33;
-            --msg-other: #2e3038;
+            --bg: #09091a;
+            --txt: rgba(255,255,255,0.90);
+            --cont: rgba(255,255,255,0.08);
+            --brd: rgba(255,255,255,0.16);
+            --hover: rgba(255,255,255,0.10);
+            --msg-other: rgba(255,255,255,0.10);
         }
 
         /* Premium Backgrounds — keep as glass tints */
@@ -67,161 +70,70 @@
 
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
+        /* Animated background orbs */
+        .lg-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, #2d1b6e 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 80% 10%, #1a3a6e 0%, transparent 55%),
+                radial-gradient(ellipse 70% 50% at 50% 80%, #0d3d2e 0%, transparent 60%),
+                radial-gradient(ellipse 80% 80% at 90% 90%, #3d1a5c 0%, transparent 60%),
+                #060614;
+        }
+        .lg-orb {
+            position: fixed; border-radius: 50%; filter: blur(70px);
+            pointer-events: none; animation: orbDrift 14s ease-in-out infinite alternate;
+        }
+        .lg-orb1 { width:560px; height:560px; top:-180px; left:-180px; background:radial-gradient(circle,rgba(123,97,255,.5),rgba(61,155,233,.2)); animation-duration:16s; }
+        .lg-orb2 { width:440px; height:440px; bottom:-140px; right:-140px; background:radial-gradient(circle,rgba(255,107,157,.45),rgba(196,123,255,.25)); animation-delay:-6s; animation-duration:18s; }
+        .lg-orb3 { width:300px; height:300px; top:40%; left:35%; background:radial-gradient(circle,rgba(48,209,88,.25),transparent); animation-delay:-10s; animation-duration:22s; }
+        @keyframes orbDrift {
+            0%   { transform: translate(0,0) scale(1); }
             33%  { transform: translate(30px,-25px) scale(1.07); }
             66%  { transform: translate(-20px,40px) scale(.95); }
             100% { transform: translate(40px,20px) scale(1.1); }
         }
-
+        .lg-filter { position: absolute; width: 0; height: 0; }
 
         body {
             font-family: 'Segoe UI', sans-serif;
             background: var(--bg); color: var(--txt);
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; min-height: -webkit-fill-available;
+            min-height: 100vh; min-height: -webkit-fill-available; transition: 0.3s;
         }
 
         /* MOBILE: fullscreen glass panels */
         .view {
             animation: fadeIn 0.4s;
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--cont);
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
             padding: 20px; box-sizing: border-box;
             display: flex; flex-direction: column;
             z-index: 10;
         }
-        #homeView {
+        /* Auth views — glass cards on mobile */
+        #homeView, #loginView, #registerView, #bannedView {
             position: relative; top: auto; left: auto;
             width: 90%; max-width: 420px; height: auto; max-height: 85vh;
-            background: var(--cont);
-            border: 1px solid var(--brd);
-            border-radius: 10px; padding: 25px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.20);
+            border-radius: 28px; padding: 25px;
+            box-shadow:
+                0 2px 0 0 rgba(255,255,255,.18) inset,
+                0 -1px 0 0 rgba(255,255,255,.06) inset,
+                0 30px 80px -10px rgba(0,0,0,.55),
+                0 8px 24px rgba(0,0,0,.35);
+            backdrop-filter: blur(var(--glass-blur)) saturate(200%) brightness(1.05);
+            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%) brightness(1.05);
             text-align: center; margin: auto;
         }
-
-        /* ── AUTH VIEWS: fullscreen with landing-page dark glass theme ── */
-        #loginView, #registerView, #bannedView {
-            position: fixed !important; top: 0 !important; left: 0 !important;
-            width: 100% !important; height: 100% !important;
-            max-width: 100% !important; max-height: 100% !important;
-            background: linear-gradient(135deg,#0d0f1a 0%,#111827 40%,#0a0e1a 70%,#0e1020 100%) !important;
-            border: none !important; border-radius: 0 !important;
-            padding: 0 !important; box-shadow: none !important;
-            flex-direction: column !important;
-            align-items: center !important; justify-content: center !important;
-            overflow: hidden !important; text-align: center !important;
-        }
-        /* Orbs inside auth views */
-        .auth-orb {
-            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.28;
-            animation: orbFloat linear infinite; pointer-events: none;
-        }
-        .auth-orb-1 { width: 420px; height: 420px; background: #5865F2; top: -100px; left: -100px; animation-duration: 22s; }
-        .auth-orb-2 { width: 320px; height: 320px; background: #7c3aed; bottom: -80px; right: -80px; animation-duration: 28s; animation-delay: -8s; }
-        .auth-orb-3 { width: 250px; height: 250px; background: #2563eb; top: 50%; left: 60%; animation-duration: 20s; animation-delay: -4s; }
-        /* Glassmorphism card inside auth views */
-        .auth-card {
-            position: relative; z-index: 2;
-            width: 90%; max-width: 420px;
-            background: rgba(255,255,255,0.045);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 24px;
-            padding: 36px 32px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.12);
-            animation: fadeSlideUp 0.6s cubic-bezier(.34,1.56,.64,1) both;
-            max-height: 90vh; overflow-y: auto;
-        }
-        .auth-card h1 {
-            font-size: 1.7rem; font-weight: 900; color: #fff;
-            margin: 0 0 6px; letter-spacing: -0.03em;
-        }
-        .auth-card .auth-sub {
-            font-size: 0.85rem; color: rgba(255,255,255,0.42); margin: 0 0 24px;
-        }
-        .auth-logo {
-            width: 54px; height: 54px; background: linear-gradient(135deg,#5865F2,#7c3aed);
-            border-radius: 16px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: #fff; margin: 0 auto 18px;
-            box-shadow: 0 8px 24px rgba(88,101,242,0.42);
-            animation: fadeSlideUp 0.5s ease both;
-        }
-        /* Inputs inside auth card */
-        .auth-card input[type=text], .auth-card input[type=password],
-        .auth-card input[type=email], .auth-card input[type=number] {
-            background: rgba(255,255,255,0.07) !important;
-            border: 1px solid rgba(255,255,255,0.13) !important;
-            color: #fff !important;
-            border-radius: 10px !important;
-            padding: 13px 16px !important;
-            font-size: 0.95rem !important;
-            transition: border-color 0.2s, background 0.2s !important;
-        }
-        .auth-card input::placeholder { color: rgba(255,255,255,0.32) !important; }
-        .auth-card input:focus {
-            border-color: rgba(88,101,242,0.6) !important;
-            background: rgba(88,101,242,0.09) !important;
-            outline: none !important;
-            box-shadow: 0 0 0 3px rgba(88,101,242,0.18) !important;
-        }
-        /* Primary button inside auth card */
-        .auth-card button:not(.secondary):not(.danger) {
-            background: #5865F2 !important;
-            color: #fff !important; border: none !important;
-            border-radius: 10px !important; font-weight: 700 !important;
-            font-size: 0.96rem !important;
-            box-shadow: 0 6px 20px rgba(88,101,242,0.38) !important;
-            transition: all 0.22s !important;
-        }
-        .auth-card button:not(.secondary):not(.danger):hover {
-            background: #4752d6 !important; transform: translateY(-1px) !important;
-            box-shadow: 0 10px 28px rgba(88,101,242,0.52) !important; opacity: 1 !important;
-        }
-        /* Secondary button inside auth card */
-        .auth-card button.secondary {
-            background: rgba(255,255,255,0.07) !important;
-            color: rgba(255,255,255,0.72) !important;
-            border: 1px solid rgba(255,255,255,0.14) !important;
-            border-radius: 10px !important; font-weight: 600 !important;
-        }
-        .auth-card button.secondary:hover {
-            background: rgba(255,255,255,0.12) !important; opacity: 1 !important;
-        }
-        /* AGB row inside auth card */
-        .auth-card .agb-row {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 8px !important;
-            color: rgba(255,255,255,0.72) !important;
-        }
-        .auth-card .info-blue { color: #a5b4fc !important; }
-        /* AGB embed inside auth card */
-        .auth-card #agbEmbed {
-            background: rgba(13,15,26,0.98) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 16px !important;
-            color: rgba(255,255,255,0.82) !important;
-        }
-        .auth-card #agbEmbed .agb-item {
-            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
-        }
-        /* Banned view special */
-        #bannedView .auth-card {
-            border-color: rgba(255,71,87,0.35) !important;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,71,87,0.2) !important;
-        }
-        #bannedView .auth-orb-1 { background: #ff4757; }
-        #bannedView .auth-orb-2 { background: #d63031; }
-        /* Forgot password overlay inside auth card */
-        .auth-card #forgotPasswordEmbed {
-            background: rgba(13,15,26,0.98) !important;
-            border-radius: 16px !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-        }
-        .auth-card #forgotSuccessEmbed {
-            background: rgba(13,15,26,0.98) !important;
-            border-radius: 16px !important;
+        /* Top shine line on auth cards */
+        #homeView::before, #loginView::before, #registerView::before {
+            content: ''; position: absolute; top: 0; left: 12px; right: 12px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-shine) 40%, var(--glass-shine) 60%, transparent);
+            border-radius: 999px; pointer-events: none;
         }
         .view-large { padding: 20px; }
 
@@ -233,9 +145,11 @@
             #mainView {
                 position: fixed !important; top: 0 !important; left: 0 !important;
                 width: 25% !important; height: 100vh !important;
-                background: var(--cont) !important;
-                border-right: 1px solid var(--brd) !important;
-                border-radius: 0 !important; box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
+                background: rgba(255,255,255,0.06) !important;
+                backdrop-filter: blur(var(--glass-blur)) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%) !important;
+                border-right: 1px solid rgba(255,255,255,0.12) !important;
+                border-radius: 0 !important; box-shadow: 4px 0 30px rgba(0,0,0,0.3) !important;
                 padding: 16px 14px !important;
             }
             /* Content views: right 75%, glass tinted */
@@ -243,11 +157,13 @@
             #inboxView, #adminPanelView {
                 position: fixed !important; top: 0 !important; left: 25% !important;
                 width: 75% !important; height: 100vh !important;
-                background: var(--bg) !important;
+                background: rgba(255,255,255,0.03) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
                 border-radius: 0 !important; box-shadow: none !important;
             }
             /* Auth cards centered */
-            #homeView {
+            #homeView, #loginView, #registerView, #bannedView {
                 position: fixed !important;
                 top: 50% !important; left: 50% !important;
                 transform: translate(-50%, -50%) !important;
@@ -255,12 +171,6 @@
                 height: auto !important;
                 max-height: 90vh !important;
                 overflow-y: auto !important;
-            }
-            /* Auth fullscreen views stay fullscreen on desktop too */
-            #loginView, #registerView, #bannedView {
-                top: 0 !important; left: 0 !important;
-                width: 100% !important; height: 100% !important;
-                transform: none !important;
             }
             /* Old floating icons: hide on desktop */
             .desktop-hide { display: none !important; }
@@ -304,13 +214,13 @@
         /* 3-dots btn (hidden on mobile by default) */
         #btn3dots {
             display: none;
-            background: var(--cont); border: 1px solid rgba(255,255,255,0.12); color: var(--txt);
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: var(--txt);
             width: 34px; height: 34px; border-radius: 50%;
             align-items: center; justify-content: center;
             font-size: 1.15rem; cursor: pointer; transition: 0.2s; padding: 0;
             flex-shrink: 0;
         }
-        #btn3dots:hover { background: var(--cont); }
+        #btn3dots:hover { background: rgba(255,255,255,0.15); }
 
         /* Sidebar title row (hidden on mobile) */
         #sidebarTitleRow {
@@ -323,9 +233,11 @@
         /* Dropdown menu */
         #dotsDropdown {
             position: fixed; top: 54px; left: 10px;
-            background: var(--cont);
-            border: 1px solid var(--brd);
-            border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            background: rgba(20,15,45,0.85);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px; box-shadow: 0 12px 40px rgba(0,0,0,0.45);
             z-index: 99999; min-width: 200px; overflow: hidden;
             animation: fadeIn 0.15s;
         }
@@ -337,63 +249,91 @@
             border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .dd-item:last-child { border-bottom: none; }
-        .dd-item:hover { background: var(--cont); }
+        .dd-item:hover { background: rgba(255,255,255,0.10); }
         .dd-item i { width: 20px; text-align: center; font-size: 1.05rem; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         button {
-            padding: 12px; border: 1px solid var(--brd); border-radius: 6px;
-            background: var(--cont); color: var(--txt);
-            font-weight: 600; cursor: pointer; transition: opacity 0.15s, background 0.15s;
-            flex-shrink: 0; font-size: 0.95rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+            padding: 12px; border: none; border-radius: 14px;
+            background: rgba(255,255,255,0.88); color: #0f0f1e;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+            flex-shrink: 0; font-size: 0.95rem; position: relative; overflow: hidden;
+            box-shadow: 0 1px 0 0 white inset, 0 -1px 0 0 rgba(0,0,0,.12) inset,
+                        0 6px 20px rgba(0,0,0,.30), 0 2px 6px rgba(0,0,0,.18);
         }
-        button:hover { opacity: 0.88; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        button::before {
+            content: ''; position: absolute; top: 0; left: -120%; width: 80%; height: 100%;
+            background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.30) 50%, transparent 80%);
+            transform: skewX(-15deg); transition: left .5s cubic-bezier(.4,0,.2,1); pointer-events: none;
+        }
+        button:hover::before { left: 140%; }
+        button:hover { opacity: 0.95; transform: scale(1.02);
+            box-shadow: 0 1px 0 0 white inset, 0 -1px 0 0 rgba(0,0,0,.10) inset,
+                        0 14px 40px rgba(0,0,0,.40), 0 4px 12px rgba(0,0,0,.22); }
+        button:disabled { opacity: 0.5; transform: none; cursor: not-allowed;
+            background: rgba(255,255,255,0.20); color: rgba(255,255,255,0.4);
+            box-shadow: none; }
+        
         button.secondary {
-            background: var(--hover); color: var(--txt);
-            border: 1px solid var(--brd);
+            background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.86);
+            border: 1px solid rgba(255,255,255,0.18);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 1px 0 0 rgba(255,255,255,.20) inset,
+                        0 -1px 0 0 rgba(255,255,255,.05) inset, 0 4px 16px rgba(0,0,0,.25);
         }
-        button.secondary:hover { background: var(--brd); }
-        button.danger { background: var(--danger); color: white; border-color: transparent; }
-        button.danger:hover { opacity: 0.88; }
-        button.gold-btn { background: #c0900c; color: white; border-color: transparent; }
-        button.green-btn { background: var(--success); color: white; border-color: transparent; }
+        button.secondary:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28); }
+        button.danger { background: rgba(255,71,87,0.80); color: white;
+            border: 1px solid rgba(255,100,130,0.30);
+            box-shadow: 0 1px 0 0 rgba(255,255,255,.18) inset, 0 4px 16px rgba(255,71,87,.30); }
+        button.danger:hover { background: rgba(255,71,87,0.95); }
+        button.gold-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000;
+            box-shadow: 0 2px 10px rgba(255,215,0,0.35); }
+        button.green-btn { background: rgba(48,209,88,0.85); color: white;
+            border: 1px solid rgba(48,209,88,0.30);
+            box-shadow: 0 1px 0 0 rgba(255,255,255,.18) inset, 0 4px 16px rgba(48,209,88,.30); }
         
         input, select, textarea {
-            width: 100%; padding: 11px 14px; margin: 8px 0;
-            border: 1px solid var(--brd); border-radius: 6px;
-            background: var(--cont); color: var(--txt);
-            box-sizing: border-box; font-family: inherit; transition: border-color 0.15s;
+            width: 100%; padding: 12px 16px; margin: 8px 0;
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
+            background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90);
+            box-sizing: border-box; font-family: inherit; transition: 0.2s;
+            backdrop-filter: blur(20px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
         }
-        input::placeholder, textarea::placeholder { color: #aaa; }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.28); }
         input:focus, select:focus, textarea:focus {
-            outline: none; border-color: var(--main);
-            box-shadow: 0 0 0 3px rgba(88,101,242,0.10);
+            outline: none; border-color: rgba(140,180,255,0.60);
+            background: rgba(255,255,255,0.11);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 3px rgba(100,150,255,.18);
         }
         
         .hidden { display: none !important; }
 
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0,0,0,0.55); backdrop-filter: blur(10px);
             display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-card {
-            background: var(--cont);
-            border: 1px solid var(--brd);
+            background: rgba(255,255,255,0.09);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255,255,255,0.20);
             width: 90%; max-width: 380px;
-            padding: 25px; border-radius: 10px;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            padding: 25px; border-radius: 24px;
+            box-shadow: 0 2px 0 0 rgba(255,255,255,.16) inset,
+                        0 -1px 0 0 rgba(255,255,255,.06) inset,
+                        0 30px 80px -10px rgba(0,0,0,.55);
             text-align: center; max-height: 90vh; overflow-y: auto; color: var(--txt);
         }
 
         #systemEmbed {
-            position: fixed; top: -80px; left: 50%; transform: translateX(-50%);
-            min-width: 250px; color: white; padding: 11px 22px; border-radius: 6px; font-weight: 600;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-            z-index: 10000; transition: top 0.3s ease;
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            min-width: 250px; color: white; padding: 12px 25px; border-radius: 99px; font-weight: bold;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.20) inset;
+            border: 1px solid rgba(255,255,255,0.15);
+            z-index: 10000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center;
         }
         #systemEmbed.show { top: 20px; }
@@ -410,14 +350,14 @@
         
         #agbEmbed { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--cont); border-radius: 8px; padding: 25px; 
+            background: var(--cont); border-radius: 20px; padding: 25px; 
             box-sizing: border-box; z-index: 100; text-align: left; display: flex; flex-direction: column; 
         }
         .agb-content { overflow-y: auto; flex: 1; margin-bottom: 15px; }
         .agb-item { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--brd); }
         .agb-item strong { color: var(--main); display: block; margin-bottom: 3px; }
 
-        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 6px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #customAlert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 50px; color: white; font-weight: bold; z-index: 9999; display: none; animation: slideDown 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
         
         /* MODERN CHAT MESSAGES */
@@ -425,7 +365,7 @@
         
         .msg { 
             padding: 10px 14px; 
-            border-radius: 8px; 
+            border-radius: 18px; 
             word-break: break-word; 
             position: relative; 
             max-width: 75%; 
@@ -471,7 +411,7 @@
         .admin-icon { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.3rem; color: var(--danger); padding: 5px; }
 
         /* SHOP STYLES */
-        .shop-bundle { border: 2px solid var(--brd); border-radius: 6px; padding: 15px; margin-bottom: 12px; text-align: left; position: relative; background: var(--hover); transition: 0.2s; }
+        .shop-bundle { border: 2px solid var(--brd); border-radius: 16px; padding: 15px; margin-bottom: 12px; text-align: left; position: relative; background: var(--hover); transition: 0.2s; }
         .shop-bundle:hover { border-color: var(--main); }
         .shop-bundle-header { font-weight: bold; font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         .shop-bundle-price { position: absolute; top: 15px; right: 15px; font-weight: bold; font-size: 1rem; color: var(--success); }
@@ -486,7 +426,7 @@
         .bundle-mega { border-color: #ffd700; background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,71,87,0.08), rgba(88,101,242,0.08)); }
         .bundle-basic { border-color: #888; background: linear-gradient(to bottom, rgba(136,136,136,0.06), transparent); }
         .bundle-speed { border-color: #00b894; background: linear-gradient(to bottom, rgba(0,184,148,0.08), transparent); }
-        .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 6px; background: rgba(67, 181, 129, 0.1); }
+        .balance-display { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); font-weight: bold; color: var(--success); font-size: 0.9rem; border: 1px solid var(--success); padding: 4px 10px; border-radius: 50px; background: rgba(67, 181, 129, 0.1); }
 
         /* CHAT UI STYLES */
         .chat-header {
@@ -500,8 +440,8 @@
         }
         
         .chat-input-wrapper {
-            flex: 1; display: flex; align-items: center; background: var(--cont); 
-            border-radius: 6px; padding: 2px 15px; border: 1px solid var(--brd); transition: border-color 0.15s;
+            flex: 1; display: flex; align-items: center; background: var(--hover); 
+            border-radius: 25px; padding: 2px 15px; border: 1px solid transparent; transition: 0.2s;
             min-width: 0; overflow: hidden;
         }
         .chat-input-wrapper:focus-within { border-color: var(--main); background: var(--cont); box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.1); }
@@ -517,7 +457,7 @@
         
         .send-btn {
             width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0;
-            background: var(--main); color: white;
+            background: var(--main); color: white; box-shadow: 0 4px 10px rgba(88, 101, 242, 0.3);
         }
         .send-btn:hover { transform: scale(1.1); }
         
@@ -546,12 +486,12 @@
         #userContextSheet.open { bottom: 0; }
         #userContextSheetBg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.35);
+            background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
             z-index: 4999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         #userContextSheetBg.open { opacity: 1; pointer-events: all; }
         .context-sheet-inner {
-            background: var(--cont); border-radius: 10px 10px 0 0; padding: 10px 0 30px 0;
+            background: var(--cont); border-radius: 24px 24px 0 0; padding: 10px 0 30px 0;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.2); border-top: 1px solid var(--brd);
         }
         .context-sheet-handle { width: 40px; height: 4px; background: var(--brd); border-radius: 2px; margin: 8px auto 12px auto; }
@@ -586,12 +526,12 @@
         .tag-admin { background: var(--main); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-owner { background: linear-gradient(45deg, #FFD700, #ff4757); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .tag-global-admin { background: #ff4757; color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .tag-mega { background: linear-gradient(45deg, #ffd700, #ff4757, #5865F2); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
-
+        .tag-mega { background: linear-gradient(45deg, #ffd700, #ff4757, #5865F2); color: white; border-radius: 4px; padding: 1px 4px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; box-shadow: 0 2px 8px rgba(255,215,0,0.5); animation: megaGlow 2s infinite alternate; }
+        @keyframes megaGlow { from { box-shadow: 0 2px 8px rgba(255,215,0,0.4); } to { box-shadow: 0 2px 16px rgba(255,71,87,0.8); } }
         .tag-super { background: linear-gradient(45deg, #43b581, #00b894); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-krass { background: linear-gradient(45deg, #5865F2, #7289DA); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
-        .tag-crazy { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
-
+        .tag-crazy { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; animation: crazyGlow 1.5s infinite alternate; }
+        @keyframes crazyGlow { from { box-shadow: 0 1px 5px rgba(255,107,107,0.4); } to { box-shadow: 0 2px 10px rgba(238,90,36,0.7); } }
         .tag-og { background: linear-gradient(45deg, #1a1a1a, #444); color: #FFD700; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; border: 1px solid #FFD700; box-shadow: 0 1px 6px rgba(255,215,0,0.4); }
         .tag-verifiziert { background: linear-gradient(45deg, #1DA1F2, #0d6efd); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
         .tag-brot { background: linear-gradient(45deg, #c8a06e, #a0522d); color: white; border-radius: 4px; padding: 1px 5px; font-size: 0.6rem; vertical-align: middle; margin-left: 5px; font-weight: bold; }
@@ -610,7 +550,7 @@
         #typingIndicator { font-size: 0.7rem; color: #888; text-align: left; padding-left: 15px; height: 15px; margin-top: -5px; margin-bottom: 5px; font-style: italic; }
 
         /* BANNED SCREEN */
-        #bannedView { z-index: 20000; }
+        #bannedView { background: #ff4757; color: white; z-index: 20000; }
         
         /* Email Settings Status */
         .email-status-box { border: 1px dashed var(--main); background: rgba(88, 101, 242, 0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
@@ -621,8 +561,8 @@
             background: var(--bg); color: var(--txt); z-index: 30000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .loader-icon { font-size: 3.5rem; color: var(--main); margin-bottom: 20px; }
-
+        .loader-icon { font-size: 4rem; color: var(--main); animation: pulse 1.5s infinite; margin-bottom: 20px; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 
         /* REPORT */
         .report-btn { color: #ff9f43; background: transparent; border: none; font-size: 1rem; cursor: pointer; }
@@ -657,10 +597,10 @@
             box-shadow: 0 2px 6px rgba(88,101,242,0.3); transition: 0.2s;
         }
         .voice-play-btn:hover { transform: scale(1.1); opacity: 0.9; }
-        .msg-self .voice-play-btn { background: var(--cont); box-shadow: none; }
+        .msg-self .voice-play-btn { background: rgba(255,255,255,0.25); box-shadow: none; }
         .voice-waveform { flex: 1; height: 28px; position: relative; display: flex; align-items: center; gap: 2px; overflow: hidden; }
         .voice-bar { width: 3px; border-radius: 2px; background: var(--main); opacity: 0.5; transition: opacity 0.1s; flex-shrink: 0; }
-        .msg-self .voice-bar { background: var(--cont); }
+        .msg-self .voice-bar { background: rgba(255,255,255,0.7); }
         .voice-bar.active { opacity: 1; }
         .voice-duration { font-size: 0.7rem; opacity: 0.75; white-space: nowrap; min-width: 28px; }
 
@@ -680,15 +620,17 @@
         /* === BEAUTIFUL DELETE CONFIRM MODAL === */
         #deleteConfirmModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center; z-index: 19999;
+            animation: fadeIn 0.2s;
         }
         .delete-confirm-card {
             background: var(--cont); width: 85%; max-width: 310px;
-            padding: 22px 20px; border-radius: 8px; text-align: center;
-            border: 1px solid var(--brd); box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            padding: 26px 22px; border-radius: 22px; text-align: center;
+            border: 2px solid var(--danger); box-shadow: 0 15px 45px rgba(255,71,87,0.25);
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .delete-confirm-icon { font-size: 2.8rem; margin-bottom: 10px; display: block; }
         .delete-confirm-card h3 { color: var(--danger); margin: 0 0 6px 0; font-size: 1.1rem; }
         .delete-confirm-card p { color: #888; font-size: 0.85rem; margin: 0 0 18px 0; line-height: 1.4; }
@@ -760,12 +702,12 @@
         }
         #fullscreenCloseBtn {
             position: absolute; top: 18px; right: 20px;
-            background: var(--cont); border: none; color: white;
+            background: rgba(255,255,255,0.15); border: none; color: white;
             width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: 0.2s;
         }
-        #fullscreenCloseBtn:hover { background: var(--cont); }
+        #fullscreenCloseBtn:hover { background: rgba(255,255,255,0.3); }
 
         /* Message link style */
         .msg a.msg-link { color: #a0c4ff; text-decoration: underline; word-break: break-all; }
@@ -775,873 +717,15 @@
         .email-notif-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd); }
         .email-notif-row span { font-size:0.85rem; flex:1; margin-right:10px; }
         .email-notif-row.mandatory span { color:#888; }
-
-        /* Message link – light theme */
-        .msg a.msg-link { color: #3b5bdb; }
-        .msg-self a.msg-link { color: rgba(255,255,255,0.9); }
-
-        /* ── LEGAL MODAL ───────────────────────────────────────────── */
-        #legalModalOverlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-            display: none; align-items: center; justify-content: center;
-            z-index: 99995; padding: 1rem;
-        }
-        #legalModalOverlay.open { display: flex; }
-        .legal-modal-box {
-            background: var(--cont); border: 1px solid var(--brd);
-            border-radius: 10px; width: 100%; max-width: 540px;
-            max-height: 88vh; overflow-y: auto;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.14);
-            position: relative;
-        }
-        .legal-tabs {
-            display: flex; align-items: center; border-bottom: 1px solid var(--brd);
-            position: sticky; top: 0; background: var(--cont); z-index: 2;
-        }
-        .legal-tab {
-            flex: 1; padding: 13px 6px; text-align: center; font-size: 0.82rem;
-            font-weight: 600; cursor: pointer; color: #888;
-            border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
-        }
-        .legal-tab.active { color: var(--main); border-bottom-color: var(--main); }
-        .legal-tab:hover { color: var(--txt); }
-        .legal-close-btn {
-            flex-shrink: 0; margin-right: 8px;
-            background: var(--hover); border: 1px solid var(--brd);
-            cursor: pointer; font-size: 0.95rem; color: var(--txt);
-            width: 30px; height: 30px; display: flex; align-items: center;
-            justify-content: center; border-radius: 50%; padding: 0; box-shadow: none;
-            transition: background 0.15s;
-        }
-        .legal-close-btn:hover { background: var(--danger); color: white; border-color: transparent; }
-        .legal-panel { display: none; padding: 22px 24px 28px; }
-        .legal-panel.active { display: block; }
-        .legal-panel h3 {
-            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.06em; color: var(--txt); margin: 0 0 6px 0;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .legal-panel p { font-size: 0.86rem; color: #666; line-height: 1.65; margin: 0 0 14px 0; }
-        .dark-mode .legal-panel p { color: #aaa; }
-        .legal-panel ul {
-            list-style: none; padding: 0; margin: 0 0 14px 0;
-        }
-        .legal-panel ul li {
-            font-size: 0.86rem; color: #666; line-height: 1.65;
-            padding: 4px 0; display: flex; align-items: flex-start; gap: 8px;
-        }
-        .dark-mode .legal-panel ul li { color: #aaa; }
-        .legal-panel ul li i { color: var(--success); margin-top: 3px; flex-shrink: 0; }
-        .legal-divider { border: none; border-top: 1px solid var(--brd); margin: 14px 0; }
-        .legal-section { margin-bottom: 6px; }
-
-        /* ═══════════════════════════════════════
-           LANDING PAGE – homeView redesign
-           ═══════════════════════════════════════ */
-        #homeView {
-            position: fixed !important; top: 0 !important; left: 0 !important;
-            width: 100% !important; height: 100% !important;
-            max-width: 100% !important; max-height: 100% !important;
-            padding: 0 !important; border: none !important;
-            border-radius: 0 !important; box-shadow: none !important;
-            background: transparent !important;
-            overflow-y: auto !important; overflow-x: hidden !important;
-            text-align: left !important; transform: none !important;
-        }
-        .lp-bg { position: fixed; inset: 0; z-index: -1; background: linear-gradient(135deg,#0d0f1a 0%,#111827 40%,#0a0e1a 70%,#0e1020 100%); overflow: hidden; }
-        .lp-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.32; animation: orbFloat linear infinite; }
-        .lp-orb-1 { width: 520px; height: 520px; background: #5865F2; top: -140px; left: -120px; animation-duration: 22s; }
-        .lp-orb-2 { width: 420px; height: 420px; background: #7c3aed; top: 45%; right: -130px; animation-duration: 27s; animation-delay: -9s; }
-        .lp-orb-3 { width: 320px; height: 320px; background: #2563eb; bottom: -80px; left: 32%; animation-duration: 19s; animation-delay: -5s; }
-        @keyframes orbFloat { 0%{transform:translate(0,0) scale(1);} 33%{transform:translate(40px,-30px) scale(1.08);} 66%{transform:translate(-30px,50px) scale(0.94);} 100%{transform:translate(0,0) scale(1);} }
-        .lp-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; position: sticky; top: 0; z-index: 100; background: rgba(10,12,25,0.8); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(255,255,255,0.07); }
-        .lp-logo { display: flex; align-items: center; gap: 9px; font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
-        .lp-logo i { color: #5865F2; font-size: 1.35rem; }
-        .lp-nav-actions { display: flex; align-items: center; gap: 9px; }
-        .lp-btn-ghost { padding: 8px 18px; border-radius: 8px; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.82); background: transparent; }
-        .lp-btn-ghost:hover { background: rgba(255,255,255,0.09); color: #fff; }
-        .lp-btn-primary { padding: 8px 20px; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; background: #5865F2; color: white; box-shadow: 0 4px 14px rgba(88,101,242,0.38); }
-        .lp-btn-primary:hover { background: #4752d6; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(88,101,242,0.5); }
-        .lp-hero { min-height: 100vh; display: flex; align-items: center; padding: 80px 32px 60px; position: relative; }
-        .lp-hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; width: 100%; max-width: 1100px; margin: 0 auto; align-items: center; }
-        .lp-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.35); padding: 5px 13px; border-radius: 20px; font-size: 0.76rem; font-weight: 600; color: #a5b4fc; margin-bottom: 20px; animation: fadeSlideUp 0.6s ease both; }
-        .lp-hero-badge span { width: 7px; height: 7px; border-radius: 50%; background: #5865F2; display: inline-block; animation: pulseDot 2s infinite; }
-        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(1.5);} }
-        .lp-hero-title { font-size: clamp(2.2rem,4.5vw,3.8rem); font-weight: 900; color: #fff; line-height: 1.12; letter-spacing: -0.03em; margin: 0 0 18px; animation: fadeSlideUp 0.7s 0.1s ease both; }
-        .lp-hero-title .grad { background: linear-gradient(135deg,#5865F2 0%,#a78bfa 50%,#60a5fa 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .lp-hero-sub { font-size: 1rem; color: rgba(255,255,255,0.52); line-height: 1.68; margin: 0 0 34px; max-width: 480px; animation: fadeSlideUp 0.7s 0.2s ease both; }
-        .lp-hero-cta { display: flex; gap: 12px; flex-wrap: wrap; animation: fadeSlideUp 0.7s 0.3s ease both; }
-        .lp-cta-main { padding: 13px 30px; border-radius: 10px; font-size: 0.98rem; font-weight: 700; cursor: pointer; border: none; background: #5865F2; color: white; box-shadow: 0 6px 22px rgba(88,101,242,0.42); transition: all 0.22s; display: flex; align-items: center; gap: 9px; }
-        .lp-cta-main:hover { background: #4752d6; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(88,101,242,0.52); }
-        .lp-cta-sec { padding: 13px 26px; border-radius: 10px; font-size: 0.98rem; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.15); transition: all 0.22s; display: flex; align-items: center; gap: 9px; }
-        .lp-cta-sec:hover { background: rgba(255,255,255,0.12); color: #fff; }
-        .lp-hero-right { display: flex; justify-content: center; align-items: center; animation: fadeSlideUp 0.8s 0.2s ease both; }
-        .lp-chat-card { width: 100%; max-width: 340px; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; backdrop-filter: blur(20px); box-shadow: 0 24px 60px rgba(0,0,0,0.4); animation: cardFloat 6s ease-in-out infinite; }
-        @keyframes cardFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-14px);} }
-        .lp-chat-header { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
-        .lp-chat-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
-        .lp-chat-name { font-size: 0.86rem; font-weight: 700; color: #fff; }
-        .lp-chat-status { font-size: 0.7rem; color: rgba(255,255,255,0.42); }
-        .lp-chat-msgs { display: flex; flex-direction: column; gap: 9px; }
-        .lp-msg { max-width: 84%; padding: 8px 13px; border-radius: 14px; font-size: 0.8rem; line-height: 1.45; }
-        .lp-msg-in { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.82); border-bottom-left-radius: 4px; }
-        .lp-msg-out { background: #5865F2; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
-        .lp-msg-typing { display: flex; align-items: center; gap: 4px; padding: 9px 13px; }
-        .lp-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); animation: typingBounce 1.2s infinite; }
-        .lp-typing-dot:nth-child(2){animation-delay:.2s;} .lp-typing-dot:nth-child(3){animation-delay:.4s;}
-        @keyframes typingBounce { 0%,80%,100%{transform:translateY(0);opacity:0.4;} 40%{transform:translateY(-6px);opacity:1;} }
-        .lp-scroll-hint { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; animation: fadeSlideUp 1s 0.9s ease both; pointer-events:none; }
-        .lp-scroll-hint span { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; }
-        .lp-scroll-arrow { width: 22px; height: 36px; border: 2px solid rgba(255,255,255,0.18); border-radius: 11px; display: flex; justify-content: center; padding-top: 6px; }
-        .lp-scroll-dot { width: 4px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 2px; animation: scrollDot 2s infinite; }
-        @keyframes scrollDot { 0%{transform:translateY(0);opacity:1;} 100%{transform:translateY(14px);opacity:0;} }
-        .lp-features { padding: 100px 32px 60px; max-width: 1100px; margin: 0 auto; }
-        .lp-section-label { text-align: center; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #5865F2; margin-bottom: 10px; }
-        .lp-section-title { text-align: center; font-size: clamp(1.7rem,3.5vw,2.6rem); font-weight: 900; color: #fff; margin: 0 0 12px; letter-spacing: -0.03em; }
-        .lp-section-sub { text-align: center; font-size: 0.95rem; color: rgba(255,255,255,0.42); margin: 0 auto 54px; max-width: 480px; line-height: 1.65; }
-        .lp-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; perspective: 1200px; }
-        .lp-card { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 28px 24px; transition: transform 0.55s cubic-bezier(.34,1.56,.64,1), opacity 0.55s, box-shadow 0.35s, border-color 0.35s; transform: translateY(50px) rotateX(12deg); opacity: 0; transform-style: preserve-3d; }
-        .lp-card.lp-visible { transform: translateY(0) rotateX(0deg); opacity: 1; }
-        .lp-card:nth-child(2){transition-delay:.1s;} .lp-card:nth-child(3){transition-delay:.2s;} .lp-card:nth-child(4){transition-delay:.05s;} .lp-card:nth-child(5){transition-delay:.15s;} .lp-card:nth-child(6){transition-delay:.25s;}
-        .lp-card:hover { transform: translateY(-10px) rotateX(0deg) scale(1.025); box-shadow: 0 22px 55px rgba(88,101,242,0.22); border-color: rgba(88,101,242,0.38); }
-        .lp-card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.28); }
-        .lp-card-title { font-size: 1.02rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
-        .lp-card-desc { font-size: 0.84rem; color: rgba(255,255,255,0.44); line-height: 1.65; }
-        .lp-stats { display: flex; justify-content: center; border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07); max-width: 860px; margin: 10px auto 80px; }
-        .lp-stat { flex: 1; text-align: center; padding: 34px 16px; border-right: 1px solid rgba(255,255,255,0.07); }
-        .lp-stat:last-child { border-right: none; }
-        .lp-stat-num { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.04em; }
-        .lp-stat-num .grad { background: linear-gradient(135deg,#5865F2,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .lp-stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.38); margin-top: 4px; }
-        .lp-cta-block { text-align: center; padding: 80px 32px 100px; background: radial-gradient(ellipse at center,rgba(88,101,242,0.12) 0%,transparent 70%); }
-        .lp-cta-block h2 { font-size: clamp(1.7rem,3.5vw,2.6rem); font-weight: 900; color: #fff; margin: 0 0 12px; letter-spacing: -0.03em; }
-        .lp-cta-block p { font-size: 0.95rem; color: rgba(255,255,255,0.42); margin: 0 0 34px; }
-        .lp-cta-block-btns { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
-        .lp-footer { text-align: center; padding: 26px 32px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.76rem; color: rgba(255,255,255,0.28); display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
-        .lp-footer a { color: rgba(255,255,255,0.42); text-decoration: none; transition: color 0.15s; cursor: pointer; }
-        .lp-footer a:hover { color: #a5b4fc; }
-        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(22px);} to{opacity:1;transform:translateY(0);} }
-        @media (max-width: 767px) {
-            .lp-nav { padding: 12px 16px; }
-            .lp-hero { padding: 64px 16px 56px; min-height: 100svh; }
-            .lp-hero-inner { grid-template-columns: 1fr; gap: 32px; text-align: center; }
-            .lp-hero-badge { margin: 0 auto 16px; }
-            .lp-hero-sub { margin: 0 auto 28px; }
-            .lp-hero-cta { justify-content: center; }
-            .lp-hero-right { order: -1; }
-            .lp-chat-card { max-width: 290px; }
-            .lp-features { padding: 60px 16px 40px; }
-            .lp-cards { grid-template-columns: 1fr; }
-            .lp-stats { flex-direction: column; margin: 10px 16px 50px; }
-            .lp-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); padding: 22px 16px; }
-            .lp-stat:last-child { border-bottom: none; }
-            .lp-cta-block { padding: 60px 16px 80px; }
-            .lp-footer { gap: 10px; padding: 22px 16px; }
-        }
-        @media (max-height: 500px) and (orientation: landscape) {
-            .lp-hero { min-height: auto; padding: 56px 24px 36px; }
-            .lp-hero-inner { grid-template-columns: 1fr 1fr; gap: 28px; text-align: left; }
-            .lp-hero-badge { margin: 0 0 12px; }
-            .lp-hero-sub { margin: 0 0 20px; max-width: 100%; }
-            .lp-hero-cta { justify-content: flex-start; }
-            .lp-hero-right { order: 0; }
-            .lp-chat-card { max-width: 240px; padding: 12px; }
-            .lp-hero-title { font-size: clamp(1.4rem,4vw,2rem); }
-            .lp-cards { grid-template-columns: repeat(3,1fr); }
-        }
-    
-        /* Auth card AGB content styling */
-        .auth-card .agb-content { overflow-y: auto; max-height: 260px; margin-bottom: 12px; }
-        .auth-card .agb-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.07) !important; font-size: 0.83rem; color: rgba(255,255,255,0.62); text-align: left; }
-        .auth-card .agb-item strong { color: #a5b4fc; display: block; margin-bottom: 3px; }
-
-        /* ════════════════════════════════════════════════════════════
-           DARK GLASS UI — Complete Premium Override for App Interface
-           ════════════════════════════════════════════════════════════ */
-
-        /* Force dark glass variables globally */
-        body, body.dark-mode,
-        body.bg-yellow, body.bg-red, body.bg-blue, body.bg-purple,
-        body.bg-orange, body.bg-darkred,
-        body.dark-mode.bg-yellow, body.dark-mode.bg-red,
-        body.dark-mode.bg-blue, body.dark-mode.bg-purple,
-        body.dark-mode.bg-orange, body.dark-mode.bg-darkred {
-            --bg: #0a0c14 !important;
-            --txt: #e2e4ee !important;
-            --cont: rgba(255,255,255,0.055) !important;
-            --brd: rgba(255,255,255,0.1) !important;
-            --hover: rgba(255,255,255,0.08) !important;
-            --msg-other: rgba(255,255,255,0.09) !important;
-            --msg-self-txt: #ffffff !important;
-        }
-
-        body {
-            background: linear-gradient(135deg,#0d0f1a 0%,#111827 45%,#0a0e1a 75%,#0e1020 100%) !important;
-            background-attachment: fixed !important;
-        }
-
-        #globalLoading {
-            background: linear-gradient(135deg,#0d0f1a 0%,#111827 45%,#0a0e1a 75%,#0e1020 100%) !important;
-        }
-        .loader-icon { color: #5865F2 !important; }
-
-        /* ── SIDEBAR ─────────────────────────────────────────── */
-        #mainView {
-            background: rgba(10,12,20,0.88) !important;
-            backdrop-filter: blur(28px) !important;
-            -webkit-backdrop-filter: blur(28px) !important;
-            border-right: 1px solid rgba(255,255,255,0.07) !important;
-        }
-        #sidebarTitleRow {
-            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
-        }
-        #sidebarTitleRow h2 {
-            background: linear-gradient(135deg,#fff 30%,#a5b4fc 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; font-weight: 900 !important;
-        }
-        #btn3dots {
-            background: rgba(255,255,255,0.07) !important;
-            border: 1px solid rgba(255,255,255,0.12) !important;
-            color: rgba(255,255,255,0.75) !important;
-        }
-        #btn3dots:hover { background: rgba(255,255,255,0.12) !important; }
-
-        /* Friend/group send request box */
-        #mainView > div[style*="rgba(88, 101, 242"] {
-            background: rgba(88,101,242,0.1) !important;
-            border: 1px solid rgba(88,101,242,0.22) !important;
-            border-radius: 14px !important;
-        }
-
-        /* Neue Gruppe button */
-        #mainView > button.secondary {
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: rgba(255,255,255,0.6) !important;
-        }
-
-        /* Friend / group list items */
-        .friend-item {
-            border-bottom: 1px solid rgba(255,255,255,0.06) !important;
-            border-radius: 12px !important;
-            margin-bottom: 3px !important;
-            padding: 11px 10px !important;
-        }
-        .friend-item:hover { background: rgba(255,255,255,0.07) !important; }
-        .pfp { border-color: rgba(255,255,255,0.15) !important; background: rgba(255,255,255,0.07) !important; }
-
-        /* Logout button mobile */
-        #mainView > button.secondary.desktop-hide {
-            background: rgba(255,71,87,0.12) !important;
-            border: 1px solid rgba(255,71,87,0.25) !important;
-            color: #ff6b78 !important;
-        }
-
-        /* ── DROPDOWN MENU ────────────────────────────────────── */
-        #dotsDropdown {
-            background: rgba(10,12,20,0.97) !important;
-            backdrop-filter: blur(28px) !important;
-            -webkit-backdrop-filter: blur(28px) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 16px !important;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(88,101,242,0.1) !important;
-        }
-        .dd-item {
-            color: rgba(255,255,255,0.78) !important;
-            border-bottom: 1px solid rgba(255,255,255,0.06) !important;
-            transition: background 0.15s !important;
-        }
-        .dd-item:hover { background: rgba(255,255,255,0.08) !important; }
-        .dd-item i { opacity: 0.9; }
-
-        /* ── MAIN CONTENT AREA ────────────────────────────────── */
-        #chatWindow, #settingsView, #shopView, #gamesView, #inboxView, #adminPanelView {
-            background: linear-gradient(160deg,#0d0f1a 0%,#111827 55%,#0a0e1a 100%) !important;
-        }
-        #desktopPlaceholder {
-            background: transparent !important;
-            color: rgba(255,255,255,0.18) !important;
-        }
-
-        /* ── CHAT VIEW ────────────────────────────────────────── */
-        .chat-header {
-            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
-            background: rgba(10,12,20,0.5) !important;
-            backdrop-filter: blur(12px) !important;
-            padding: 12px 16px 12px !important;
-            border-radius: 0 !important;
-            margin-bottom: 0 !important;
-        }
-        #chatWithTitle { color: #fff !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
-
-        .msg.msg-other {
-            background: rgba(255,255,255,0.09) !important;
-            color: rgba(255,255,255,0.88) !important;
-            border: 1px solid rgba(255,255,255,0.08) !important;
-            border-radius: 14px !important;
-            border-bottom-left-radius: 4px !important;
-        }
-        .msg.msg-self {
-            background: linear-gradient(135deg,#5865F2,#4752d6) !important;
-            box-shadow: 0 4px 16px rgba(88,101,242,0.38) !important;
-            border-radius: 14px !important;
-            border-bottom-right-radius: 4px !important;
-        }
-        .system-msg {
-            color: rgba(255,255,255,0.32) !important;
-            background: rgba(255,255,255,0.04) !important;
-            border-radius: 10px !important;
-            padding: 6px 14px !important;
-        }
-
-        .chat-input-wrapper {
-            background: rgba(255,255,255,0.07) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 16px !important;
-            padding: 4px 16px !important;
-        }
-        .chat-input-wrapper:focus-within {
-            border-color: rgba(88,101,242,0.5) !important;
-            background: rgba(88,101,242,0.08) !important;
-            box-shadow: 0 0 0 3px rgba(88,101,242,0.15) !important;
-        }
-        #chatInput { color: #fff !important; }
-        #chatInput::placeholder { color: rgba(255,255,255,0.3) !important; }
-
-        .send-btn {
-            background: linear-gradient(135deg,#5865F2,#4752d6) !important;
-            box-shadow: 0 4px 14px rgba(88,101,242,0.42) !important;
-            border: none !important;
-            border-radius: 50% !important;
-            transition: all 0.22s !important;
-        }
-        .send-btn:hover { transform: scale(1.08) !important; box-shadow: 0 6px 20px rgba(88,101,242,0.55) !important; }
-
-        #replyPreviewBar {
-            background: rgba(88,101,242,0.1) !important;
-            border-left: 3px solid #5865F2 !important;
-            border-radius: 10px !important;
-        }
-        #replyPreviewBar .reply-from { color: #a5b4fc !important; }
-        #replyPreviewBar .reply-text { color: rgba(255,255,255,0.55) !important; }
-
-        #typingIndicator { color: rgba(255,255,255,0.38) !important; }
-        #chatLoading { color: #a5b4fc !important; }
-
-        .voice-btn { color: rgba(255,255,255,0.5) !important; }
-        .voice-btn:hover { color: #ff6b78 !important; opacity: 1 !important; }
-        .file-label { color: rgba(255,255,255,0.5) !important; }
-        .file-label:hover { color: #a5b4fc !important; opacity: 1 !important; }
-
-        /* Reply quote in messages */
-        .reply-quote {
-            background: rgba(255,255,255,0.08) !important;
-            border-left-color: rgba(255,255,255,0.3) !important;
-        }
-        .msg-self .reply-quote {
-            background: rgba(0,0,0,0.15) !important;
-            border-left-color: rgba(255,255,255,0.5) !important;
-        }
-
-        /* ── INPUTS & SELECTS (global) ────────────────────────── */
-        input:not([type=checkbox]):not([type=radio]):not([type=file]),
-        select, textarea {
-            background: rgba(255,255,255,0.07) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: #fff !important;
-            border-radius: 10px !important;
-            transition: all 0.2s !important;
-        }
-        input:not([type=checkbox]):not([type=radio])::placeholder,
-        textarea::placeholder { color: rgba(255,255,255,0.3) !important; }
-        input:not([type=checkbox]):not([type=radio]):focus,
-        select:focus, textarea:focus {
-            border-color: rgba(88,101,242,0.55) !important;
-            background: rgba(88,101,242,0.09) !important;
-            box-shadow: 0 0 0 3px rgba(88,101,242,0.18) !important;
-        }
-        select option { background: #111827 !important; color: #e2e4ee !important; }
-
-        /* ── BUTTONS (global) ─────────────────────────────────── */
-        button:not(.send-btn):not(.voice-btn):not(.icon-btn):not(.three-dot-btn):not(.kick-btn)
-               :not(.report-btn):not(.rec-cancel):not(.rec-send):not(.lp-btn-ghost)
-               :not(.lp-btn-primary):not(.lp-cta-main):not(.lp-cta-sec) {
-            border-radius: 10px !important;
-            transition: all 0.2s !important;
-        }
-        /* Primary (unclassed) buttons */
-        button:not([class]):not(.send-btn),
-        button[class=""] {
-            background: rgba(88,101,242,0.18) !important;
-            color: rgba(255,255,255,0.9) !important;
-            border: 1px solid rgba(88,101,242,0.3) !important;
-        }
-        button.secondary {
-            background: rgba(255,255,255,0.07) !important;
-            color: rgba(255,255,255,0.72) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-        }
-        button.secondary:hover { background: rgba(255,255,255,0.12) !important; opacity: 1 !important; }
-        button.danger {
-            background: linear-gradient(135deg,#ff4757,#d63031) !important;
-            border: none !important;
-            box-shadow: 0 4px 14px rgba(255,71,87,0.3) !important;
-        }
-        button.green-btn {
-            background: linear-gradient(135deg,#27ae60,#1e8449) !important;
-            border: none !important;
-            box-shadow: 0 4px 14px rgba(39,174,96,0.28) !important;
-        }
-        button.gold-btn {
-            background: linear-gradient(135deg,#d4a017,#b8860b) !important;
-            border: none !important;
-        }
-        button.icon-btn {
-            background: transparent !important;
-            color: rgba(255,255,255,0.58) !important;
-            border: 1px solid transparent !important;
-        }
-        button.icon-btn:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; }
-        button.three-dot-btn { color: rgba(255,255,255,0.55) !important; background: transparent !important; }
-        button.three-dot-btn:hover { background: rgba(255,255,255,0.08) !important; }
-
-        /* ── MODALS ───────────────────────────────────────────── */
-        .modal-overlay { background: rgba(0,0,0,0.72) !important; }
-        .modal-card {
-            background: rgba(10,12,20,0.97) !important;
-            backdrop-filter: blur(28px) !important;
-            -webkit-backdrop-filter: blur(28px) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 22px !important;
-            box-shadow: 0 28px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(88,101,242,0.1) !important;
-            color: rgba(255,255,255,0.88) !important;
-        }
-        .modal-card h2, .modal-card h3 { color: rgba(255,255,255,0.95) !important; }
-        .modal-card p { color: rgba(255,255,255,0.6) !important; }
-        .modal-card strong { color: rgba(255,255,255,0.88) !important; }
-
-        /* Delete confirm card */
-        .delete-confirm-card {
-            background: rgba(10,12,20,0.97) !important;
-            backdrop-filter: blur(28px) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 28px 70px rgba(0,0,0,0.7) !important;
-            color: rgba(255,255,255,0.88) !important;
-        }
-        .delete-confirm-card p { color: rgba(255,255,255,0.55) !important; }
-
-        /* Admin confirm / sign-out embeds */
-        #adminConfirmEmbed > div, #signOutAllEmbed {
-            background: rgba(10,12,20,0.97) !important;
-            backdrop-filter: blur(24px) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 18px !important;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important;
-        }
-
-        /* ── CONTEXT SHEET (user/group options) ───────────────── */
-        .context-sheet-inner {
-            background: rgba(10,12,20,0.97) !important;
-            backdrop-filter: blur(28px) !important;
-            -webkit-backdrop-filter: blur(28px) !important;
-            border-top: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 28px 28px 0 0 !important;
-            box-shadow: 0 -16px 50px rgba(0,0,0,0.6) !important;
-        }
-        .context-sheet-handle { background: rgba(255,255,255,0.18) !important; }
-        .context-sheet-title { border-bottom: 1px solid rgba(255,255,255,0.08) !important; color: #a5b4fc !important; }
-        .context-sheet-item { color: rgba(255,255,255,0.82) !important; }
-        .context-sheet-item:hover { background: rgba(255,255,255,0.07) !important; }
-        .context-sheet-item.danger-item { color: #ff6b78 !important; }
-        .context-sheet-item.warn-item { color: #ffa94d !important; }
-
-        /* ── SHOP ─────────────────────────────────────────────── */
-        .shop-bundle {
-            background: rgba(255,255,255,0.04) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 18px !important;
-            transition: all 0.25s !important;
-        }
-        .shop-bundle:hover {
-            border-color: rgba(88,101,242,0.4) !important;
-            background: rgba(88,101,242,0.07) !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.3) !important;
-        }
-        .shop-bundle-header { color: rgba(255,255,255,0.92) !important; }
-        .shop-bundle ul li { color: rgba(255,255,255,0.6) !important; }
-        .balance-display {
-            background: rgba(39,174,96,0.12) !important;
-            border: 1px solid rgba(39,174,96,0.3) !important;
-            color: #4ade80 !important;
-            border-radius: 10px !important;
-        }
-
-        /* ── INBOX ────────────────────────────────────────────── */
-        .inbox-msg-card {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.08) !important;
-            border-radius: 16px !important;
-            transition: background 0.15s !important;
-        }
-        .inbox-msg-card:hover { background: rgba(255,255,255,0.08) !important; }
-        .inbox-msg-title { color: #a5b4fc !important; }
-        .inbox-msg-body { color: rgba(255,255,255,0.7) !important; }
-        .inbox-msg-time, .inbox-msg-from { color: rgba(255,255,255,0.38) !important; }
-        .inbox-delete-btn { color: rgba(255,255,255,0.3) !important; }
-        .inbox-delete-btn:hover { color: #ff6b78 !important; }
-
-        /* ── GROUP MEMBERS GRID ───────────────────────────────── */
-        .member-grid { background: rgba(255,255,255,0.04) !important; border-radius: 14px !important; }
-        .member-card {
-            background: rgba(255,255,255,0.06) !important;
-            border: 2px solid rgba(255,255,255,0.1) !important;
-            border-radius: 12px !important;
-            color: rgba(255,255,255,0.82) !important;
-        }
-        .member-card:hover { border-color: rgba(88,101,242,0.5) !important; }
-        .member-card.selected {
-            background: linear-gradient(135deg,#5865F2,#4752d6) !important;
-            border-color: #5865F2 !important;
-            box-shadow: 0 4px 14px rgba(88,101,242,0.38) !important;
-        }
-
-        /* ── PLUS OPTIONS ─────────────────────────────────────── */
-        .plus-option-item {
-            border: 2px solid rgba(255,255,255,0.15) !important;
-            background: rgba(255,255,255,0.06) !important;
-        }
-        .plus-option-item.locked { background: rgba(255,255,255,0.03) !important; opacity: 0.5 !important; }
-        .lock-icon { background: rgba(10,12,20,0.9) !important; color: rgba(255,255,255,0.6) !important; }
-        .chat-plus-container {
-            background: linear-gradient(to bottom, rgba(255,215,0,0.07), rgba(255,255,255,0.02)) !important;
-            border: 1px solid rgba(255,215,0,0.28) !important;
-            border-radius: 18px !important;
-        }
-
-        /* ── INFO LIST ITEMS (settings/group/admin) ───────────── */
-        .info-list-item { border-bottom: 1px solid rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.82) !important; }
-        .history-item { border-bottom: 1px solid rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.78) !important; }
-
-        /* ── SETTINGS EMAIL BOX ───────────────────────────────── */
-        .email-status-box {
-            background: rgba(88,101,242,0.08) !important;
-            border: 1px dashed rgba(88,101,242,0.38) !important;
-            border-radius: 10px !important;
-        }
-
-        /* ── AGB ROW (in mainView) ────────────────────────────── */
-        .agb-row {
-            background: rgba(88,101,242,0.09) !important;
-            border: 1px solid rgba(88,101,242,0.2) !important;
-            color: rgba(255,255,255,0.72) !important;
-        }
-
-        /* ── SYSTEM EMBED TOAST ───────────────────────────────── */
-        #systemEmbed {
-            backdrop-filter: blur(16px) !important;
-            border-radius: 14px !important;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
-        }
-
-        /* ── HEADING COLORS ───────────────────────────────────── */
-        h1, h2, h3 { color: rgba(255,255,255,0.92) !important; }
-        p { color: rgba(255,255,255,0.65) !important; }
-        label { color: rgba(255,255,255,0.72) !important; }
-        strong, b { color: rgba(255,255,255,0.88) !important; }
-
-        /* ── SCROLLBAR ────────────────────────────────────────── */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(88,101,242,0.45); }
-
-        /* ── BANNED VIEW OVERRIDE (overrides inline bg) ───────── */
-        #bannedView { background: linear-gradient(135deg,#0d0f1a 0%,#1a0005 50%,#0d0000 100%) !important; }
-
-        /* Mobile icons */
-        .settings-icon { color: rgba(255,255,255,0.72) !important; }
-        .shop-icon { color: #fbbf24 !important; }
-        .admin-icon { color: #ff6b78 !important; }
-        .inbox-icon { color: #4ade80 !important; }
-
-        /* View section subtitles */
-        #settingsView, #shopView, #inboxView, #adminPanelView, #chatWindow, #gamesView {
-            color: rgba(255,255,255,0.85) !important;
-        }
-
-        /* Kick button */
-        .kick-btn { border-radius: 6px !important; }
-
-        /* Admin section dividers */
-        #adminPanelView > div[style*="border-top"] { border-top: 1px solid rgba(255,255,255,0.07) !important; }
-
-        /* Admin tab buttons */
-        #tabBtnUser, #tabBtnReport { border-radius: 10px !important; }
-        #tabBtnUser:not(.secondary) {
-            background: rgba(88,101,242,0.22) !important;
-            border: 1px solid rgba(88,101,242,0.35) !important;
-            color: #a5b4fc !important;
-        }
-
-        /* PFP no-content circles */
-        [id*="NoPfp"], .no-pfp-circle {
-            background: rgba(88,101,242,0.25) !important;
-            border: 1px solid rgba(88,101,242,0.4) !important;
-        }
-
-        /* Report button */
-        .report-btn { color: #ffa94d !important; }
-
-        /* Msg sender name */
-        .msg-sender-name { color: #a5b4fc !important; }
-
-        /* Unread badge */
-        .unread-badge { background: #ff4757 !important; }
-
-        /* Chat back button / action buttons */
-        #chatWindow .action-btn-group button.icon-btn { color: rgba(255,255,255,0.55) !important; }
-
-        /* View fade-in */
-        .view { animation: fadeIn 0.3s ease !important; }
-
-
-</style>
+    </style>
 </head>
 <body>
 
-    <!-- ════════════════════════════════════════════════
-         LEGAL MODAL – Datenschutz / Nutzung / Kontakt
-         ════════════════════════════════════════════════ -->
-    <div id="legalModalOverlay" onclick="if(event.target===this)closeLegalModal()">
-      <div class="legal-modal-box">
-        <div class="legal-tabs">
-          <div class="legal-tab active" id="ltab-datenschutz" onclick="switchLegalTab('datenschutz')">
-            <i class="fas fa-shield-halved"></i> Datenschutz
-          </div>
-          <div class="legal-tab" id="ltab-nutzung" onclick="switchLegalTab('nutzung')">
-            <i class="fas fa-file-lines"></i> Nutzung
-          </div>
-          <div class="legal-tab" id="ltab-kontakt" onclick="switchLegalTab('kontakt')">
-            <i class="fas fa-envelope"></i> Kontakt
-          </div>
-          <button class="legal-close-btn" onclick="closeLegalModal()" title="Schließen"><i class="fas fa-xmark"></i></button>
-        </div>
-
-        <!-- ── Datenschutzerklärung ── -->
-        <div class="legal-panel active" id="lpanel-datenschutz">
-          <div class="legal-section">
-            <h3><i class="fas fa-user-tie"></i> Verantwortlicher</h3>
-            <p>Betreiber: <strong>John</strong> · Kontakt: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-database"></i> Erhobene Daten</h3>
-            <p>Beim Erstellen eines Kontos und der Nutzung von John Chat werden folgende Daten verarbeitet:</p>
-            <ul>
-              <li><i class="fas fa-check"></i> Benutzername</li>
-              <li><i class="fas fa-check"></i> Passwort (verschlüsselt gespeichert)</li>
-              <li><i class="fas fa-check"></i> E-Mail-Adresse (für 2-Faktor-Authentifizierung)</li>
-              <li><i class="fas fa-check"></i> Chatnachrichten und geteilte Medien</li>
-              <li><i class="fas fa-check"></i> Profilbild (optional)</li>
-              <li><i class="fas fa-check"></i> Zeitstempel von Aktivitäten</li>
-            </ul>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-fire"></i> Firebase / Google (Drittanbieter)</h3>
-            <p>John Chat nutzt <strong>Firebase (Google LLC, USA)</strong> für Datenbankdienste, Authentifizierung und Dateispeicherung. Damit findet eine Übermittlung in ein Drittland (USA) statt. Firebase stützt die Übermittlung auf Standardvertragsklauseln (SCCs) gem. Art. 46 Abs. 2 lit. c DSGVO. Weitere Infos: <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener" style="color:var(--main)">firebase.google.com/support/privacy</a></p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-clock"></i> Speicherdauer</h3>
-            <p>Daten werden für die Dauer der Kontoexistenz gespeichert. Nach Kontolöschung werden Daten innerhalb von 30 Tagen entfernt, sofern keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-gavel"></i> Rechtsgrundlage</h3>
-            <p>Die Verarbeitung erfolgt auf Basis deiner Einwilligung durch die Registrierung (Art. 6 Abs. 1 lit. a DSGVO) sowie zur Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-scale-balanced"></i> Deine Rechte (Art. 15–21 DSGVO)</h3>
-            <ul>
-              <li><i class="fas fa-check"></i> <strong>Auskunft</strong> über gespeicherte Daten (Art. 15)</li>
-              <li><i class="fas fa-check"></i> <strong>Berichtigung</strong> falscher Daten (Art. 16)</li>
-              <li><i class="fas fa-check"></i> <strong>Löschung</strong> deiner Daten (Art. 17)</li>
-              <li><i class="fas fa-check"></i> <strong>Einschränkung</strong> der Verarbeitung (Art. 18)</li>
-              <li><i class="fas fa-check"></i> <strong>Datenübertragbarkeit</strong> (Art. 20)</li>
-              <li><i class="fas fa-check"></i> <strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21)</li>
-            </ul>
-            <p>Anfragen an: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-flag"></i> Beschwerderecht</h3>
-            <p>Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO), z. B. beim Landesbeauftragten für Datenschutz deines Bundeslandes.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-cookie-bite"></i> Lokale Speicherung (localStorage)</h3>
-            <p>John Chat speichert deinen Benutzernamen im lokalen Speicher deines Browsers (<code>localStorage</code>), wenn du „Angemeldet bleiben" aktivierst. Diese Daten verlassen dein Gerät nicht und werden ausschließlich zur automatischen Anmeldung verwendet. Du kannst sie jederzeit durch Abmelden oder das Löschen der Browser-Daten entfernen.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-camera"></i> Profilbilder & Medien</h3>
-            <p>Hochgeladene Profilbilder und geteilte Mediendateien (Bilder) werden über <strong>Firebase Storage (Google LLC)</strong> gespeichert. Sie sind über direkte URLs abrufbar und somit prinzipiell öffentlich zugänglich. Lade keine sensiblen oder vertraulichen Bilder hoch.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-shield-virus"></i> Datensicherheit</h3>
-            <p>Wir treffen technische Maßnahmen zum Schutz deiner Daten, darunter:</p>
-            <ul>
-              <li><i class="fas fa-check"></i> Verschlüsselte Übertragung (HTTPS/TLS)</li>
-              <li><i class="fas fa-check"></i> Firebase-Sicherheitsregeln zur Zugriffskontrolle</li>
-              <li><i class="fas fa-check"></i> 2-Faktor-Authentifizierung (optional)</li>
-              <li><i class="fas fa-check"></i> Sicherheits-E-Mail bei neuer Anmeldung</li>
-            </ul>
-            <p>Eine vollständige Sicherheit kann jedoch nicht garantiert werden. John Chat ist ein privates Projekt ohne kommerzielle Infrastruktur.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-child"></i> Daten Minderjähriger</h3>
-            <p>John Chat richtet sich nicht gezielt an Kinder unter 13 Jahren. Wir erheben wissentlich keine Daten von Kindern unter 13. Falls du davon Kenntnis erlangst, wende dich bitte an: <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-rotate"></i> Änderungen dieser Datenschutzerklärung</h3>
-            <p>Diese Datenschutzerklärung kann jederzeit aktualisiert werden. Wesentliche Änderungen werden den Nutzern über den Chat-Posteingang mitgeteilt. Die aktuelle Version ist immer über diesen Dialog abrufbar.</p>
-            <p style="font-size:0.78rem; color:#888;">Stand: 2025</p>
-          </div>
-        </div>
-
-        <!-- ── Nutzungsbedingungen ── -->
-        <div class="legal-panel" id="lpanel-nutzung">
-          <div class="legal-section">
-            <h3><i class="fas fa-globe"></i> Geltungsbereich</h3>
-            <p>Diese Nutzungsbedingungen gelten für alle Nutzer von John Chat. Mit der Registrierung stimmst du ihnen zu. Betreiber: <strong>John</strong> · <a href="mailto:entspann.schick@gmail.com" style="color:var(--main)">entspann.schick@gmail.com</a></p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-child"></i> Mindestalter</h3>
-            <p>John Chat darf nur von Personen ab <strong>13 Jahren</strong> genutzt werden. Minderjährige unter 16 Jahren benötigen die Zustimmung eines Erziehungsberechtigten.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-user-check"></i> Nutzerpflichten</h3>
-            <ul>
-              <li><i class="fas fa-check"></i> Wahre Angaben bei der Registrierung</li>
-              <li><i class="fas fa-check"></i> Kein Missbrauch des Dienstes oder Mehrfach-Accounts</li>
-              <li><i class="fas fa-check"></i> Kein Versand von Spam, Malware oder unerwünschten Werbeangeboten</li>
-              <li><i class="fas fa-check"></i> Keine Beleidigungen, Diskriminierung oder Harassment</li>
-              <li><i class="fas fa-check"></i> Keine sexuellen, gewaltverherrlichenden oder illegalen Inhalte</li>
-            </ul>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-ban"></i> Sperrung & Kündigung</h3>
-            <p>Der Betreiber kann Accounts bei Regelverstößen <strong>ohne Vorwarnung sperren oder löschen</strong>. Du kannst dein Konto jederzeit selbst löschen.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-triangle-exclamation"></i> Haftungsausschluss</h3>
-            <p>John Chat ist ein privates Projekt und wird ohne Gewähr bereitgestellt. Der Betreiber übernimmt keine Haftung für Ausfälle, Datenverluste oder nutzergenerierte Inhalte.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-pen-to-square"></i> Änderungen</h3>
-            <p>Der Betreiber behält sich vor, diese Bedingungen jederzeit anzupassen. Wesentliche Änderungen werden im Chat bekannt gegeben.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-message"></i> Chatregeln</h3>
-            <ul>
-              <li><i class="fas fa-check"></i> Behandle andere Nutzer mit Respekt und Anstand</li>
-              <li><i class="fas fa-check"></i> Keine Weitergabe privater Informationen anderer Nutzer</li>
-              <li><i class="fas fa-check"></i> Kein Fluten des Chats mit Wiederholungsnachrichten (Spam)</li>
-              <li><i class="fas fa-check"></i> Keine falschen Identitäten oder Imitation anderer Nutzer</li>
-              <li><i class="fas fa-check"></i> Keine Werbung oder Verlinkung zu externen Diensten ohne Erlaubnis</li>
-            </ul>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-image"></i> Medieninhalte</h3>
-            <p>Beim Teilen von Bildern und Medien gilt:</p>
-            <ul>
-              <li><i class="fas fa-check"></i> Nur Inhalte teilen, für die du die Rechte besitzt</li>
-              <li><i class="fas fa-check"></i> Keine urheberrechtlich geschützten Materialien ohne Erlaubnis</li>
-              <li><i class="fas fa-check"></i> Keine Bilder, die Personen ohne deren Einwilligung zeigen</li>
-              <li><i class="fas fa-check"></i> Maximale Dateigröße beachten (Firebase-Limits)</li>
-            </ul>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-euro-sign"></i> Käufe & Guthaben</h3>
-            <p>Käufe im Shop sind endgültig und können nicht erstattet werden, außer bei einem technischen Fehler. Guthaben ist kein Zahlungsmittel und hat keinen Geldwert außerhalb von John Chat. Der Betreiber behält sich vor, Preise und Angebote jederzeit zu ändern.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-server"></i> Verfügbarkeit</h3>
-            <p>John Chat wird ohne Gewähr auf Verfügbarkeit bereitgestellt. Wartungsarbeiten, technische Ausfälle oder Änderungen können jederzeit ohne Vorankündigung auftreten. Ein Anspruch auf dauerhaften Betrieb besteht nicht.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-scale-balanced"></i> Anwendbares Recht</h3>
-            <p>Es gilt deutsches Recht. Gerichtsstand ist der Wohnsitz des Betreibers, soweit gesetzlich zulässig.</p>
-            <p style="font-size:0.78rem; color:#888;">Stand: 2025</p>
-          </div>
-        </div>
-
-        <!-- ── Kontakt ── -->
-        <div class="legal-panel" id="lpanel-kontakt">
-          <div class="legal-section">
-            <h3><i class="fas fa-user-tie"></i> Betreiber</h3>
-            <p><strong>John</strong><br>
-            <span style="font-size:0.82rem; color:#888;">Privates, nicht-kommerzielles Projekt · John Chat v3.1</span></p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-envelope"></i> E-Mail</h3>
-            <p><a href="mailto:entspann.schick@gmail.com" style="color:var(--main); font-weight:600;">entspann.schick@gmail.com</a></p>
-            <p style="font-size:0.82rem;">Für Anfragen zu Datenschutz, Account-Löschung, Beschwerden oder allgemeine Fragen.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-clock"></i> Reaktionszeit</h3>
-            <p>Anfragen werden in der Regel innerhalb von <strong>3–7 Werktagen</strong> beantwortet. Bei dringendem Bedarf (z. B. Sicherheitsvorfälle) bitte entsprechend kennzeichnen.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-list-check"></i> Wofür du uns kontaktieren kannst</h3>
-            <ul>
-              <li><i class="fas fa-check"></i> Kontolöschung oder Datenschutzanfragen</li>
-              <li><i class="fas fa-check"></i> Meldung von Regelverstößen oder Missbrauch</li>
-              <li><i class="fas fa-check"></i> Technische Probleme oder Bugs</li>
-              <li><i class="fas fa-check"></i> Fragen zu Käufen oder Guthaben</li>
-              <li><i class="fas fa-check"></i> Allgemeines Feedback und Verbesserungsvorschläge</li>
-              <li><i class="fas fa-check"></i> Beschwerde bei Sperrung oder Moderation</li>
-            </ul>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-triangle-exclamation"></i> Sicherheitsvorfälle</h3>
-            <p>Bei Verdacht auf Sicherheitslücken, kompromittierte Accounts oder Datenmissbrauch bitte <strong>sofort</strong> eine E-Mail mit dem Betreff <code style="background:var(--hover); padding:2px 6px; border-radius:4px; font-size:0.82rem;">SECURITY</code> senden.</p>
-          </div>
-          <hr class="legal-divider">
-          <div class="legal-section">
-            <h3><i class="fas fa-circle-info"></i> Hinweis</h3>
-            <p>John Chat ist ein privates, nicht-kommerzielles Projekt. Es besteht keine gesetzliche Impressumspflicht, da keine geschäftsmäßige Nutzung vorliegt. Bei Fragen zur DSGVO-Konformität steht der Betreiber per E-Mail zur Verfügung.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
     <div id="globalLoading" class="hidden">
-        <div class="loader-icon"><i class="fas fa-comments"></i></div>
+        <div class="loader-icon"><i class="fas fa-comment-dots"></i></div>
         <h2 style="margin:0;">John Chat</h2>
         <p>Chats werden geladen...</p>
-        <button id="loadingLogoutBtn" onclick="executeLogout()" class="danger" style="display:none; margin-top:20px; padding:12px 30px; border-radius:6px; font-size:0.95rem;"><i class="fas fa-right-from-bracket"></i> Abmelden</button>
+        <button id="loadingLogoutBtn" onclick="executeLogout()" class="danger" style="display:none; margin-top:20px; padding:12px 30px; border-radius:50px; font-size:0.95rem;"><i class="fas fa-sign-out-alt"></i> Abmelden</button>
         <p id="loadingLogoutHint" style="display:none; font-size:0.8rem; color:#888; margin-top:5px;">Das Laden dauert ungewöhnlich lang...</p>
     </div>
 
@@ -1649,7 +733,7 @@
     <div id="customAlert"></div>
 
     <!-- Inline Bestätigungs-Embed (kein Gerät-Dialog) -->
-    <div id="adminConfirmEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--main); border-radius:8px; padding:14px 20px; z-index:10001; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:260px; max-width:340px;">
+    <div id="adminConfirmEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--main); border-radius:16px; padding:14px 20px; z-index:10001; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:260px; max-width:340px;">
         <p id="adminConfirmMsg" style="margin:0 0 12px 0; font-size:0.9rem; font-weight:bold; color:var(--txt);"></p>
         <div style="display:flex; gap:10px; justify-content:center;">
             <button onclick="confirmAdminAction()" style="padding:8px 18px; font-size:0.85rem; background:var(--main);">✓ Ja</button>
@@ -1658,179 +742,15 @@
     </div>
 
     <div id="homeView" class="view">
-
-        <!-- Animated background orbs -->
-        <div class="lp-bg">
-            <div class="lp-orb lp-orb-1"></div>
-            <div class="lp-orb lp-orb-2"></div>
-            <div class="lp-orb lp-orb-3"></div>
+        <h1>John Chat</h1>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+           <button onclick="showView('loginView')">Anmelden</button>
+           <button onclick="showView('registerView')" class="secondary">Registrieren</button>
         </div>
-
-        <!-- NAV -->
-        <nav class="lp-nav">
-            <div class="lp-logo">
-                <i class="fas fa-comments"></i> John Chat
-            </div>
-            <div class="lp-nav-actions">
-                <button class="lp-btn-ghost" onclick="showView('loginView')"><i class="fas fa-right-to-bracket"></i> Anmelden</button>
-                <button class="lp-btn-primary" onclick="showView('registerView')"><i class="fas fa-user-plus"></i> Registrieren</button>
-            </div>
-        </nav>
-
-        <!-- HERO -->
-        <section class="lp-hero">
-            <div class="lp-hero-inner">
-                <div class="lp-hero-left">
-                    <div class="lp-hero-badge">
-                        <span></span> Live · Echtzeit-Nachrichten
-                    </div>
-                    <h1 class="lp-hero-title">
-                        Chat with the<br>
-                        <span class="grad">whole world.</span>
-                    </h1>
-                    <p class="lp-hero-sub">
-                        Verbinde dich mit Freunden, erstelle Gruppen und schreibe in Echtzeit – sicher, schnell und kostenlos. Überall. Immer.
-                    </p>
-                    <div class="lp-hero-cta">
-                        <button class="lp-cta-main" onclick="showView('registerView')">
-                            <i class="fas fa-rocket"></i> Jetzt starten
-                        </button>
-                        <button class="lp-cta-sec" onclick="showView('loginView')">
-                            <i class="fas fa-right-to-bracket"></i> Anmelden
-                        </button>
-                    </div>
-                </div>
-
-                <div class="lp-hero-right">
-                    <div class="lp-chat-card">
-                        <div class="lp-chat-header">
-                            <div class="lp-chat-avatar" style="background:linear-gradient(135deg,#5865F2,#a78bfa);">👤</div>
-                            <div>
-                                <div class="lp-chat-name">John Chat</div>
-                                <div class="lp-chat-status">● Online · 42 Nutzer aktiv</div>
-                            </div>
-                        </div>
-                        <div class="lp-chat-msgs">
-                            <div class="lp-msg lp-msg-in">Hey! Bist du heute Abend dabei? 👋</div>
-                            <div class="lp-msg lp-msg-out">Ja klar! Was ist geplant? 🎉</div>
-                            <div class="lp-msg lp-msg-in">Komm einfach in den Chat rein 😄</div>
-                            <div class="lp-msg lp-msg-out">Bin dabei! ✅</div>
-                            <div class="lp-msg lp-msg-in lp-msg-typing">
-                                <div class="lp-typing-dot"></div>
-                                <div class="lp-typing-dot"></div>
-                                <div class="lp-typing-dot"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lp-scroll-hint">
-                <span>Scroll</span>
-                <div class="lp-scroll-arrow">
-                    <div class="lp-scroll-dot"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- STATS STRIP -->
-        <div class="lp-stats">
-            <div class="lp-stat">
-                <div class="lp-stat-num"><span class="grad">100%</span></div>
-                <div class="lp-stat-label">Kostenlos</div>
-            </div>
-            <div class="lp-stat">
-                <div class="lp-stat-num"><span class="grad">Echtzeit</span></div>
-                <div class="lp-stat-label">Nachrichten</div>
-            </div>
-            <div class="lp-stat">
-                <div class="lp-stat-num"><span class="grad">2FA</span></div>
-                <div class="lp-stat-label">Sicherheit</div>
-            </div>
-            <div class="lp-stat">
-                <div class="lp-stat-num"><span class="grad">∞</span></div>
-                <div class="lp-stat-label">Gruppen & Chats</div>
-            </div>
-        </div>
-
-        <!-- FEATURES -->
-        <section class="lp-features">
-            <div class="lp-section-label"><i class="fas fa-sparkles"></i> Features</div>
-            <h2 class="lp-section-title">Alles was du brauchst</h2>
-            <p class="lp-section-sub">Designed für echte Verbindungen – mit Funktionen, die deinen Chat besser machen.</p>
-
-            <div class="lp-cards" id="lpCardsGrid">
-                <div class="lp-card">
-                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#5865F2,#4752d6);">
-                        <i class="fas fa-shield-halved" style="color:#fff;"></i>
-                    </div>
-                    <div class="lp-card-title">Maximale Sicherheit</div>
-                    <div class="lp-card-desc">2-Faktor-Authentifizierung per E-Mail, Sicherheitswarnungen bei neuen Anmeldungen und verschlüsselte Passwörter schützen deinen Account.</div>
-                </div>
-                <div class="lp-card">
-                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#10b981,#059669);">
-                        <i class="fas fa-bolt" style="color:#fff;"></i>
-                    </div>
-                    <div class="lp-card-title">Echtzeit-Chat</div>
-                    <div class="lp-card-desc">Nachrichten werden blitzschnell via Firebase übertragen. Tipp-Anzeige, Lesebestätigungen und sofortige Benachrichtigungen inklusive.</div>
-                </div>
-                <div class="lp-card">
-                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
-                        <i class="fas fa-users" style="color:#fff;"></i>
-                    </div>
-                    <div class="lp-card-title">Gruppen & Freunde</div>
-                    <div class="lp-card-desc">Erstelle beliebig viele Gruppen, lade Freunde ein, verwalte Mitglieder und chatte gleichzeitig mit mehreren Personen.</div>
-                </div>
-                <div class="lp-card">
-                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#ec4899,#db2777);">
-                        <i class="fas fa-image" style="color:#fff;"></i>
-                    </div>
-                    <div class="lp-card-title">Bilder & Sprachnachrichten</div>
-                    <div class="lp-card-desc">Teile Bilder direkt im Chat oder schicke Sprachnachrichten per Mikrofon – für Momente, bei denen Worte allein nicht reichen.</div>
-                </div>
-                <div class="lp-card">
-                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
-                        <i class="fas fa-bag-shopping" style="color:#fff;"></i>
-                    </div>
-                    <div class="lp-card-title">Premium Shop</div>
-                    <div class="lp-card-desc">Personalisiere deinen Chat mit exklusiven Themes, Name-Farben, Badges und Emoji-Paketen aus dem integrierten Shop.</div>
-                </div>
-                <div class="lp-card">
-                    <div class="lp-card-icon" style="background:linear-gradient(135deg,#06b6d4,#0284c7);">
-                        <i class="fas fa-moon" style="color:#fff;"></i>
-                    </div>
-                    <div class="lp-card-title">Dark Mode & Themes</div>
-                    <div class="lp-card-desc">Wähle zwischen Light und Dark Mode oder schalte farbige Premium-Hintergründe frei – dein Chat, dein Look.</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- BOTTOM CTA -->
-        <section class="lp-cta-block">
-            <h2>Bereit zu chatten?</h2>
-            <p>Kostenlos registrieren – in 30 Sekunden startklar.</p>
-            <div class="lp-cta-block-btns">
-                <button class="lp-cta-main" onclick="showView('registerView')">
-                    <i class="fas fa-rocket"></i> Jetzt kostenlos starten
-                </button>
-                <button class="lp-cta-sec" onclick="showView('loginView')">
-                    <i class="fas fa-right-to-bracket"></i> Ich habe schon einen Account
-                </button>
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="lp-footer">
-            <span>© 2025 John Chat · Privates Projekt</span>
-            <a onclick="openLegalModal('datenschutz')"><i class="fas fa-shield-halved"></i> Datenschutz</a>
-            <a onclick="openLegalModal('nutzung')"><i class="fas fa-file-lines"></i> Nutzungsbedingungen</a>
-            <a onclick="openLegalModal('kontakt')"><i class="fas fa-envelope"></i> Kontakt</a>
-        </footer>
-
     </div>
 
     <div id="bannedView" class="view hidden">
-        <h1 style="font-size: 3rem;"><i class="fas fa-circle-ban"></i></h1>
+        <h1 style="font-size: 3rem;"><i class="fas fa-ban"></i></h1>
         <h2>GESPERRT</h2>
         <p id="banMessage">Dein Account wurde permanent gesperrt.</p>
         <p id="banReasonDisplay" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-weight: bold;"></p>
@@ -1838,87 +758,60 @@
     </div>
 
     <div id="registerView" class="view hidden">
-        <div class="auth-orb auth-orb-1"></div>
-        <div class="auth-orb auth-orb-2"></div>
-        <div class="auth-orb auth-orb-3"></div>
-        <div class="auth-card">
-            <div class="auth-logo"><i class="fas fa-user-plus"></i></div>
-            <h1>Konto erstellen</h1>
-            <p class="auth-sub">Tritt John Chat bei &amp; chatte sicher</p>
-            <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7F\u00e4\u00f6\u00fc\u00c4\u00d6\u00dc\u00df]/g, '')">
-            <input type="password" id="regPass" placeholder="Passwort">
-            <input type="email" id="regEmail" placeholder="E-Mail Adresse">
-            <div class="agb-row">
-                <input type="checkbox" id="agbCheck">
-                <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln &amp; AGB</span></span>
-            </div>
-            <button onclick="register()" style="width:100%; margin-top:8px;">Konto erstellen</button>
-            <button onclick="showView('homeView')" class="secondary" style="margin-top:10px; width:100%;">
-                <i class="fas fa-arrow-left"></i> Zurück
-            </button>
-        
-            <div id="agbEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:inherit; padding:28px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center; overflow-y:auto; background:rgba(13,15,26,0.97); backdrop-filter:blur(20px);">
-                <h2 style="color:#a5b4fc; margin-top:0;"><i class="fas fa-file-lines"></i> Nutzungsbedingungen &amp; Regeln</h2>
-                <div class="agb-content">
-                    <div class="agb-item"><strong>1. Projektinfo</strong>John Chat ist ein privates Projekt. Die Nutzung erfolgt auf eigene Gefahr. Es besteht kein Anspruch auf Verfügbarkeit.</div>
-                    <div class="agb-item"><strong>2. Mindestalter</strong>Die Nutzung von John Chat setzt ein Mindestalter von 13 Jahren voraus.</div>
-                    <div class="agb-item"><strong>3. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Regelverstößen einzusehen und Maßnahmen zu ergreifen.</div>
-                    <div class="agb-item"><strong>4. Datenspeicherung</strong>Nachrichten und Bilder werden über Firebase (Google LLC, USA) verarbeitet. E-Mail-Adressen werden für die 2-Faktor-Authentifizierung gespeichert.</div>
-                    <div class="agb-item"><strong>5. Verhalten</strong>Respektloser Umgang, Beleidigungen, Diskriminierung oder Harassment führen zum sofortigen Ausschluss.</div>
-                    <div class="agb-item"><strong>6. Verbotene Inhalte</strong>Sexuelle, gewaltverherrlichende oder illegale Inhalte sind strikt verboten.</div>
-                    <div class="agb-item"><strong>7. Kontosperrung</strong>Der Betreiber kann Accounts ohne Angabe von Gründen sperren oder löschen.</div>
-                    <div class="agb-item"><strong>8. Haftung</strong>Der Betreiber übernimmt keine Haftung für Inhalte, die von Nutzern erstellt wurden, oder für technische Ausfälle.</div>
-                </div>
-                <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:0.78rem; color:rgba(255,255,255,0.36); text-align:left; line-height:1.5;">
-                    Betreiber: <strong>John</strong> · Kontakt: <a href="mailto:entspann.schick@gmail.com" style="color:#a5b4fc;">entspann.schick@gmail.com</a>
-                </div>
-                <button onclick="toggleAgb(false)" style="width:100%; margin-top:12px;">Schließen</button>
-            </div>
+        <h1>Konto erstellen</h1>
+        <input type="text" id="regUser" maxlength="10" placeholder="Benutzername (max. 10 Zeichen)" oninput="this.value = this.value.replace(/[^\x00-\x7FäöüÄÖÜß]/g, '')">
+        <input type="password" id="regPass" placeholder="Passwort">
+        <input type="email" id="regEmail" placeholder="E-Mail Adresse">
+        <div class="agb-row">
+            <input type="checkbox" id="agbCheck">
+            <span>Ich akzeptiere die <span class="info-blue" onclick="toggleAgb(true)">Regeln & AGB</span></span>
         </div>
-    </div>
-    <div id="loginView" class="view hidden">
-        <div class="auth-orb auth-orb-1"></div>
-        <div class="auth-orb auth-orb-2"></div>
-        <div class="auth-orb auth-orb-3"></div>
-        <div class="auth-card">
-            <div class="auth-logo"><i class="fas fa-comment-dots"></i></div>
-            <h1>Willkommen zurück</h1>
-            <p class="auth-sub">Melde dich bei John Chat an</p>
-
-            <input type="text" id="loginUser" placeholder="Benutzername">
-            <input type="password" id="loginPass" placeholder="Passwort">
-            
-            <div class="agb-row" style="justify-content: flex-start; background: transparent; padding-left: 0;">
-                <input type="checkbox" id="keepLogin">
-                <span style="color:rgba(255,255,255,0.62); font-size:0.88rem;">Angemeldet bleiben &amp; Push zulassen</span>
+        <button onclick="register()">Konto erstellen</button>
+        <button onclick="showView('homeView')" class="secondary" style="margin-top:10px;">Zurück</button>
+    
+        <div id="agbEmbed" class="hidden">
+            <h2 style="color:var(--main); margin-top:0;">Regeln & Nutzung</h2>
+            <div class="agb-content">
+                <div class="agb-item"><strong>1. Projekt-Status</strong>Dies ist ein privates Projekt (PV). Die Nutzung erfolgt auf eigene Gefahr.</div>
+                <div class="agb-item"><strong>2. Moderation</strong>Admins behalten sich das Recht vor, Chats bei gemeldeten Verstößen zu prüfen.</div>
+                <div class="agb-item"><strong>3. Datenspeicherung</strong>Bilder und Nachrichten werden über Firebase Storage/Database verarbeitet.</div>
+                <div class="agb-item"><strong>4. Verhalten</strong>Respektloser Umgang führt zum sofortigen Ausschluss.</div>
+                <div class="agb-item"><strong>5. Sicherheit</strong>John Chat Gewährleistet absolute Sicherheit.</div>
+                <div class="agb-item"><strong>6. Algemeine Regeln</strong>Sexuelle Inhalte sowie Beleidigungen sind verboten!</div>
             </div>
+            <button onclick="toggleAgb(false)" style="width:100%;">Schließen</button>
+         </div>
+    </div>
 
-            <button onclick="login()" style="width:100%; margin-top:8px;">
-                <i class="fas fa-right-to-bracket"></i> Einloggen
-            </button>
-            <button onclick="showForgotPassword()" style="width:100%; margin-top:10px;" class="secondary">
-                <i class="fas fa-key"></i> Passwort vergessen
-            </button>
-            <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:8px;">
-                <i class="fas fa-arrow-left"></i> Zurück
-            </button>
+    <div id="loginView" class="view hidden">
+        <h1>Login</h1>
+        <input type="text" id="loginUser" placeholder="Benutzername">
+        <input type="password" id="loginPass" placeholder="Passwort">
+        
+        <div class="agb-row" style="justify-content: flex-start; background: transparent; padding-left: 0;">
+            <input type="checkbox" id="keepLogin">
+            <span>Angemeldet bleiben & Push zulassen</span>
+        </div>
 
-            <!-- Passwort Vergessen Embed -->
-            <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(13,15,26,0.97); backdrop-filter:blur(20px); border-radius:inherit; padding:28px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
-                <h2 style="margin-top:0; color:#fff;"><i class="fas fa-unlock-keyhole" style="color:#a5b4fc;"></i> Passwort vergessen</h2>
-                <p style="font-size:0.9rem; color:rgba(255,255,255,0.48); margin-bottom:15px;">Gib deinen Benutzernamen und deine hinterlegte E-Mail-Adresse ein. Du erhältst dann deinen Zugangscode per E-Mail.</p>
-                <input type="text" id="forgotUser" placeholder="Benutzername *" style="margin-bottom:8px;">
-                <input type="email" id="forgotEmail" placeholder="E-Mail-Adresse *" style="margin-bottom:15px;">
-                <button onclick="submitForgotPassword()" style="width:100%;">Code per E-Mail senden</button>
-                <button onclick="hideForgotPassword()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+        <button onclick="login()" style="width:100%">Einloggen</button>
+        <button onclick="showForgotPassword()" style="width:100%; margin-top:10px; background:#888; color:white;">Passwort vergessen</button>
+        <button onclick="showView('homeView')" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
 
-                <!-- Erfolgs-Embed innerhalb Passwort vergessen -->
-                <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(13,15,26,0.98); border-radius:inherit; padding:28px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-                    <div style="font-size:3rem; margin-bottom:15px;">📧</div>
-                    <h2 style="color:#4ade80; margin-top:0;">E-Mail gesendet!</h2>
-                    <p style="color:rgba(255,255,255,0.48); font-size:0.9rem;">Wir haben dir eine E-Mail mit deinem Zugangscode zugesendet.</p>
-                    <button onclick="hideForgotPassword()" style="width:100%; margin-top:20px;">Zurück zum Login</button>
-                </div>
+        <!-- Passwort Vergessen Embed -->
+        <div id="forgotPasswordEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:20px; padding:25px; box-sizing:border-box; z-index:100; display:flex; flex-direction:column; justify-content:center;">
+            <h2 style="margin-top:0;"><i class="fas fa-key" style="color:var(--main);"></i> Passwort vergessen</h2>
+            <p style="font-size:0.9rem; color:#888; margin-bottom:15px;">Gib deinen Benutzernamen und deine hinterlegte E-Mail-Adresse ein. Du erhältst dann deinen Zugangscode per E-Mail.</p>
+            <input type="text" id="forgotUser" placeholder="Benutzername *" style="margin-bottom:8px;">
+            <input type="email" id="forgotEmail" placeholder="E-Mail-Adresse *" style="margin-bottom:15px;">
+            <button onclick="submitForgotPassword()" style="width:100%;">Code per E-Mail senden</button>
+            <button onclick="hideForgotPassword()" class="secondary" style="width:100%; margin-top:10px;">Zurück</button>
+
+            <!-- Erfolgs-Embed innerhalb Passwort vergessen -->
+            <div id="forgotSuccessEmbed" class="hidden" style="position:absolute; top:0; left:0; width:100%; height:100%; background:var(--cont); border-radius:20px; padding:25px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                <div style="font-size:3rem; margin-bottom:15px;">📧</div>
+                <h2 style="color:var(--success); margin-top:0;">E-Mail gesendet!</h2>
+                <p style="color:#888; font-size:0.9rem;">Wir haben dir eine E-Mail mit deinem Zugangscode zugesendet.</p>
+                <button onclick="hideForgotPassword()" style="width:100%; margin-top:20px;">Zurück zum Login</button>
             </div>
         </div>
     </div>
@@ -1927,26 +820,28 @@
 
         <!-- Desktop: Sidebar title row with 3-dots -->
         <div id="sidebarTitleRow">
-            <button id="btn3dots" onclick="openDotsMenu()" title="Menü"><i class="fas fa-bars"></i></button>
+            <button id="btn3dots" onclick="openDotsMenu()" title="Menü"><i class="fas fa-ellipsis-v"></i></button>
             <h2 id="sidebarTitle">John Chat</h2>
             <span style="width:34px;"></span><!-- spacer to center title -->
         </div>
 
         <!-- Desktop dropdown -->
         <div id="dotsDropdown" class="hidden">
-            <div class="dd-item" onclick="closeDotsMenu();showView('settingsView')"><i class="fas fa-gear" style="color:var(--txt)"></i>Einstellungen</div>
-            <div class="dd-item" onclick="closeDotsMenu();showView('shopView')"><i class="fas fa-bag-shopping" style="color:var(--gold)"></i>Shop</div>
-            <div class="dd-item" onclick="closeDotsMenu();showView('inboxView')"><i class="fas fa-inbox" style="color:var(--success)"></i>Postfach <span id="inboxBadgeMenu" style="background:var(--danger);color:#fff;border-radius:50%;padding:1px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span></div>
-            <div id="adminDotsBtn" class="dd-item hidden" onclick="closeDotsMenu();showView('adminPanelView')"><i class="fas fa-shield" style="color:var(--danger)"></i>Admin Panel</div>
-            <div class="dd-item" onclick="closeDotsMenu();confirmLogout()" style="color:var(--danger)"><i class="fas fa-right-from-bracket"></i>Abmelden</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('settingsView')"><i class="fas fa-cog" style="color:var(--txt)"></i>Einstellungen</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('gamesView')"><i class="fas fa-gamepad" style="color:#5865F2"></i>Games</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('shopView')"><i class="fas fa-store" style="color:var(--gold)"></i>Shop</div>
+            <div class="dd-item" onclick="closeDotsMenu();showView('inboxView')"><i class="fas fa-envelope" style="color:var(--success)"></i>Postfach <span id="inboxBadgeMenu" style="background:var(--danger);color:#fff;border-radius:50%;padding:1px 6px;font-size:0.65rem;font-weight:bold;display:none;margin-left:auto;"></span></div>
+            <div id="adminDotsBtn" class="dd-item hidden" onclick="closeDotsMenu();showView('adminPanelView')"><i class="fas fa-user-shield" style="color:var(--danger)"></i>Admin Panel</div>
+            <div class="dd-item" onclick="closeDotsMenu();confirmLogout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i>Abmelden</div>
         </div>
 
         <!-- Mobile: original floating icons (hidden on desktop via CSS) -->
-        <span id="adminBtn" class="admin-icon desktop-hide hidden" onclick="showView('adminPanelView')"><i class="fas fa-shield"></i></span>
-        <span class="shop-icon desktop-hide" onclick="showView('shopView')" title="Shop"><i class="fas fa-bag-shopping"></i></span>
-        <span class="inbox-icon desktop-hide" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-inbox"></i></span>
+        <span id="adminBtn" class="admin-icon desktop-hide hidden" onclick="showView('adminPanelView')"><i class="fas fa-user-shield"></i></span>
+        <span class="games-icon desktop-hide" onclick="showView('gamesView')" title="Spiele"><i class="fas fa-gamepad"></i></span>
+        <span class="shop-icon desktop-hide" onclick="showView('shopView')" title="Shop"><i class="fas fa-store"></i></span>
+        <span class="inbox-icon desktop-hide" onclick="showView('inboxView')" title="Postfach"><i class="fas fa-envelope"></i></span>
         <span class="inbox-badge desktop-hide" id="inboxBadge"></span>
-        <span class="settings-icon desktop-hide" onclick="showView('settingsView')"><i class="fas fa-gear"></i></span>
+        <span class="settings-icon desktop-hide" onclick="showView('settingsView')"><i class="fas fa-cog"></i></span>
         
         <h2 id="userGreeting">Hi</h2>
         
@@ -1965,17 +860,17 @@
 
     <!-- Desktop right-panel placeholder -->
     <div id="desktopPlaceholder">
-        <i class="fas fa-comments" style="font-size:3.5rem;"></i>
+        <i class="fas fa-comment-dots" style="font-size:3.5rem;"></i>
         <p style="margin:0;font-size:1rem;">Wähle einen Chat aus</p>
         <p style="margin:0;font-size:0.82rem;">Deine Nachrichten erscheinen hier</p>
     </div>
 
     <div id="adminPanelView" class="view view-large hidden">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <h2 style="color: var(--danger); margin:0;"><i class="fas fa-shield"></i> Admin Panel</h2>
+            <h2 style="color: var(--danger); margin:0;"><i class="fas fa-user-shield"></i> Admin Panel</h2>
             <div style="display:flex; gap:8px;">
-                <button onclick="triggerUpdateAnnouncement()" style="padding:8px 12px; font-size:0.85rem; background:var(--success); color:white;" title="Update ankündigen"><i class="fas fa-circle-arrow-down"></i> Update</button>
-                <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-arrows-rotate"></i> Refresh</button>
+                <button onclick="triggerUpdateAnnouncement()" style="padding:8px 12px; font-size:0.85rem; background:var(--success); color:white;" title="Update ankündigen"><i class="fas fa-download"></i> Update</button>
+                <button onclick="location.reload()" class="secondary" style="padding:8px 12px; font-size:0.85rem;" title="Seite aktualisieren"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
         
@@ -2004,8 +899,8 @@
     </div>
 
     <!-- SIGN OUT ALL DEVICES CONFIRM EMBED -->
-    <div id="signOutAllEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--danger); border-radius:8px; padding:14px 20px; z-index:10002; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:280px; max-width:350px;">
-        <p style="margin:0 0 8px 0; font-size:0.9rem; font-weight:bold; color:var(--danger);"><i class="fas fa-right-from-bracket"></i> Von allen Geräten abmelden?</p>
+    <div id="signOutAllEmbed" class="hidden" style="position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--cont); border:2px solid var(--danger); border-radius:16px; padding:14px 20px; z-index:10002; box-shadow:0 8px 25px rgba(0,0,0,0.25); text-align:center; min-width:280px; max-width:350px;">
+        <p style="margin:0 0 8px 0; font-size:0.9rem; font-weight:bold; color:var(--danger);"><i class="fas fa-sign-out-alt"></i> Von allen Geräten abmelden?</p>
         <p style="margin:0 0 12px 0; font-size:0.8rem; color:#888;">Alle aktiven Sitzungen werden sofort beendet.</p>
         <div style="display:flex; gap:10px; justify-content:center;">
             <button onclick="executeSignOutAllDevices()" class="danger" style="padding:8px 18px; font-size:0.85rem;">✓ Ja, abmelden</button>
@@ -2024,7 +919,7 @@
             </div>
 
             <div style="margin-bottom:15px; background: rgba(255,71,87,0.06); padding:10px; border-radius:10px; border:1px solid rgba(255,71,87,0.2);">
-                <strong style="font-size:0.85rem;"><i class="fas fa-unlock-keyhole"></i> Passwort</strong>
+                <strong style="font-size:0.85rem;"><i class="fas fa-key"></i> Passwort</strong>
                 <p id="adminUserPasswordDisplay" style="margin:5px 0; font-family:monospace; font-size:1rem; letter-spacing:1px; color:var(--txt); background:var(--hover); padding:6px 10px; border-radius:8px; word-break:break-all;">–</p>
                 <div style="display:flex; gap:6px; margin-top:6px;">
                     <input type="text" id="adminNewPasswordInput" placeholder="Neues Passwort..." style="margin:0; font-size:0.85rem;">
@@ -2067,7 +962,7 @@
                     </div>
                 </div>
 
-                <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-inbox"></i> Nachricht senden</button>
+                <button onclick="openAdminMsgModal()" class="secondary" style="background:var(--main); color:white;"><i class="fas fa-envelope"></i> Nachricht senden</button>
                 <button onclick="closeAdminAction()" class="secondary">Abbrechen</button>
             </div>
         </div>
@@ -2075,7 +970,7 @@
 
     <div id="adminMsgModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3><i class="fas fa-inbox" style="color:var(--main);"></i> Nachricht senden</h3>
+            <h3><i class="fas fa-envelope" style="color:var(--main);"></i> Nachricht senden</h3>
             <p style="font-size:0.85rem; color:#888; margin:0 0 10px 0;">An: <b id="adminMsgTarget">-</b></p>
             <input type="text" id="adminMsgTitle" placeholder="Betreff / Titel..." maxlength="60">
             <textarea id="adminMsgBody" placeholder="Nachrichtentext..." rows="4" style="resize:none;"></textarea>
@@ -2179,7 +1074,7 @@
             <h3 id="chatWithTitle" style="margin:0; font-size:1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">Chat</h3>
             <div style="display:flex; gap:5px;">
                 <button id="reportChatBtn" class="secondary" onclick="openReportModal()" style="font-size:1rem; padding:8px; color:#ff9f43;"><i class="fas fa-exclamation-triangle"></i></button>
-                <button id="groupSettingsBtn" class="secondary hidden" onclick="openGroupSettings()" style="font-size:1rem; padding: 8px;"><i class="fas fa-gear"></i></button>
+                <button id="groupSettingsBtn" class="secondary hidden" onclick="openGroupSettings()" style="font-size:1rem; padding: 8px;"><i class="fas fa-cog"></i></button>
                 <button id="groupInfoBtn" class="secondary hidden" onclick="openGroupInfo()" style="font-size:1rem; padding: 8px;"><i class="fas fa-info-circle"></i></button>
                 <button id="leaveBtn" class="danger hidden" onclick="confirmLeaveGroup()" style="font-size:0.8rem; padding: 8px;">Verlassen</button>
             </div>
@@ -2200,14 +1095,14 @@
                         <span class="reply-from" id="replyFromName"></span>
                         <span class="reply-text" id="replyPreviewText"></span>
                     </div>
-                    <button class="reply-cancel-btn" onclick="clearReply()"><i class="fas fa-xmark"></i></button>
+                    <button class="reply-cancel-btn" onclick="clearReply()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="chat-input-wrapper" id="chatInputWrapper">
                     <input type="text" id="chatInput" placeholder="Nachricht..." oninput="handleTyping()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
                     <div class="recording-bar" id="recordingBar">
                         <span class="rec-dot"></span>
                         <span class="rec-timer" id="recTimer">0:00 / 0:14</span>
-                        <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-xmark"></i></button>
+                        <button class="rec-cancel" onclick="cancelVoiceRecording()" title="Abbrechen"><i class="fas fa-times"></i></button>
                         <button class="rec-send" id="recSendBtn" onclick="sendVoiceMessage()" title="Senden" disabled><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -2227,7 +1122,7 @@
 
         <!-- APK DOWNLOAD -->
         <a href="https://github.com/johnkuhl2012-arch/Web/releases/download/V1.0/John-Chat.apk" download="John-Chat.apk" style="display:block; margin-bottom:12px; flex-shrink:0; text-decoration:none;">
-            <button style="width:100%; background:#43b581; font-size:0.95rem; border-radius:12px; padding:12px;"><i class="fas fa-circle-arrow-down"></i> John Chat App herunterladen</button>
+            <button style="width:100%; background:#43b581; font-size:0.95rem; border-radius:12px; padding:12px;"><i class="fas fa-download"></i> John Chat App herunterladen</button>
         </a>
 
         <!-- TABS -->
@@ -2271,17 +1166,17 @@
             </div>
 
             <!-- 2FA EMBED (Aktivieren) -->
-            <div id="twoFactorEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:5000;">
-                <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <div id="twoFactorEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5000;">
+                <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
                     <div id="twoFactorStep1" class="">
-                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-lock"></i> 2FA Aktivieren</h3>
+                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-shield-alt"></i> 2FA Aktivieren</h3>
                         <p style="font-size:0.9rem;">Ein 6-stelliger Code wird an deine hinterlegte Email-Adresse gesendet. Bitte überprüfe dein Postfach.</p>
                         <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Der Code ist <b>5 Minuten</b> gültig.</p>
-                        <button onclick="send2FACode('enable')" style="width:100%; margin-bottom:8px;"><i class="fas fa-inbox"></i> Code senden</button>
+                        <button onclick="send2FACode('enable')" style="width:100%; margin-bottom:8px;"><i class="fas fa-envelope"></i> Code senden</button>
                         <button onclick="close2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
                     </div>
                     <div id="twoFactorStep2" class="hidden">
-                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
+                        <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
                         <p style="font-size:0.9rem;">Bitte gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                         <input type="number" id="twoFactorCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                         <div id="twoFactorCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -2292,16 +1187,16 @@
             </div>
 
             <!-- 2FA EMBED (Deaktivieren) -->
-            <div id="twoFactorDisableEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:5000;">
-                <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <div id="twoFactorDisableEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5000;">
+                <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
                     <div id="twoFactorDisableStep1" class="">
-                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-lock"></i> 2FA Deaktivieren</h3>
+                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-shield-alt"></i> 2FA Deaktivieren</h3>
                         <p style="font-size:0.9rem;">Um 2FA zu deaktivieren, musst du deinen Code per Email bestätigen.</p>
-                        <button onclick="send2FACode('disable')" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-inbox"></i> Code senden</button>
+                        <button onclick="send2FACode('disable')" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-envelope"></i> Code senden</button>
                         <button onclick="close2FADisableEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
                     </div>
                     <div id="twoFactorDisableStep2" class="hidden">
-                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
+                        <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
                         <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                         <input type="number" id="twoFactorDisableCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                         <div id="twoFactorDisableCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -2350,10 +1245,10 @@
 
             <!-- EMAIL ANZEIGE -->
             <div style="border:1px solid var(--main); border-radius:12px; padding:14px; margin-bottom:12px; background:rgba(88,101,242,0.04);">
-                <h3 style="margin:0 0 8px 0; font-size:1rem;"><i class="fas fa-inbox" style="color:var(--main);"></i> Deine Email-Adresse</h3>
+                <h3 style="margin:0 0 8px 0; font-size:1rem;"><i class="fas fa-envelope" style="color:var(--main);"></i> Deine Email-Adresse</h3>
                 <p style="font-size:0.78rem; color:#888; margin:0 0 10px 0;"><i class="fas fa-lock"></i> Email ist Pflicht und kann nur geändert, nicht entfernt werden.</p>
                 <div style="display:flex; align-items:center; gap:8px; background:var(--hover); border-radius:10px; padding:10px 12px; margin-bottom:10px;">
-                    <i class="fas fa-inbox" style="color:var(--main);"></i>
+                    <i class="fas fa-envelope" style="color:var(--main);"></i>
                     <span id="emailTabMasked" style="font-size:0.9rem; font-family:monospace; flex:1; word-break:break-all;">••••••••••</span>
                     <button onclick="toggleEmailVisibility()" id="emailTabToggleBtn" class="secondary" style="padding:5px 10px; font-size:0.78rem; border-radius:8px; flex-shrink:0;">Anzeigen</button>
                 </div>
@@ -2370,15 +1265,15 @@
                 <div style="background:rgba(255,71,87,0.05); border:1px solid rgba(255,71,87,0.2); border-radius:10px; padding:10px; margin-bottom:12px;">
                     <p style="font-size:0.78rem; font-weight:bold; color:var(--danger); margin:0 0 8px 0;"><i class="fas fa-lock"></i> Pflicht – kann nicht deaktiviert werden</p>
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,71,87,0.15);">
-                        <span style="font-size:0.85rem;"><i class="fas fa-lock" style="color:var(--main); width:16px; margin-right:5px;"></i>2FA Code (Aktivierung &amp; Deaktivierung)</span>
+                        <span style="font-size:0.85rem;"><i class="fas fa-shield-alt" style="color:var(--main); width:16px; margin-right:5px;"></i>2FA Code (Aktivierung &amp; Deaktivierung)</span>
                         <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,71,87,0.15);">
-                        <span style="font-size:0.85rem;"><i class="fas fa-unlock-keyhole" style="color:#e67e22; width:16px; margin-right:5px;"></i>Passwort geändert</span>
+                        <span style="font-size:0.85rem;"><i class="fas fa-key" style="color:#e67e22; width:16px; margin-right:5px;"></i>Passwort geändert</span>
                         <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0;">
-                        <span style="font-size:0.85rem;"><i class="fas fa-right-to-bracket" style="color:var(--success); width:16px; margin-right:5px;"></i>In Account eingeloggt</span>
+                        <span style="font-size:0.85rem;"><i class="fas fa-sign-in-alt" style="color:var(--success); width:16px; margin-right:5px;"></i>In Account eingeloggt</span>
                         <input type="checkbox" checked disabled style="width:18px;height:18px;margin:0;opacity:0.5;cursor:not-allowed;">
                     </div>
                 </div>
@@ -2399,7 +1294,7 @@
                     <input type="checkbox" id="enotif-bundlePurchase" checked onchange="saveEmailNotifSetting('bundlePurchase', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
-                    <span style="font-size:0.85rem;"><i class="fas fa-circle-ban" style="color:var(--danger); width:16px; margin-right:5px;"></i>Account gesperrt / entsperrt</span>
+                    <span style="font-size:0.85rem;"><i class="fas fa-ban" style="color:var(--danger); width:16px; margin-right:5px;"></i>Account gesperrt / entsperrt</span>
                     <input type="checkbox" id="enotif-banStatus" checked onchange="saveEmailNotifSetting('banStatus', this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;">
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--brd);">
@@ -2474,7 +1369,7 @@
     <!-- INBOX VIEW -->
     <div id="inboxView" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; flex-shrink:0;">
-            <h2 style="margin:0;"><i class="fas fa-inbox" style="color:var(--success);"></i> Postfach</h2>
+            <h2 style="margin:0;"><i class="fas fa-envelope" style="color:var(--success);"></i> Postfach</h2>
             <button onclick="clearInbox()" class="danger" style="font-size:0.75rem; padding:6px 12px;">Alle löschen</button>
         </div>
         <div class="scroll-area" id="inboxList" style="padding-right:5px;">
@@ -2486,7 +1381,7 @@
     <!-- SHOP VIEW -->
     <div id="gamesView" class="view hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2 style="margin:0;"><i class="fas fa-dice-five" style="color:#5865F2;"></i> Spiele</h2>
+            <h2 style="margin:0;"><i class="fas fa-gamepad" style="color:#5865F2;"></i> Spiele</h2>
             <button onclick="showView('mainView')" class="secondary" style="padding:7px 14px; font-size:0.85rem;"><i class="fas fa-chevron-left"></i> Zurück</button>
         </div>
         <p style="font-size:0.82rem; color:#888; margin:0 0 15px 0;">Spiele direkt mit deinen John Chat Freunden.</p>
@@ -2495,7 +1390,7 @@
         <div onclick="window.open('https://john-chat-game-tictactoe.netlify.app', '_blank')"
              style="
                 border: 2px solid #5865F2;
-                border-radius: 8px;
+                border-radius: 18px;
                 padding: 20px;
                 background: linear-gradient(135deg, rgba(88,101,242,0.08), rgba(88,101,242,0.03));
                 cursor: pointer;
@@ -2509,7 +1404,7 @@
             <div style="position:absolute; top:-15px; right:-10px; font-size:5.5rem; opacity:0.07; pointer-events:none;">❌⭕</div>
             <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
                 <div style="
-                    width: 52px; height: 52px; border-radius: 6px;
+                    width: 52px; height: 52px; border-radius: 14px;
                     background: linear-gradient(135deg, #5865F2, #7289DA);
                     display: flex; align-items: center; justify-content: center;
                     font-size: 1.7rem; flex-shrink: 0;
@@ -2522,14 +1417,14 @@
                 <div style="margin-left:auto; color:#5865F2; font-size:1.1rem;"><i class="fas fa-chevron-right"></i></div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <span style="background:rgba(88,101,242,0.12); color:#5865F2; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600;">👥 Freundes Spiel</span>
-                <span style="background:rgba(67,181,129,0.12); color:#43b581; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🤖 Solo vs KI</span>
-                <span style="background:rgba(255,159,67,0.12); color:#ff9f43; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🔍 Spielsuche</span>
+                <span style="background:rgba(88,101,242,0.12); color:#5865F2; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">👥 Freundes Spiel</span>
+                <span style="background:rgba(67,181,129,0.12); color:#43b581; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🤖 Solo vs KI</span>
+                <span style="background:rgba(255,159,67,0.12); color:#ff9f43; border-radius:50px; padding:4px 10px; font-size:0.75rem; font-weight:600;">🔍 Spielsuche</span>
             </div>
         </div>
 
         <!-- Placeholder mehr Spiele -->
-        <div style="margin-top:15px; border: 2px dashed var(--brd); border-radius: 8px; padding: 22px; text-align:center; color:#aaa;">
+        <div style="margin-top:15px; border: 2px dashed var(--brd); border-radius: 18px; padding: 22px; text-align:center; color:#aaa;">
             <div style="font-size:2rem; margin-bottom:6px;">🕹️</div>
             <div style="font-size:0.88rem; font-weight:600; color:#bbb;">Mehr Spiele bald verfügbar</div>
             <div style="font-size:0.75rem; margin-top:4px; color:#ccc;">Stay tuned!</div>
@@ -2538,7 +1433,7 @@
 
     <div id="shopView" class="view view-large hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <h2 style="margin:0;"><i class="fas fa-bag-shopping" style="color:var(--gold);"></i> Shop</h2>
+            <h2 style="margin:0;"><i class="fas fa-store" style="color:var(--gold);"></i> Shop</h2>
             <div style="text-align:right;">
                 <span style="font-size:0.8rem; color:#888;">Guthaben:</span><br>
                 <span id="shopBalanceDisplay" style="color:var(--success); font-weight:bold;">0.00€</span>
@@ -2841,7 +1736,7 @@
             <h2 style="margin-top:0; color:var(--danger);">Benutzer blockieren?</h2>
             <p><b id="blockTargetName"></b> wird aus deiner Freundesliste entfernt und kann dir keine Nachrichten mehr schicken.</p>
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
-                <button class="danger" onclick="executeBlock()"><i class="fas fa-circle-ban"></i> Blockieren</button>
+                <button class="danger" onclick="executeBlock()"><i class="fas fa-ban"></i> Blockieren</button>
                 <button onclick="document.getElementById('blockConfirmModal').classList.add('hidden')" class="secondary">Abbrechen</button>
             </div>
         </div>
@@ -3262,8 +2157,8 @@
             const msgs = Object.entries(data).sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0));
             list.innerHTML = msgs.map(([id, m]) => `
                 <div class="inbox-msg-card">
-                    <button class="inbox-delete-btn" onclick="deleteInboxMsg('${id}')"><i class="fas fa-xmark"></i></button>
-                    <div class="inbox-msg-from"><i class="fas fa-shield" style="color:var(--main);"></i> ${m.from || 'System'}</div>
+                    <button class="inbox-delete-btn" onclick="deleteInboxMsg('${id}')"><i class="fas fa-times"></i></button>
+                    <div class="inbox-msg-from"><i class="fas fa-user-shield" style="color:var(--main);"></i> ${m.from || 'System'}</div>
                     <div class="inbox-msg-title">${m.title || '(Kein Betreff)'}</div>
                     <div class="inbox-msg-body">${m.body || ''}</div>
                     <span class="inbox-msg-time">${m.timestamp ? new Date(m.timestamp).toLocaleString('de-DE') : ''}</span>
@@ -3682,7 +2577,7 @@
                         ${formatName(s)} addet dich 
                         <div class="action-btn-group">
                               <button onclick="accept('${s}')" style="padding:5px 10px;"><i class="fas fa-check"></i></button>
-                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;"><i class="fas fa-xmark"></i></button>
+                            <button class="danger" onclick="deny('${s}')" style="padding:5px 10px;"><i class="fas fa-times"></i></button>
                         </div>
                       </div>`;
                 });
@@ -3699,7 +2594,7 @@
                             <img class="pfp" id="pfp-view-${f}" src="${pfpSrc}" style="${pfpStyle}">
                             <span><span id="fname-${f}">${formatName(f)}</span> <span class="unread-badge" id="badge-${cid}">0</span></span>
                         </div>
-                        <button class="three-dot-btn" onclick="openContextSheet('friend','${f}','${f}')"><i class="fas fa-bars"></i></button>
+                        <button class="three-dot-btn" onclick="openContextSheet('friend','${f}','${f}')"><i class="fas fa-ellipsis-v"></i></button>
                       </div>`;
                     watchChat(cid, 'private', f); 
                     loadPfp(f);
@@ -3723,7 +2618,7 @@
                                     ${iconHTML}
                                     <span>${gName} <span class="unread-badge" id="badge-${gid}">0</span></span>
                                 </div>
-                                <button class="three-dot-btn" onclick="openContextSheet('group','${gid}','${gName}')"><i class="fas fa-bars"></i></button>
+                                <button class="three-dot-btn" onclick="openContextSheet('group','${gid}','${gName}')"><i class="fas fa-ellipsis-v"></i></button>
                             </div>`;
                             
                             watchChat(gid, 'group', gName);
@@ -4245,7 +3140,7 @@
             let badgeHTML = '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">';
             purchasedBundles.forEach(bid => {
                 const def = BUNDLE_DEFS[bid];
-                if(def) badgeHTML += `<span style="background:var(--main); color:white; border-radius:8px; padding:3px 10px; font-size:0.75rem; font-weight:bold;">${def.name}</span>`;
+                if(def) badgeHTML += `<span style="background:var(--main); color:white; border-radius:20px; padding:3px 10px; font-size:0.75rem; font-weight:bold;">${def.name}</span>`;
             });
             badgeHTML += '</div>';
             container.innerHTML += badgeHTML;
@@ -4261,7 +3156,7 @@
                     });
                 });
                 let emojiHTML = '<p style="font-size:0.8rem; font-weight:bold; margin:8px 0 5px 0;">Custom Emoji:</p><div class="plus-options" id="emojiSelector">';
-                emojiHTML += `<div class="plus-option-item ${myEmoji==='' ? 'active-selection':''}" data-val="" onclick="setEmoji('')"><i class="fas fa-circle-ban"></i></div>`;
+                emojiHTML += `<div class="plus-option-item ${myEmoji==='' ? 'active-selection':''}" data-val="" onclick="setEmoji('')"><i class="fas fa-ban"></i></div>`;
                 emojiOrder.forEach(em => {
                     if(emojis.has(em)) {
                         emojiHTML += `<div class="plus-option-item ${myEmoji===em ? 'active-selection':''}" data-val="${em}" onclick="setEmoji('${em}')">${em}</div>`;
@@ -4300,7 +3195,7 @@
             }
 
             container.innerHTML += `<div style="border-top:1px dashed var(--gold); margin-top:10px; padding-top:8px;">
-                <p style="font-size:0.8rem; text-align:center; color:#888; margin:0;">Weitere Pakete im <b onclick="showView('shopView')" style="color:var(--gold);cursor:pointer;"><i class="fas fa-bag-shopping"></i> Shop</b></p>
+                <p style="font-size:0.8rem; text-align:center; color:#888; margin:0;">Weitere Pakete im <b onclick="showView('shopView')" style="color:var(--gold);cursor:pointer;"><i class="fas fa-store"></i> Shop</b></p>
             </div>`;
         }
         
@@ -4559,8 +3454,8 @@
                     const name = b.key;
                     list.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px solid var(--brd);">
-                        <span style="font-size:0.9rem;"><i class="fas fa-circle-ban" style="color:var(--danger); margin-right:6px;"></i>${formatName(name)}</span>
-                        <button onclick="unblockUser('${name}')" class="secondary" style="font-size:0.78rem; padding:5px 10px; border-radius:8px;">Entsperren</button>
+                        <span style="font-size:0.9rem;"><i class="fas fa-ban" style="color:var(--danger); margin-right:6px;"></i>${formatName(name)}</span>
+                        <button onclick="unblockUser('${name}')" class="secondary" style="font-size:0.78rem; padding:5px 10px; border-radius:20px;">Entsperren</button>
                     </div>`;
                 });
             });
@@ -5512,7 +4407,7 @@
                 .body h2{color:#5865F2;font-size:1.15rem;margin-top:0;}
                 .box{background:#f0f2f5;border-radius:12px;padding:15px 18px;margin:16px 0;border-left:4px solid #5865F2;font-size:0.95rem;color:#444;}
                 .footer{background:#f8f9fa;padding:16px 30px;text-align:center;color:#999;font-size:0.8rem;border-top:1px solid #eee;}
-                .badge{display:inline-block;background:#5865F2;color:#fff;border-radius:8px;padding:3px 12px;font-size:0.78rem;font-weight:bold;margin-bottom:10px;}
+                .badge{display:inline-block;background:#5865F2;color:#fff;border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:bold;margin-bottom:10px;}
             </style></head><body>
             <div class="wrap">
                 <div class="header"><div class="logo">💬</div><h1>John Chat</h1></div>
@@ -5658,7 +4553,7 @@
                 toggleBtn.classList.add('danger');
                 toggleBtn.classList.remove('green-btn');
             } else {
-                statusText.innerHTML = '<span style="color:#888;"><i class="fas fa-xmark-circle"></i> Deaktiviert</span>';
+                statusText.innerHTML = '<span style="color:#888;"><i class="fas fa-times-circle"></i> Deaktiviert</span>';
                 toggleBtn.innerText = 'Aktivieren';
                 toggleBtn.classList.remove('danger');
                 toggleBtn.classList.add('green-btn');
@@ -6744,20 +5639,20 @@
                 const cid = [currentUser, id].sort().join("_");
                 const isMuted = mutedChats[cid] === true;
                 const isOwner = id.toLowerCase() === OWNER_NAME;
-                items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comments" style="color:var(--main);"></i> Chat öffnen</div>`;
-                items += `<div class="context-sheet-item" onclick="openNicknameModal('${id}', '${name}'); closeContextSheet()"><i class="fas fa-pen-clip" style="color:var(--main);"></i> Anzeigename ändern</div>`;
+                items += `<div class="context-sheet-item" onclick="openChat('${id}', false); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="openNicknameModal('${id}', '${name}'); closeContextSheet()"><i class="fas fa-tag" style="color:var(--main);"></i> Anzeigename ändern</div>`;
                 items += `<div class="context-sheet-item" onclick="toggleMute('${cid}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
                 if(!isOwner) {
                     items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${cid}', 'user', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
-                    items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-circle-ban"></i> Blockieren</div>`;
+                    items += `<div class="context-sheet-item danger-item" onclick="askBlock('${id}'); closeContextSheet()"><i class="fas fa-ban"></i> Blockieren</div>`;
                 }
                 items += `<div class="context-sheet-item danger-item" onclick="askUnfriend('${id}'); closeContextSheet()"><i class="fas fa-user-times"></i> Entfreunden</div>`;
             } else if(type === 'group') {
                 const isMuted = mutedChats[id] === true;
-                items += `<div class="context-sheet-item" onclick="openChat('${id}', true, '${name}'); closeContextSheet()"><i class="fas fa-comments" style="color:var(--main);"></i> Chat öffnen</div>`;
+                items += `<div class="context-sheet-item" onclick="openChat('${id}', true, '${name}'); closeContextSheet()"><i class="fas fa-comment-dots" style="color:var(--main);"></i> Chat öffnen</div>`;
                 items += `<div class="context-sheet-item" onclick="toggleMute('${id}'); closeContextSheet()"><i class="fas fa-${isMuted ? 'bell' : 'bell-slash'}" style="color:#888;"></i> ${isMuted ? 'Stummschaltung aufheben' : 'Stummschalten'}</div>`;
                 items += `<div class="context-sheet-item warn-item" onclick="openReportModal('${id}', 'group', '${name}'); closeContextSheet()"><i class="fas fa-exclamation-triangle"></i> Melden</div>`;
-                items += `<div class="context-sheet-item danger-item" onclick="confirmLeaveGroupById('${id}', '${name}'); closeContextSheet()"><i class="fas fa-right-from-bracket"></i> Gruppe verlassen</div>`;
+                items += `<div class="context-sheet-item danger-item" onclick="confirmLeaveGroupById('${id}', '${name}'); closeContextSheet()"><i class="fas fa-sign-out-alt"></i> Gruppe verlassen</div>`;
             }
 
             document.getElementById('contextSheetItems').innerHTML = items;
@@ -6960,17 +5855,17 @@
     </script>
 
     <!-- EMAIL LÖSCHEN MIT 2FA BESTÄTIGUNG -->
-    <div id="deleteEmailWith2FAEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:99998;">
-        <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--danger);">
+    <div id="deleteEmailWith2FAEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99998;">
+        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--danger);">
             <div id="deleteEmail2FAStep1">
                 <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-exclamation-triangle"></i> Email entfernen</h3>
                 <p style="font-size:0.9rem;">Da <b>2FA aktiviert</b> ist, musst du das Entfernen der Email per Code bestätigen.</p>
                 <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">⚠️ 2FA wird dabei automatisch deaktiviert.</p>
-                <button onclick="sendDeleteEmail2FACode()" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-inbox"></i> Bestätigungscode senden</button>
+                <button onclick="sendDeleteEmail2FACode()" style="width:100%; margin-bottom:8px;" class="danger"><i class="fas fa-envelope"></i> Bestätigungscode senden</button>
                 <button onclick="closeDeleteEmail2FAEmbed()" class="secondary" style="width:100%;">Abbrechen</button>
             </div>
             <div id="deleteEmail2FAStep2" class="hidden">
-                <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
+                <h3 style="color:var(--danger); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
                 <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                 <input type="number" id="deleteEmail2FACodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="deleteEmail2FATimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -6981,22 +5876,22 @@
     </div>
 
     <!-- 2FA LOGIN EMBED - Außerhalb aller Views, immer sichtbar wenn aktiv -->
-    <div id="twoFactorLoginEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7)); display:flex; justify-content:center; align-items:center; z-index:99999;">
-        <div style="background:var(--cont); padding:30px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
-            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-lock"></i> Zwei-Faktor-Authentifizierung</h2>
+    <div id="twoFactorLoginEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99999;">
+        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
+            <h2 style="color:var(--main); margin-top:0;"><i class="fas fa-shield-alt"></i> Zwei-Faktor-Authentifizierung</h2>
             <p style="font-size:0.9rem;">Wir haben einen 6-stelligen Code an deine Email-Adresse gesendet.</p>
             <p style="font-size:0.8rem; color:#888;">Der Code ist <b>5 Minuten</b> gültig.</p>
             <input type="number" id="twoFactorLoginCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:15px 0;">
             <div id="twoFactorLoginTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
-            <button onclick="verifyLoginCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-right-to-bracket"></i> Anmelden</button>
-            <button onclick="resendLoginCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-rotate-right"></i> Code erneut senden</button>
+            <button onclick="verifyLoginCode()" style="width:100%; margin-bottom:8px;" class="green-btn"><i class="fas fa-sign-in-alt"></i> Anmelden</button>
+            <button onclick="resendLoginCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-redo"></i> Code erneut senden</button>
             <button onclick="cancelLogin2FA()" class="danger" style="width:100%; font-size:0.85rem;">Abmelden</button>
         </div>
     </div>
 
     <!-- EMAIL VERKNÜPFT BESTÄTIGUNGS-EMBED -->
-    <div id="emailLinkedEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:99998;">
-        <div style="background:var(--cont); padding:30px; border-radius:8px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--success);">
+    <div id="emailLinkedEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99998;">
+        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:2px solid var(--success);">
             <div style="font-size:3rem; margin-bottom:10px;">✅</div>
             <h2 style="color:var(--success); margin-top:0;">Email verknüpft!</h2>
             <p style="font-size:0.9rem;">Wir haben eine Bestätigungsmail an</p>
@@ -7008,12 +5903,12 @@
     </div>
 
     <!-- UPDATE OVERLAY - shown to all users -->
-    <div id="updateOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92)); display:flex; justify-content:center; align-items:center; z-index:999999;">
-        <div style="background:var(--cont); padding:35px 30px; border-radius:10px; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid var(--success);">
+    <div id="updateOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); backdrop-filter:blur(10px); display:flex; justify-content:center; align-items:center; z-index:999999;">
+        <div style="background:var(--cont); padding:35px 30px; border-radius:24px; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid var(--success);">
             <div style="font-size:3rem; margin-bottom:12px;">🔄</div>
             <h2 style="color:var(--success); margin:0 0 8px 0;">Update verfügbar</h2>
             <p style="font-size:0.95rem; color:var(--txt); margin:0 0 20px 0;">Aktualisiere die Seite, um die neueste Version von John Chat zu laden.</p>
-            <button onclick="location.reload()" style="width:100%; background:var(--success); color:white; font-size:1rem; padding:14px; border-radius:6px;"><i class="fas fa-rotate-right"></i> Reload</button>
+            <button onclick="location.reload()" style="width:100%; background:var(--success); color:white; font-size:1rem; padding:14px; border-radius:14px;"><i class="fas fa-redo"></i> Reload</button>
         </div>
     </div>
 
@@ -7028,8 +5923,8 @@
     </div>
 
     <!-- EMAIL PFLICHT POPUP (für Accounts ohne Email) -->
-    <div id="emailRequiredEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85)); display:flex; justify-content:center; align-items:center; z-index:99997;">
-        <div style="background:var(--cont); padding:30px; border-radius:8px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
+    <div id="emailRequiredEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99997;">
+        <div style="background:var(--cont); padding:30px; border-radius:20px; max-width:370px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.4); border:2px solid var(--main);">
             <div style="font-size:2.5rem; margin-bottom:10px;">📧</div>
             <h2 style="color:var(--main); margin-top:0;">Email erforderlich</h2>
             <p style="font-size:0.9rem; color:#888;">Um John Chat nutzen zu können, musst du eine gültige E-Mail-Adresse hinterlegen und bestätigen.</p>
@@ -7042,24 +5937,24 @@
                 <input type="number" id="emailRequiredCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="emailRequiredTimer" style="font-size:0.8rem; color:#888; margin-bottom:8px;"></div>
                 <button onclick="verifyEmailRequiredCode()" style="width:100%; margin-bottom:8px;" class="green-btn">Email bestätigen</button>
-                <button onclick="resendEmailRequiredCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-rotate-right"></i> Code erneut senden</button>
+                <button onclick="resendEmailRequiredCode()" class="secondary" style="width:100%; margin-bottom:8px; font-size:0.85rem;"><i class="fas fa-redo"></i> Code erneut senden</button>
                 <button onclick="resetEmailRequiredStep()" class="secondary" style="width:100%; font-size:0.85rem;">Andere Email eingeben</button>
             </div>
         </div>
     </div>
 
     <!-- EMAIL ÄNDERN VERIFIZIERUNGS-EMBED (Settings) -->
-    <div id="emailChangeVerifyEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:5001;">
-        <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--main);">
+    <div id="emailChangeVerifyEmbed" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:5001;">
+        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--main);">
             <div id="emailChangeStep1">
-                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-inbox"></i> Email bestätigen</h3>
+                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-envelope"></i> Email bestätigen</h3>
                 <p style="font-size:0.9rem;">Wir senden einen 6-stelligen Code an <b id="emailChangePendingDisplay"></b>.</p>
                 <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">Der Code ist <b>5 Minuten</b> gültig.</p>
-                <button onclick="sendEmailChangeCode()" style="width:100%; margin-bottom:8px;"><i class="fas fa-inbox"></i> Code senden</button>
+                <button onclick="sendEmailChangeCode()" style="width:100%; margin-bottom:8px;"><i class="fas fa-envelope"></i> Code senden</button>
                 <button onclick="closeEmailChangeVerify()" class="secondary" style="width:100%;">Abbrechen</button>
             </div>
             <div id="emailChangeStep2" class="hidden">
-                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-unlock-keyhole"></i> Code eingeben</h3>
+                <h3 style="color:var(--main); margin-top:0;"><i class="fas fa-key"></i> Code eingeben</h3>
                 <p style="font-size:0.9rem;">Gib den 6-stelligen Code ein, den du per Email erhalten hast.</p>
                 <input type="number" id="emailChangeCodeInput" placeholder="6-stelliger Code..." style="text-align:center; font-size:1.3rem; letter-spacing:8px; font-weight:bold; margin:10px 0;">
                 <div id="emailChangeCodeTimer" style="font-size:0.8rem; color:#888; margin-bottom:10px;"></div>
@@ -7071,14 +5966,14 @@
 
     <!-- FULLSCREEN IMAGE OVERLAY -->
     <div id="fullscreenImageOverlay" onclick="closeFullscreenImage()">
-        <button id="fullscreenCloseBtn" onclick="closeFullscreenImage()"><i class="fas fa-xmark"></i></button>
+        <button id="fullscreenCloseBtn" onclick="closeFullscreenImage()"><i class="fas fa-times"></i></button>
         <img id="fullscreenImageEl" src="" onclick="event.stopPropagation()">
     </div>
 
     <!-- NICKNAME MODAL -->
-    <div id="nicknameModalOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6)); display:flex; justify-content:center; align-items:center; z-index:99990;">
-        <div style="background:var(--cont); padding:25px; border-radius:8px; max-width:340px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
-            <h3 style="margin-top:0; color:var(--main);"><i class="fas fa-pen-clip"></i> Anzeigename ändern</h3>
+    <div id="nicknameModalOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:flex; justify-content:center; align-items:center; z-index:99990;">
+        <div style="background:var(--cont); padding:25px; border-radius:20px; max-width:340px; width:90%; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); border:1px solid var(--brd);">
+            <h3 style="margin-top:0; color:var(--main);"><i class="fas fa-tag"></i> Anzeigename ändern</h3>
             <p style="font-size:0.85rem; color:#888; margin-bottom:4px;">Nur du siehst diesen Namen.</p>
             <p style="font-size:0.9rem; margin-bottom:12px;">Freund: <b id="nicknameModalRealName"></b></p>
             <input type="hidden" id="nicknameModalFriendId">
@@ -7090,69 +5985,3 @@
 
 </body>
 </html>
-
-<script>
-/* ── LEGAL MODAL ─────────────────────────────────────────────── */
-function openLegalModal(tab) {
-    document.getElementById('legalModalOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    if (tab) switchLegalTab(tab);
-}
-function closeLegalModal() {
-    document.getElementById('legalModalOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-}
-function switchLegalTab(tab) {
-    ['datenschutz','nutzung','kontakt'].forEach(t => {
-        document.getElementById('ltab-' + t).classList.toggle('active', t === tab);
-        document.getElementById('lpanel-' + t).classList.toggle('active', t === tab);
-    });
-}
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeLegalModal();
-});
-</script>
-
-<script>
-/* ── LANDING PAGE SCROLL ANIMATIONS ──────────────────────── */
-(function() {
-    function initLandingAnimations() {
-        const cards = document.querySelectorAll('#lpCardsGrid .lp-card');
-        if (!cards.length) return;
-        const obs = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('lp-visible');
-                    obs.unobserve(e.target);
-                }
-            });
-        }, { threshold: 0.12 });
-        cards.forEach(c => obs.observe(c));
-    }
-    // Run when homeView is shown or immediately if visible
-    const origShowView = window.showView;
-    if (typeof origShowView === 'function') {
-        window.showView = function(id) {
-            origShowView(id);
-            if (id === 'homeView') setTimeout(initLandingAnimations, 60);
-        };
-    }
-    // Also init on page load if homeView is the active view
-    window.addEventListener('load', function() {
-        const hv = document.getElementById('homeView');
-        if (hv && !hv.classList.contains('hidden')) {
-            setTimeout(initLandingAnimations, 200);
-        }
-    });
-    // Scroll within homeView: re-check on scroll
-    const homeEl = document.getElementById('homeView');
-    if (homeEl) {
-        homeEl.addEventListener('scroll', function() {
-            document.querySelectorAll('#lpCardsGrid .lp-card:not(.lp-visible)').forEach(c => {
-                const r = c.getBoundingClientRect();
-                if (r.top < window.innerHeight * 0.9) c.classList.add('lp-visible');
-            });
-        }, { passive: true });
-    }
-})();
-</script>
